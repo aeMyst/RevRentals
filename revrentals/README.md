@@ -1,4 +1,4 @@
-# revrentals
+# RevRentals
 
 A new Flutter project.
 
