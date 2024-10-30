@@ -77,10 +77,8 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        iconTheme: const IconThemeData(color: Colors.black),
-        elevation: 0,
-        
+        backgroundColor: Colors.blueGrey,
+        iconTheme: const IconThemeData(color: Colors.white),        
       ),
       body: SafeArea(
         child: Center(
@@ -91,9 +89,9 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                 // const SizedBox(height: 50),
                 Image.asset(
                   'lib/images/rr_logo.png',
-                  height: 300,
+                  height: 400,
                 ),
-                const SizedBox(height: 10),
+                // const SizedBox(height: 10),
                 const Text(
                   'Sign in as Admin',
                   style: TextStyle(
