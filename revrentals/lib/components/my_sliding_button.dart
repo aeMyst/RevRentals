@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 
 class MySlidingButton extends StatefulWidget{
   //final Function()? onTap;
-
-  const MySlidingButton({Key? key}) : super(key: key);
+  final VoidCallback onSignUp;
+  const MySlidingButton({super.key, required this.onSignUp});
 
   //const MySlidingButton({super.key, required this.onTap });
 
@@ -40,6 +40,9 @@ class _MySlidingButtonState extends State<MySlidingButton> {
             onValueChanged: (int? newValue) {
               setState(() {
                 _sliding = newValue;
+                if (_sliding == 1) {
+                  widget.onSignUp();
+                }
               });
             },
           ),
