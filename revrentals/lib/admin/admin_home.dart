@@ -1,53 +1,5 @@
-// import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:flutter/material.dart';
-// import 'package:revrentals/admin/admin_auth.dart';
-// import 'package:revrentals/admin/admin_login.dart';
-// import 'package:revrentals/components/admin_agreement.dart';
-
-// class AdminHomePage extends StatelessWidget {
-//   AdminHomePage({super.key});
-
-//   // Sign user out method
-//   void signUserOut(BuildContext context) {
-//     FirebaseAuth.instance.signOut();
-//     // Optionally navigate back to login page
-//     Navigator.push(context,
-//         MaterialPageRoute(builder: (context) => const AdminLoginPage()));
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: Colors.white,
-//       appBar: AppBar(
-//         automaticallyImplyLeading: false, // Prevent back button
-//         backgroundColor: Colors.white,
-//         actions: [
-//           IconButton(
-//             onPressed: () => signUserOut(context),
-//             icon: const Icon(Icons.logout),
-//           ),
-//         ],
-//       ),
-//       body: SafeArea(
-//         child: Center(
-//           child: SingleChildScrollView(
-//             child: Column(
-//               mainAxisAlignment: MainAxisAlignment.center,
-//               children: [
-//                 const SizedBox(height: 50),
-
-//               ],
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:revrentals/admin/admin_auth.dart';
 import 'package:revrentals/admin/admin_login.dart';
 import 'package:revrentals/admin/admin_agreement.dart';
 import 'package:revrentals/admin/admin_lot.dart';
@@ -63,7 +15,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
   // Sign user out method
   void signUserOut(BuildContext context) {
     FirebaseAuth.instance.signOut();
-    Navigator.push(
+    Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const AdminLoginPage()),
     );

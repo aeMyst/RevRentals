@@ -80,6 +80,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
         backgroundColor: Colors.white,
         iconTheme: const IconThemeData(color: Colors.black),
         elevation: 0,
+        
       ),
       body: SafeArea(
         child: Center(
@@ -87,7 +88,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 50),
+                // const SizedBox(height: 50),
                 Image.asset(
                   'lib/images/rr_logo.png',
                   height: 300,
