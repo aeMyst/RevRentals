@@ -195,6 +195,7 @@ import 'package:revrentals/components/my_button.dart';
 import 'package:revrentals/components/my_textfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:revrentals/user/profile_detail.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -208,7 +209,8 @@ class _LoginPageState extends State<LoginPage> {
   final passwordController = TextEditingController();
   final usernameController = TextEditingController();
   final confirmPasswordController = TextEditingController();
-  final adminEmailController = TextEditingController(); // Added for admin email
+  final db = FirebaseFirestore.instance;
+  FirebaseAuth auth = FirebaseAuth.instance;
 
   bool isSignUpMode = false;
   int? _selectedRole = 0; // 0 for "Renter", 1 for "Seller"
@@ -302,21 +304,32 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailOrUsernameController.text,
         password: passwordController.text,
       );
       Navigator.pop(context);
+      final user = userCredential.user;
 
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .set({
-        'username': usernameController.text,
-        'email': emailOrUsernameController.text,
-      });
+      if (user != null) {
+        final uid = user.uid;
+        await db.collection('users').doc(user!.uid).set({
+          'username': usernameController.text,
+          'email': emailOrUsernameController.text,
+          'password': passwordController.text,
+          'role': _selectedRole == 1 ? 'Seller' : 'Renter',
+          'profile_complete': false,
+        });
+      }
 
       Navigator.pop(context);
+
+      // Navigate to Profile Details Page after successful signup
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const ProfileDetailsPage()),
+      );
     } on FirebaseAuthException catch (e) {
       Navigator.pop(context);
       showError(e.message ?? 'Failed to sign up');
@@ -423,7 +436,7 @@ class _LoginPageState extends State<LoginPage> {
                   },
                 ),
                 const SizedBox(height: 20),
-                if (isSignUpMode) 
+                if (isSignUpMode)
                   // CupertinoSlidingSegmentedControl<int>(
                   //   children: const {
                   //     0: Text('Renter'),
@@ -433,11 +446,11 @@ class _LoginPageState extends State<LoginPage> {
                   //   onValueChanged: onRoleSelected,
                   // ),
 
-                MyTextField(
-                  controller: usernameController,
-                  hintText: 'Username',
-                  obscureText: false,
-                ),
+                  MyTextField(
+                    controller: usernameController,
+                    hintText: 'Username',
+                    obscureText: false,
+                  ),
                 const SizedBox(height: 10),
                 MyTextField(
                   controller: emailOrUsernameController,
@@ -457,24 +470,24 @@ class _LoginPageState extends State<LoginPage> {
                     hintText: 'Confirm Password',
                     obscureText: true,
                   ),
-                  ... [
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Choose "Renter" if you are looking to rent items, '
-                    'or "Seller" if you plan to offer items for rent.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 14, color: Colors.black54),
-                  ),
-                  const SizedBox(height: 10),
-                  CupertinoSlidingSegmentedControl<int>(
-                    children: const {
-                      0: Text('Renter'),
-                      1: Text('Seller'),
-                    },
-                    groupValue: _selectedRole,
-                    onValueChanged: onRoleSelected,
-                  ),
-                ],
+                  ...[
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Choose "Renter" if you are looking to rent items, '
+                      'or "Seller" if you plan to offer items for rent.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 14, color: Colors.black54),
+                    ),
+                    const SizedBox(height: 10),
+                    CupertinoSlidingSegmentedControl<int>(
+                      children: const {
+                        0: Text('Renter'),
+                        1: Text('Seller'),
+                      },
+                      groupValue: _selectedRole,
+                      onValueChanged: onRoleSelected,
+                    ),
+                  ],
                 ],
                 const SizedBox(height: 15),
                 MyButton(
