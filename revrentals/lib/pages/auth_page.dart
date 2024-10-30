@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:revrentals/pages/home_page.dart';
 import 'package:revrentals/pages/login_page.dart';
 import 'package:revrentals/user/profile_detail.dart';
+import 'package:revrentals/user/renter_user_home.dart';
 
 class AuthPage extends StatelessWidget {
   const AuthPage({super.key});
@@ -38,7 +39,7 @@ class AuthPage extends StatelessWidget {
                   return ProfileDetailsPage();
                 } else {
                   // Profile is complete or some error occurred; go to home page
-                  return HomePage();
+                  return UserHomePage();
                 }
               },
             );
