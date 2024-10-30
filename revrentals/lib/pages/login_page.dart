@@ -195,7 +195,6 @@ import 'package:revrentals/components/my_button.dart';
 import 'package:revrentals/components/my_textfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cupertino_icons/cupertino_icons.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -212,10 +211,17 @@ class _LoginPageState extends State<LoginPage> {
   final adminEmailController = TextEditingController(); // Added for admin email
 
   bool isSignUpMode = false;
+  int? _selectedRole = 0; // 0 for "Renter", 1 for "Seller"
 
   void toggleAuthMode(bool isSignUp) {
     setState(() {
       isSignUpMode = isSignUp;
+    });
+  }
+
+  void onRoleSelected(int? newRole) {
+    setState(() {
+      _selectedRole = newRole;
     });
   }
 
@@ -300,6 +306,8 @@ class _LoginPageState extends State<LoginPage> {
         email: emailOrUsernameController.text,
         password: passwordController.text,
       );
+      Navigator.pop(context);
+
       await FirebaseFirestore.instance
           .collection('users')
           .doc(FirebaseAuth.instance.currentUser!.uid)
@@ -329,27 +337,6 @@ class _LoginPageState extends State<LoginPage> {
         ],
       ),
     );
-  }
-
-  Future<void> signInAsAdmin(BuildContext context) async {
-    // Implement the admin login logic here
-    showDialog(
-      context: context,
-      builder: (context) => const Center(child: CircularProgressIndicator()),
-    );
-
-    try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: adminEmailController.text,
-        password: passwordController
-            .text, // Use a separate password for admin login if necessary
-      );
-      Navigator.pop(context);
-      // Navigate to admin dashboard or home screen
-    } on FirebaseAuthException catch (e) {
-      Navigator.pop(context);
-      showError(e.message ?? 'Failed to log in as admin');
-    }
   }
 
   Future<void> resetPassword(BuildContext context) async {
@@ -401,17 +388,16 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 50),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Image.asset(
                       'lib/images/rr_logo.png',
-                      height: 200,
+                      height: 300,
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
+                // const SizedBox(height: 10),
                 const Text(
                   'Welcome to RevRentals',
                   style: TextStyle(
@@ -437,12 +423,21 @@ class _LoginPageState extends State<LoginPage> {
                   },
                 ),
                 const SizedBox(height: 20),
-                if (isSignUpMode)
-                  MyTextField(
-                    controller: usernameController,
-                    hintText: 'Username',
-                    obscureText: false,
-                  ),
+                if (isSignUpMode) 
+                  // CupertinoSlidingSegmentedControl<int>(
+                  //   children: const {
+                  //     0: Text('Renter'),
+                  //     1: Text('Seller'),
+                  //   },
+                  //   groupValue: _selectedRole,
+                  //   onValueChanged: onRoleSelected,
+                  // ),
+
+                MyTextField(
+                  controller: usernameController,
+                  hintText: 'Username',
+                  obscureText: false,
+                ),
                 const SizedBox(height: 10),
                 MyTextField(
                   controller: emailOrUsernameController,
@@ -462,8 +457,26 @@ class _LoginPageState extends State<LoginPage> {
                     hintText: 'Confirm Password',
                     obscureText: true,
                   ),
+                  ... [
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Choose "Renter" if you are looking to rent items, '
+                    'or "Seller" if you plan to offer items for rent.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14, color: Colors.black54),
+                  ),
+                  const SizedBox(height: 10),
+                  CupertinoSlidingSegmentedControl<int>(
+                    children: const {
+                      0: Text('Renter'),
+                      1: Text('Seller'),
+                    },
+                    groupValue: _selectedRole,
+                    onValueChanged: onRoleSelected,
+                  ),
                 ],
-                const SizedBox(height: 25),
+                ],
+                const SizedBox(height: 15),
                 MyButton(
                   onTap: () => authenticateUser(context),
                   label: isSignUpMode ? 'Sign Up' : 'Log In',
@@ -496,24 +509,6 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-
-                // // Admin login section
-                // const Text(
-                //   'Admin Login',
-                //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                // ),
-                // const SizedBox(height: 10),
-                // MyTextField(
-                //   controller: adminEmailController,
-                //   hintText: 'Admin Email',
-                //   obscureText: false,
-                // ),
-                // const SizedBox(height: 10),
-                // MyButton(
-                //   onTap: () => signInAsAdmin(context),
-                //   label: 'Sign In as Admin',
-                // ),
-                // const SizedBox(height: 20),
               ],
             ),
           ),
