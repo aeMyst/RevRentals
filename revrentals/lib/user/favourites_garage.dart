@@ -8,6 +8,7 @@ class FavouritesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text('Favorites'),
         backgroundColor: Colors.blueGrey,
@@ -19,16 +20,16 @@ class FavouritesPage extends StatelessWidget {
             rentalPrice: 0,
             imagePath: 'lib/images/ninja_zx4r.png',
           ),
-          MotorcycleCard(
-            model: 'Honda CRF250R',
-            rentalPrice: 0,
-            imagePath: 'lib/images/dirtbike.png',
-          ),
-          MotorcycleCard(
-            model: 'Vespa Scooter',
-            rentalPrice: 0,
-            imagePath: 'lib/images/scooter.png',
-          ),
+          // MotorcycleCard(
+          //   model: 'Honda CRF250R',
+          //   rentalPrice: 0,
+          //   imagePath: 'lib/images/dirtbike.png',
+          // ),
+          // MotorcycleCard(
+          //   model: 'Vespa Scooter',
+          //   rentalPrice: 0,
+          //   imagePath: 'lib/images/scooter.png',
+          // ),
         ],
       ),
     );
@@ -52,6 +53,7 @@ class MotorcycleCard extends StatelessWidget {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       child: Card(
+        color: Colors.white,
         elevation: 3,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -99,6 +101,7 @@ class GaragePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text('Garage'),
         backgroundColor: Colors.blueGrey,

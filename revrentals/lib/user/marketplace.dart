@@ -91,9 +91,9 @@ class MotorcycleTab extends StatelessWidget {
           rentalPrice: 0,
         ),
         MotorcycleCard(
-          imagePath: 'lib/images/scooter.png',
+          imagePath: 'lib/images/moped.jpg',
           isFavorite: false,
-          model: 'Scooter',
+          model: 'Velocifero TENNIS 4000W',
           rentalPrice: 0,
         ),
         MotorcycleCard(
@@ -126,6 +126,8 @@ class MotorcycleCard extends StatelessWidget {
       width: 200,
       margin: EdgeInsets.only(right: 16),
       child: Card(
+              color: Colors.white,
+
         elevation: 3,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -143,12 +145,12 @@ class MotorcycleCard extends StatelessWidget {
                   height: 100,
                 ),
               ),
-              // if (isFavorite)
-              //   Positioned(
-              //     top: 8,
-              //     right: 8,
-              //     child: Icon(Icons.favorite, color: Colors.red),
-              //   ),
+              if (isFavorite)
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Icon(Icons.favorite, color: Colors.red),
+                ),
               SizedBox(height: 10),
               // Model name
               Text(

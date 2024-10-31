@@ -13,24 +13,24 @@ class GearPage extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            // GearItem(
-            //   imagePath: 'assets/helmet.png',
-            //   name: 'MT Helmet',
-            //   description: 'Black and white helmet with high impact resistance.',
-            //   price: 67.87,
-            // ),
-            // GearItem(
-            //   imagePath: 'assets/gloves.png',
-            //   name: 'Riding Gloves',
-            //   description: 'High-quality leather gloves for comfort and protection.',
-            //   price: 35.50,
-            // ),
-            // GearItem(
-            //   imagePath: 'assets/jacket.png',
-            //   name: 'Riding Jacket',
-            //   description: 'Waterproof jacket with armor protection.',
-            //   price: 120.99,
-            // ),
+            GearItem(
+              imagePath: 'lib/images/agv_pista.webp',
+              name: 'AGV Pista GP RR',
+              description: '',
+              price: 0,
+            ),
+            GearItem(
+              imagePath: 'lib/images/gloves.png',
+              name: 'Alpinestars Stella SMX-2 Air Carbon V2',
+              description: 'High-quality leather gloves for comfort and protection.',
+              price: 35.50,
+            ),
+            GearItem(
+              imagePath: 'lib/images/jacket.jpg',
+              name: 'Alpinestars GPR Plus Jacket',
+              description: 'Leather jacket with armor protection.',
+              price: 120.99,
+            ),
             // Add more gear items as needed
           ],
         ),
@@ -55,6 +55,7 @@ class GearItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 3,
       margin: EdgeInsets.symmetric(vertical: 8),
@@ -100,15 +101,15 @@ class GearItem extends StatelessWidget {
               ),
             ),
             // Buy button
-            ElevatedButton(
-              onPressed: () {
-                // Add your buy action here
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-              ),
-              child: Text('Buy Now'),
-            ),
+            // ElevatedButton(
+            //   onPressed: () {
+            //     // Add your buy action here
+            //   },
+            //   style: ElevatedButton.styleFrom(
+            //     backgroundColor: Colors.black,
+            //   ),
+            //   child: Text('Buy Now'),
+            // ),
           ],
         ),
       ),

@@ -66,7 +66,10 @@ flutter:
     - lib/images/ninja_zx4r.png
     - lib/images/scooter.png
     - lib/images/dirtbike.png
-
+    - lib/images/agv_pista.webp
+    - lib/images/gloves.png
+    - lib/images/jacket.jpg
+    - lib/images/moped.jpg
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
