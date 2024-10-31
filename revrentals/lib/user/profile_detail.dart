@@ -197,6 +197,7 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
     return FutureBuilder<DocumentSnapshot>(
       future: users.doc(user.uid).get(),
       builder:
+      // TODO: Fix issue of loading empty profile details page
           (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
