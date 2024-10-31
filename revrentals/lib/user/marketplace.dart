@@ -1,9 +1,17 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:revrentals/pages/auth_page.dart';
+import 'package:revrentals/pages/login_page.dart';
 import 'package:revrentals/user/profile_detail.dart';
 import 'package:revrentals/utils/utils.dart';
 
 class MarketplacePage extends StatelessWidget {
   const MarketplacePage({Key? key}) : super(key: key);
+
+  void signUserOut(BuildContext context) {
+    FirebaseAuth.instance.signOut();
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>const AuthPage()));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +23,7 @@ class MarketplacePage extends StatelessWidget {
           backgroundColor: Colors.blueGrey,
           actions: [
             IconButton(
-              onPressed: ButtonUtils.signUserOut,
+              onPressed: () => signUserOut(context),
               icon: Icon(Icons.logout, color: Colors.white),
             ),
             IconButton(
@@ -76,7 +84,6 @@ class MarketplacePage extends StatelessWidget {
   }
 }
 
-
 // Widget to display motorcycles in each tab
 class MotorcycleTab extends StatelessWidget {
   @override
@@ -126,8 +133,7 @@ class MotorcycleCard extends StatelessWidget {
       width: 200,
       margin: EdgeInsets.only(right: 16),
       child: Card(
-              color: Colors.white,
-
+        color: Colors.white,
         elevation: 3,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),

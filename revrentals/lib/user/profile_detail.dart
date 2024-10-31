@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:revrentals/components/my_button.dart';
+import 'package:revrentals/user/renter_user_home.dart';
 
 class ProfileDetailsPage extends StatefulWidget {
   const ProfileDetailsPage({Key? key}) : super(key: key);
@@ -39,7 +40,7 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
           'address': addressController.text,
           'profile_complete': true, // Set profile_complete to true upon save
         });
-        Navigator.pop(context); // Return to previous page after saving
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> UserHomePage()));
       } catch (e) {
         showError("Failed to save profile details. Please try again.");
       }
@@ -199,21 +200,9 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
       builder:
       // TODO: Fix issue of loading empty profile details page
           (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Scaffold(
-            appBar: AppBar(title: Text('Profile Details')),
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
 
-        if (!snapshot.hasData || !snapshot.data!.exists) {
-          return Scaffold(
-            appBar: AppBar(title: Text('Profile Details')),
-            body: Center(
-              child: Text('User profile not found.',
-                  style: TextStyle(fontSize: 18)),
-            ),
-          );
+        if (snapshot.connectionState!= ConnectionState.done) {
+          return SizedBox.shrink();
         }
 
         // Load data into controllers
@@ -262,13 +251,13 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
                     validator: (value) =>
                         value!.isEmpty ? 'Please enter your email' : null,
                   ),
-                  // const SizedBox(height: 8),
-                  // TextFormField(
-                  //   controller: _addressController,
-                  //   decoration: InputDecoration(labelText: 'Address'),
-                  //   validator: (value) =>
-                  //       value!.isEmpty ? 'Please enter your address' : null,
-                  // ),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: _addressController,
+                    decoration: InputDecoration(labelText: 'Address'),
+                    validator: (value) =>
+                        value!.isEmpty ? 'Please enter your address' : null,
+                  ),
                   const SizedBox(height: 8),
                   Text('License Number: $license_number',
                       style: TextStyle(fontSize: 18)),
