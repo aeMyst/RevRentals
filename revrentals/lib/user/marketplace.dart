@@ -114,7 +114,7 @@ class MotorcycleTab extends StatelessWidget {
   }
 }
 
-class MotorcycleCard extends StatelessWidget {
+class MotorcycleCard extends StatefulWidget {
   final String model;
   final double rentalPrice;
   final String imagePath;
@@ -128,6 +128,25 @@ class MotorcycleCard extends StatelessWidget {
   });
 
   @override
+  _MotorcycleCardState createState() => _MotorcycleCardState();
+}
+
+class _MotorcycleCardState extends State<MotorcycleCard> {
+  late bool isFavorite;
+
+  @override
+  void initState() {
+    super.initState();
+    isFavorite = widget.isFavorite; // Initialize state with the passed value
+  }
+
+  void toggleFavorite() {
+    setState(() {
+      isFavorite = !isFavorite; // Toggle favorite state
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       width: 200,
@@ -138,44 +157,109 @@ class MotorcycleCard extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Motorcycle image
-              Center(
-                child: Image.asset(
-                  imagePath,
-                  fit: BoxFit.cover,
-                  height: 100,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Motorccycle image
+            Center(
+              child: Image.asset(
+                widget.imagePath,
+                fit: BoxFit.cover,
+                height: 100,
+              ),
+            ),
+            // Heart icon
+            Positioned(
+              top: 8,
+              right: 8,
+              child: GestureDetector(
+                onTap: toggleFavorite,
+                child: Icon(
+                  Icons.favorite,
+                  color: isFavorite ? Colors.red : Colors.grey,
                 ),
               ),
-              if (isFavorite)
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: Icon(Icons.favorite, color: Colors.red),
-                ),
-              SizedBox(height: 10),
-              // Model name
-              Text(
-                model,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
+            ),
+            SizedBox(height:10),
+            //Model name
+            Text(
+              widget.model,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
               ),
-              SizedBox(height: 5),
-              // Rental price per hour
-              Text(
-                'Per Hour: \$${rentalPrice.toStringAsFixed(2)}',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
+            ),
+            SizedBox(height: 5),
+            //Rental price per hour
+            Text(
+              'Per Hour: \$${widget.rentalPrice.toStringAsFixed(2)}',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
               ),
-              SizedBox(height: 10),
+            ),
+            SizedBox(height: 10),
+           ],
+          ),
+        ),
+      ),
+    );
+  }
+
+ 
+
+}
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Container(
+  //     width: 200,
+  //     margin: EdgeInsets.only(right: 16),
+  //     child: Card(
+  //       color: Colors.white,
+  //       elevation: 3,
+  //       shape: RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.circular(12),
+  //       ),
+  //       child: Padding(
+  //         padding: const EdgeInsets.all(12.0),
+  //         child: Column(
+  //           crossAxisAlignment: CrossAxisAlignment.start,
+  //           children: [
+  //             // Motorcycle image
+  //             Center(
+  //               child: Image.asset(
+  //                 imagePath,
+  //                 fit: BoxFit.cover,
+  //                 height: 100,
+  //               ),
+  //             ),
+  //             if (isFavorite)
+  //               Positioned(
+  //                 top: 8,
+  //                 right: 8,
+  //                 child: Icon(Icons.favorite, color: Colors.red),
+  //               ),
+  //             SizedBox(height: 10),
+  //             // Model name
+  //             Text(
+  //               model,
+  //               style: TextStyle(
+  //                 fontWeight: FontWeight.bold,
+  //                 fontSize: 18,
+  //               ),
+  //             ),
+  //             SizedBox(height: 5),
+  //             // Rental price per hour
+  //             Text(
+  //               'Per Hour: \$${rentalPrice.toStringAsFixed(2)}',
+  //               style: TextStyle(
+  //                 fontSize: 16,
+  //                 fontWeight: FontWeight.w600,
+  //               ),
+  //             ),
+  //             SizedBox(height: 10),
 
               // Rent button
               // Center(
@@ -189,13 +273,19 @@ class MotorcycleCard extends StatelessWidget {
               //     ),
               //   ),
               // ),
-            ],
-          ),
-        ),
-      ),
-    );
+    //         ],
+    //       ),
+    //     ),
+    //   ),
+    // );
+ // }
+  
+  @override
+  State<StatefulWidget> createState() {
+    // TODO: implement createState
+    throw UnimplementedError();
   }
-}
+// }
 // class MotorcycleCard extends StatelessWidget {
 //   final String imagePath;
 //   final bool isFavorite;
