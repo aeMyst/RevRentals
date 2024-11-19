@@ -57,7 +57,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
                     // Navigate to Lots screen
                   }),
                   SizedBox(width: 24),
-                  _buildMenuButton(Icons.file_copy, "Agreements", () {
+                  _buildMenuButton(Icons.file_copy, "Reservations", () {
                     // Navigate to Agreements screen
                     Navigator.push(
                       context,
