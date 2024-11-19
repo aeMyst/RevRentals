@@ -140,10 +140,10 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
             // motorcycle price
             Center(
               child: Text(
-                'Rental Price: \$${widget.rentalPrice.toStringAsFixed(2)} per day',  
+                'Per day: \$${widget.rentalPrice.toStringAsFixed(2)} CAD',  
                 style: const TextStyle(
                   fontWeight: FontWeight.w600,
-                  fontSize: 18,
+                  fontSize: 16,
                 ),
               ),
             ),
@@ -166,7 +166,7 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
                     selectedStartDate == null
                         ? 'Select Start Date'
                         : 'Start: ${DateFormat('yyyy-MM-dd').format(selectedStartDate!)}',
-                    style: const TextStyle(color: Colors.black, fontSize: 16),
+                    style: const TextStyle(color: Colors.black, fontSize: 14),
                   ),
                 ),
               ),
@@ -186,7 +186,7 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
                     selectedEndDate == null
                         ? 'Select End Date'
                         : 'End: ${DateFormat('yyyy-MM-dd').format(selectedEndDate!)}',
-                    style: const TextStyle(color: Colors.black, fontSize: 16),
+                    style: const TextStyle(color: Colors.black, fontSize: 14),
                   ),
                 ),
               ),
@@ -205,7 +205,7 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 30),
                   textStyle: const TextStyle(
-                    fontSize: 16,),
+                    fontSize: 14,),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8), 
                   ),
