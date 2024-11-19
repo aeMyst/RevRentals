@@ -1,10 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:revrentals/pages/auth_page.dart';
-import 'package:revrentals/pages/login_page.dart';
 import 'package:revrentals/user/notifications.dart';
 import 'package:revrentals/user/profile_detail.dart';
-import 'package:revrentals/utils/utils.dart';
+import 'package:revrentals/user/motorcycle_details.dart';
+
 
 class MarketplacePage extends StatelessWidget {
   const MarketplacePage({Key? key}) : super(key: key);
@@ -103,26 +103,26 @@ class MotorcycleTab extends StatelessWidget {
           imagePath: 'lib/images/ninja_zx4r.png',
           isFavorite: true,
           model: 'Kawasaki Ninja ZX-4R',
-          rentalPrice: 0,
+          rentalPrice: 150,
         ),
         MotorcycleCard(
           imagePath: 'lib/images/moped.jpg',
           isFavorite: false,
           model: 'Velocifero TENNIS 4000W',
-          rentalPrice: 0,
+          rentalPrice: 120,
         ),
         MotorcycleCard(
           imagePath: 'lib/images/dirtbike.png',
           isFavorite: false,
           model: 'Honda CRF250R',
-          rentalPrice: 0,
+          rentalPrice: 200,
         ),
       ],
     );
   }
 }
 
-class MotorcycleCard extends StatelessWidget {
+class MotorcycleCard extends StatefulWidget {
   final String model;
   final double rentalPrice;
   final String imagePath;
@@ -136,8 +136,27 @@ class MotorcycleCard extends StatelessWidget {
   });
 
   @override
+  _MotorcycleCardState createState() => _MotorcycleCardState();
+}
+
+class _MotorcycleCardState extends State<MotorcycleCard> {
+  @override
   Widget build(BuildContext context) {
-    return Container(
+    return GestureDetector(
+      onTap: () {
+        // Navigate to the MotorcycleDetailPage when the card is tapped
+        Navigator.push(
+          context,
+           MaterialPageRoute(
+        builder: (context) => MotorcycleDetailPage(
+          model: widget.model,             // Pass the model to the detail page
+          rentalPrice: widget.rentalPrice,  // Pass rental price
+          imagePath: widget.imagePath,      // Pass image path
+        ),
+      ),
+    );
+  },
+    child: Container(
       width: 200,
       margin: const EdgeInsets.only(right: 16),
       child: Card(
@@ -154,12 +173,12 @@ class MotorcycleCard extends StatelessWidget {
               // Motorcycle image
               Center(
                 child: Image.asset(
-                  imagePath,
+                  widget.imagePath,
                   fit: BoxFit.cover,
                   height: 100,
                 ),
               ),
-              if (isFavorite)
+              if (widget.isFavorite)
                 Positioned(
                   top: 8,
                   right: 8,
@@ -168,7 +187,7 @@ class MotorcycleCard extends StatelessWidget {
               const SizedBox(height: 10),
               // Model name
               Text(
-                model,
+                widget.model,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
@@ -177,7 +196,7 @@ class MotorcycleCard extends StatelessWidget {
               const SizedBox(height: 5),
               // Rental price per hour
               Text(
-                'Per Hour: \$${rentalPrice.toStringAsFixed(2)}',
+                'Per Day: \$${widget.rentalPrice.toStringAsFixed(2)}',
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -188,6 +207,8 @@ class MotorcycleCard extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 }
+
