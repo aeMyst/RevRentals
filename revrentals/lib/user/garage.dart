@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:revrentals/pages/auth_page.dart';
+import 'package:revrentals/user/add_listing.dart';
 import 'package:revrentals/user/notifications.dart';
 import 'package:revrentals/user/profile_detail.dart';
 
@@ -105,6 +106,7 @@ class GaragePage extends StatelessWidget {
               Tab(text: 'Listed'),
               Tab(text: 'Rented'),
             ],
+  
             labelColor: Colors.white,
             unselectedLabelColor: Colors.grey,
           ),
@@ -117,8 +119,8 @@ class GaragePage extends StatelessWidget {
               Expanded(
                 child: TabBarView(
                   children: [
-                    ListedMotorcyclesTab(), // Listed tab
-                    RentedMotorcyclesTab(),  // Rented tab
+                    ListedTab(), // Listed tab
+                    RentedTab(),  // Rented tab
                   ],
                 ),
               ),
@@ -130,8 +132,9 @@ class GaragePage extends StatelessWidget {
   }
 }
 
+
 // Widget to display listed motorcycles
-class ListedMotorcyclesTab extends StatelessWidget {
+class ListedTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -179,7 +182,7 @@ class ListedMotorcyclesTab extends StatelessWidget {
 }
 
 // Widget to display rented motorcycles
-class RentedMotorcyclesTab extends StatelessWidget {
+class RentedTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
@@ -203,58 +206,5 @@ class RentedMotorcyclesTab extends StatelessWidget {
       ],
     );
   }
-}
 
-// New page to add a listing
-class AddListingPage extends StatelessWidget {
-  const AddListingPage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blueGrey,
-        title: const Text("Add Listing"),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Model',
-                hintText: 'Enter motorcycle model',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Rental Price',
-                hintText: 'Enter rental price per hour',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Image Path',
-                hintText: 'Enter image path or URL',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: () {
-                // Handle saving the listing here
-              },
-              child: const Text('Save Listing'),
-              // style: ElevatedButton.styleFrom(coColors.blueGrey),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }

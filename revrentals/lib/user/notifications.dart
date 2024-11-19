@@ -13,6 +13,7 @@ class NotificationsPage extends StatelessWidget {
         title: Text('Notifications'),
         centerTitle: true,
         backgroundColor: Colors.blueGrey,
+        foregroundColor: Colors.white,
       ),
       body: ListView(
         children: [
