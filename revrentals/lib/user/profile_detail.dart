@@ -28,23 +28,25 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
       return;
     }
 
-    if (_auth.currentUser != null) {
-      try {
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(_auth.currentUser!.uid)
-            .update({
-          'first_name': firstNameController.text,
-          'last_name': lastNameController.text,
-          'license_number': licenseNumberController.text,
-          'address': addressController.text,
-          'profile_complete': true, // Set profile_complete to true upon save
-        });
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> UserHomePage()));
-      } catch (e) {
-        showError("Failed to save profile details. Please try again.");
-      }
-    }
+    // if (_auth.currentUser != null) {
+    //   try {
+    //     await FirebaseFirestore.instance
+    //         .collection('users')
+    //         .doc(_auth.currentUser!.uid)
+    //         .update({
+    //       'first_name': firstNameController.text,
+    //       'last_name': lastNameController.text,
+    //       'license_number': licenseNumberController.text,
+    //       'address': addressController.text,
+    //       'profile_complete': true, // Set profile_complete to true upon save
+    //     });
+    //     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> UserHomePage()));
+    //   } catch (e) {
+    //     showError("Failed to save profile details. Please try again.");
+    //   }
+    // }
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> UserHomePage()));
+
   }
 
   void showError(String message) {
