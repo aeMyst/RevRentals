@@ -134,24 +134,45 @@ class GaragePage extends StatelessWidget {
 class ListedMotorcyclesTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      scrollDirection: Axis.vertical,
+    return Stack(
       children: [
-        // MotorcycleCard(
-        //   imagePath: 'lib/images/ninja_zx4r.png',
-        //   model: 'Kawasaki Ninja ZX-4R',
-        //   rentalPrice: 0,
+        // ListView(
+        //   scrollDirection: Axis.vertical,
+        //   children: [
+        //     MotorcycleCard(
+        //       imagePath: 'lib/images/ninja_zx4r.png',
+        //       model: 'Kawasaki Ninja ZX-4R',
+        //       rentalPrice: 0,
+        //     ),
+        //     MotorcycleCard(
+        //       imagePath: 'lib/images/moped.jpg',
+        //       model: 'Velocifero TENNIS 4000W',
+        //       rentalPrice: 0,
+        //     ),
+        //     MotorcycleCard(
+        //       imagePath: 'lib/images/dirtbike.png',
+        //       model: 'Honda CRF250R',
+        //       rentalPrice: 0,
+        //     ),
+        //   ],
         // ),
-        // MotorcycleCard(
-        //   imagePath: 'lib/images/moped.jpg',
-        //   model: 'Velocifero TENNIS 4000W',
-        //   rentalPrice: 0,
-        // ),
-        // MotorcycleCard(
-        //   imagePath: 'lib/images/dirtbike.png',
-        //   model: 'Honda CRF250R',
-        //   rentalPrice: 0,
-        // ),
+        Positioned(
+          bottom: 16,
+          right: 16,
+          child: FloatingActionButton(
+            onPressed: () {
+              // Navigate to add listing page
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddListingPage(),
+                ),
+              );
+            },
+            backgroundColor: Colors.blueGrey,
+            child: const Icon(Icons.add, color: Colors.white),
+          ),
+        ),
       ],
     );
   }
@@ -180,6 +201,60 @@ class RentedMotorcyclesTab extends StatelessWidget {
         //   rentalPrice: 0,
         // ),
       ],
+    );
+  }
+}
+
+// New page to add a listing
+class AddListingPage extends StatelessWidget {
+  const AddListingPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.blueGrey,
+        title: const Text("Add Listing"),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              decoration: InputDecoration(
+                labelText: 'Model',
+                hintText: 'Enter motorcycle model',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              decoration: InputDecoration(
+                labelText: 'Rental Price',
+                hintText: 'Enter rental price per hour',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              decoration: InputDecoration(
+                labelText: 'Image Path',
+                hintText: 'Enter image path or URL',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton(
+              onPressed: () {
+                // Handle saving the listing here
+              },
+              child: const Text('Save Listing'),
+              // style: ElevatedButton.styleFrom(coColors.blueGrey),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
