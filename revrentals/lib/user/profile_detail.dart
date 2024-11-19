@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:revrentals/components/my_button.dart';
-import 'package:revrentals/user/renter_user_home.dart';
+import 'package:revrentals/user/user_home.dart';
 
 class ProfileDetailsPage extends StatefulWidget {
   const ProfileDetailsPage({Key? key}) : super(key: key);
@@ -28,24 +28,10 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
       return;
     }
 
-    // if (_auth.currentUser != null) {
-    //   try {
-    //     await FirebaseFirestore.instance
-    //         .collection('users')
-    //         .doc(_auth.currentUser!.uid)
-    //         .update({
-    //       'first_name': firstNameController.text,
-    //       'last_name': lastNameController.text,
-    //       'license_number': licenseNumberController.text,
-    //       'address': addressController.text,
-    //       'profile_complete': true, // Set profile_complete to true upon save
-    //     });
-    //     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> UserHomePage()));
-    //   } catch (e) {
-    //     showError("Failed to save profile details. Please try again.");
-    //   }
-    // }
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> UserHomePage()));
+    // Save profile details here in db here
+    //
+    //
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> UserHomePage()));
 
   }
 
@@ -207,13 +193,14 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
           return SizedBox.shrink();
         }
 
-        // Load data into controllers
-        var userData = snapshot.data!.data() as Map<String, dynamic>;
-        _firstNameController.text = userData['first_name'] ?? '';
-        _lastNameController.text = userData['last_name'] ?? '';
-        _addressController.text = userData['address'] ?? '';
-        _emailController.text = userData['email'] ?? '';
-        String license_number = userData['license_number'] ?? '';
+        // Load data from profile table here
+        
+        // var userData = snapshot.data!.data() as Map<String, dynamic>;
+        // _firstNameController.text = userData['first_name'] ?? '';
+        // _lastNameController.text = userData['last_name'] ?? '';
+        // _addressController.text = userData['address'] ?? '';
+        // _emailController.text = userData['email'] ?? '';
+        // String license_number = userData['license_number'] ?? '';
 
         return Scaffold(
           backgroundColor: Colors.white,
@@ -261,8 +248,8 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
                         value!.isEmpty ? 'Please enter your address' : null,
                   ),
                   const SizedBox(height: 8),
-                  Text('License Number: $license_number',
-                      style: TextStyle(fontSize: 18)),
+                  // Text('License Number: $license_number',
+                  //     style: TextStyle(fontSize: 18)),
                   const SizedBox(height: 16),
                   MyButton(
                       onTap: () => _updateProfile(user.uid),

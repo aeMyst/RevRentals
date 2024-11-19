@@ -1,13 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:revrentals/user/favourites_garage.dart';
+import 'package:revrentals/user/garage.dart';
 import 'package:revrentals/user/gear.dart';
 import 'package:revrentals/user/marketplace.dart';
 import 'package:revrentals/user/profile_detail.dart';
 import 'package:revrentals/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:revrentals/user/gear.dart';
-import 'package:revrentals/user/favourites_garage.dart';
 import 'package:revrentals/user/marketplace.dart'; // Import the new MarketplacePage
 
 class UserHomePage extends StatefulWidget {
@@ -21,7 +20,7 @@ class _UserHomePageState extends State<UserHomePage> {
   final List<Widget> _pages = [
     MarketplacePage(), // Use the new MarketplacePage
     GearPage(),
-    FavouritesPage(),
+    // FavouritesPage(),
     GaragePage(),
   ];
 
@@ -49,10 +48,10 @@ class _UserHomePageState extends State<UserHomePage> {
             icon: Icon(Icons.sports_motorsports),
             label: 'Gear',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Favorites',
-          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.favorite),
+          //   label: 'Favorites',
+          // ),
           BottomNavigationBarItem(
             icon: Icon(Icons.warehouse),
             label: 'Garage',

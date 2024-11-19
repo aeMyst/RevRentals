@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:revrentals/pages/auth_page.dart';
 import 'package:revrentals/pages/login_page.dart';
+import 'package:revrentals/user/notifications.dart';
 import 'package:revrentals/user/profile_detail.dart';
 import 'package:revrentals/utils/utils.dart';
 
@@ -10,24 +11,32 @@ class MarketplacePage extends StatelessWidget {
 
   void signUserOut(BuildContext context) {
     FirebaseAuth.instance.signOut();
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>const AuthPage()));
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => const AuthPage()));
   }
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 4, // Number of tabs
+      length: 3, // Number of tabs reduced to 3 (without Favorites tab)
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
           backgroundColor: Colors.blueGrey,
+          leading: IconButton(
+            icon: const Icon(Icons.notifications, color: Colors.white),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => NotificationsPage()),
+            ),
+          ),
           actions: [
             IconButton(
               onPressed: () => signUserOut(context),
-              icon: Icon(Icons.logout, color: Colors.white),
+              icon: const Icon(Icons.logout, color: Colors.white),
             ),
             IconButton(
-              icon: Icon(Icons.person, color: Colors.white),
+              icon: const Icon(Icons.person, color: Colors.white),
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -41,14 +50,14 @@ class MarketplacePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Container(
                 decoration: BoxDecoration(
                   color: Colors.grey[200],
                   borderRadius: BorderRadius.circular(10),
                 ),
-                padding: EdgeInsets.symmetric(horizontal: 8),
-                child: TextField(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: const TextField(
                   decoration: InputDecoration(
                     hintText: 'Find motorcycle, etc',
                     border: InputBorder.none,
@@ -56,23 +65,22 @@ class MarketplacePage extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
+              // Updated TabBar with 3 tabs (without 'Favorite' tab)
               TabBar(
                 tabs: [
-                  Tab(text: 'Favorite'),
-                  Tab(text: 'Recommended'),
-                  Tab(text: 'Nearby'),
-                  Tab(text: 'Best Models'),
+                  const Tab(text: 'Recommended'),
+                  const Tab(text: 'Nearby'),
+                  const Tab(text: 'Best Models'),
                 ],
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Expanded(
                 child: TabBarView(
                   children: [
-                    MotorcycleTab(),
-                    MotorcycleTab(),
-                    MotorcycleTab(),
-                    MotorcycleTab(),
+                    MotorcycleTab(), // Recommended tab
+                    MotorcycleTab(), // Nearby tab
+                    MotorcycleTab(), // Best Models tab
                   ],
                 ),
               ),
@@ -114,7 +122,7 @@ class MotorcycleTab extends StatelessWidget {
   }
 }
 
-class MotorcycleCard extends StatefulWidget {
+class MotorcycleCard extends StatelessWidget {
   final String model;
   final double rentalPrice;
   final String imagePath;
@@ -128,188 +136,58 @@ class MotorcycleCard extends StatefulWidget {
   });
 
   @override
-  _MotorcycleCardState createState() => _MotorcycleCardState();
-}
-
-class _MotorcycleCardState extends State<MotorcycleCard> {
-  late bool isFavorite;
-
-  @override
-  void initState() {
-    super.initState();
-    isFavorite = widget.isFavorite; // Initialize state with the passed value
-  }
-
-  void toggleFavorite() {
-    setState(() {
-      isFavorite = !isFavorite; // Toggle favorite state
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Container(
       width: 200,
-      margin: EdgeInsets.only(right: 16),
+      margin: const EdgeInsets.only(right: 16),
       child: Card(
         color: Colors.white,
         elevation: 3,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Motorccycle image
-            Center(
-              child: Image.asset(
-                widget.imagePath,
-                fit: BoxFit.cover,
-                height: 100,
-              ),
-            ),
-            // Heart icon
-            Positioned(
-              top: 8,
-              right: 8,
-              child: GestureDetector(
-                onTap: toggleFavorite,
-                child: Icon(
-                  Icons.favorite,
-                  color: isFavorite ? Colors.red : Colors.grey,
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Motorcycle image
+              Center(
+                child: Image.asset(
+                  imagePath,
+                  fit: BoxFit.cover,
+                  height: 100,
                 ),
               ),
-            ),
-            SizedBox(height:10),
-            //Model name
-            Text(
-              widget.model,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
+              if (isFavorite)
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: const Icon(Icons.favorite, color: Colors.red),
+                ),
+              const SizedBox(height: 10),
+              // Model name
+              Text(
+                model,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
               ),
-            ),
-            SizedBox(height: 5),
-            //Rental price per hour
-            Text(
-              'Per Hour: \$${widget.rentalPrice.toStringAsFixed(2)}',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
+              const SizedBox(height: 5),
+              // Rental price per hour
+              Text(
+                'Per Hour: \$${rentalPrice.toStringAsFixed(2)}',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            ),
-            SizedBox(height: 10),
-           ],
+              const SizedBox(height: 10),
+            ],
           ),
         ),
       ),
     );
   }
-
- 
-
 }
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Container(
-  //     width: 200,
-  //     margin: EdgeInsets.only(right: 16),
-  //     child: Card(
-  //       color: Colors.white,
-  //       elevation: 3,
-  //       shape: RoundedRectangleBorder(
-  //         borderRadius: BorderRadius.circular(12),
-  //       ),
-  //       child: Padding(
-  //         padding: const EdgeInsets.all(12.0),
-  //         child: Column(
-  //           crossAxisAlignment: CrossAxisAlignment.start,
-  //           children: [
-  //             // Motorcycle image
-  //             Center(
-  //               child: Image.asset(
-  //                 imagePath,
-  //                 fit: BoxFit.cover,
-  //                 height: 100,
-  //               ),
-  //             ),
-  //             if (isFavorite)
-  //               Positioned(
-  //                 top: 8,
-  //                 right: 8,
-  //                 child: Icon(Icons.favorite, color: Colors.red),
-  //               ),
-  //             SizedBox(height: 10),
-  //             // Model name
-  //             Text(
-  //               model,
-  //               style: TextStyle(
-  //                 fontWeight: FontWeight.bold,
-  //                 fontSize: 18,
-  //               ),
-  //             ),
-  //             SizedBox(height: 5),
-  //             // Rental price per hour
-  //             Text(
-  //               'Per Hour: \$${rentalPrice.toStringAsFixed(2)}',
-  //               style: TextStyle(
-  //                 fontSize: 16,
-  //                 fontWeight: FontWeight.w600,
-  //               ),
-  //             ),
-  //             SizedBox(height: 10),
-
-              // Rent button
-              // Center(
-              //   child: ElevatedButton(
-              //     onPressed: () {
-              //       // Add action for rent button
-              //     },
-              //     child: Text('Rent Bike'),
-              //     style: ElevatedButton.styleFrom(
-              //       backgroundColor: Colors.black,
-              //     ),
-              //   ),
-              // ),
-    //         ],
-    //       ),
-    //     ),
-    //   ),
-    // );
- // }
-  
-  @override
-  State<StatefulWidget> createState() {
-    // TODO: implement createState
-    throw UnimplementedError();
-  }
-// }
-// class MotorcycleCard extends StatelessWidget {
-//   final String imagePath;
-//   final bool isFavorite;
-
-//   MotorcycleCard({required this.imagePath, this.isFavorite = false});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       width: 150,
-//       margin: EdgeInsets.only(right: 16),
-//       child: Stack(
-//         children: [
-//           Card(
-//               child: Image.asset(imagePath, fit: BoxFit.cover),
-//               ),
-//           if (isFavorite)
-//             Positioned(
-//               top: 8,
-//               right: 8,
-//               child: Icon(Icons.favorite, color: Colors.red),
-//             ),
-//         ],
-//       ),
-//     );
-//   }
-// }
