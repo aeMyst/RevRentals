@@ -160,10 +160,10 @@ class MotorcycleCard extends StatelessWidget {
                 ),
               ),
               if (isFavorite)
-                Positioned(
+                const Positioned(
                   top: 8,
                   right: 8,
-                  child: const Icon(Icons.favorite, color: Colors.red),
+                  child: Icon(Icons.favorite, color: Colors.red),
                 ),
               const SizedBox(height: 10),
               // Model name

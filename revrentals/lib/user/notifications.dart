@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter/material.dart';
-
 
 class NotificationsPage extends StatelessWidget {
 
@@ -16,7 +14,7 @@ class NotificationsPage extends StatelessWidget {
         foregroundColor: Colors.white,
       ),
       body: ListView(
-        children: [
+        children: const [
           // MotorcycleCard(
           //   model: 'Yamaha YZF R1',
           //   rentalPrice: 0,
