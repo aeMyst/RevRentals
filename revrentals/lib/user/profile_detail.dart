@@ -31,8 +31,9 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
     // Save profile details here in db here
     //
     //
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> UserHomePage()));
 
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => UserHomePage()));
   }
 
   void showError(String message) {
@@ -51,24 +52,14 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
     );
   }
 
-  // Sign user out method
-  void signUserOut() {
-    FirebaseAuth.instance.signOut();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        iconTheme: IconThemeData(color: Colors.white),
         backgroundColor: Colors.blueGrey,
-        // title: const Text("Complete Profile Details"),
-        actions: [
-          IconButton(
-            onPressed: () => signUserOut(),
-            icon: const Icon(Icons.logout, color: Colors.white),
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         child: Center(
@@ -148,13 +139,7 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
   void _updateProfile(String uid) async {
     if (_formKey.currentState!.validate()) {
       try {
-        // TODO: Fix issue with updating email in Firebase, this only updates it in the database
-        await FirebaseFirestore.instance.collection('users').doc(uid).update({
-          'first_name': _firstNameController.text,
-          'last_name': _lastNameController.text,
-          'address': _addressController.text,
-          'email': _emailController.text,
-        });
+      // POST Request to update profile details here
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Profile updated successfully')),
@@ -173,7 +158,17 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
 
     if (user == null) {
       return Scaffold(
-        appBar: AppBar(title: Text('Profile Details')),
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          iconTheme: IconThemeData(
+            color: Colors.white,
+          ),
+          title: Text(
+            'Profile Details',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.blueGrey,
+        ),
         body: Center(
           child: Text('No user is currently logged in.',
               style: TextStyle(fontSize: 18)),
@@ -186,21 +181,13 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
     return FutureBuilder<DocumentSnapshot>(
       future: users.doc(user.uid).get(),
       builder:
-      // TODO: Fix issue of loading empty profile details page
+          // TODO: Fix issue of loading empty profile details page
           (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-
-        if (snapshot.connectionState!= ConnectionState.done) {
+        if (snapshot.connectionState != ConnectionState.done) {
           return SizedBox.shrink();
         }
 
         // Load data from profile table here
-        
-        // var userData = snapshot.data!.data() as Map<String, dynamic>;
-        // _firstNameController.text = userData['first_name'] ?? '';
-        // _lastNameController.text = userData['last_name'] ?? '';
-        // _addressController.text = userData['address'] ?? '';
-        // _emailController.text = userData['email'] ?? '';
-        // String license_number = userData['license_number'] ?? '';
 
         return Scaffold(
           backgroundColor: Colors.white,
@@ -208,7 +195,8 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
             iconTheme: IconThemeData(
               color: Colors.white,
             ),
-            title: Text('Profile Details',
+            title: Text(
+              'Profile Details',
               style: TextStyle(color: Colors.white),
             ),
             backgroundColor: Colors.blueGrey,

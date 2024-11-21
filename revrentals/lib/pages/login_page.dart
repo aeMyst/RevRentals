@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:revrentals/admin/admin_auth.dart';
 import 'package:revrentals/components/my_button.dart';
 import 'package:revrentals/components/my_textfield.dart';
+import 'package:revrentals/user/profile_detail.dart';
+import 'package:revrentals/user/user_home.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -44,8 +46,20 @@ class _LoginPageState extends State<LoginPage> {
     String input = emailOrUsernameController.text;
     String password = passwordController.text;
 
-    // Placeholder for login logic: Use Django API here
-    print('Login with: $input, Password: $password');
+    // Placeholder for login logic: Use Django API here;
+
+    if ((input == 'test' || input == 'test@gmail.com') &&
+        password == 'test123') {
+      Navigator.pop(context); // Close the loading dialog
+
+      // Navigate to Admin Home Page after successful login
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => UserHomePage()),
+      );
+    } else {
+      throw Exception("Invalid credentials");
+    }
   }
 
   Future<void> signUpUser(BuildContext context) async {
@@ -68,7 +82,19 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     // Placeholder for sign-up logic: Use Django API here
-    print('Sign up with Username: $username, Email: $emailOrUsername');
+
+    bool mockSuccess = true; // Change to false to simulate failure
+
+    Navigator.pop(context);
+
+    if (mockSuccess) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const ProfileDetailsPage()),
+      );
+    } else {
+      showError(context, "Sign-up failed. Please try again.");
+    }
   }
 
   void showError(BuildContext context, String message) {
@@ -148,8 +174,7 @@ class _LoginPageState extends State<LoginPage> {
                 ],
                 MyTextField(
                   controller: emailOrUsernameController,
-                  hintText:
-                      isSignUpMode ? 'Email' : 'Email or Username',
+                  hintText: isSignUpMode ? 'Email' : 'Email or Username',
                   obscureText: false,
                 ),
                 const SizedBox(height: 10),
