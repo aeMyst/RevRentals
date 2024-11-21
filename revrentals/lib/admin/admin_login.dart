@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:revrentals/admin/admin_home.dart';
 import 'package:revrentals/components/my_textfield.dart';
 import 'package:revrentals/components/my_button.dart';
@@ -12,47 +11,42 @@ class AdminLoginPage extends StatefulWidget {
 }
 
 class _AdminLoginPageState extends State<AdminLoginPage> {
-  final emailController = TextEditingController();
+  final adminNameController = TextEditingController();
   final passwordController = TextEditingController();
 
-  // SIGN USER IN METHOD
+  // SIGN USER IN METHOD (Placeholder for Django API)
   void signUserIn(BuildContext context) async {
-    // Show loading circle
+    // Show loading indicator
     showDialog(
       context: context,
-      builder: (context) {
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-      },
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
     );
 
-    // try to sign in
-    try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailController.text.trim(), // Trim whitespace
-        password: passwordController.text.trim(),
-      );
-      Navigator.pop(context); // Close the loading dialog
+    // Placeholder for login logic
+    String adminName = adminNameController.text.trim();
+    String password = passwordController.text.trim();
 
-      // Navigate to Admin Home Page after successful login
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) =>  AdminHomePage()),
-      );
-    } on FirebaseAuthException catch (e) {
-      Navigator.pop(context);
-      String message;
-      if (e.code == 'user-not-found') {
-        message = 'No user found for that email.';
-        errorMessage(message);
-      } else if (e.code == 'wrong-password') {
-        message = 'Incorrect password.';
-        errorMessage(message);
+    try {
+      // Simulate an API call to Django backend
+      // Replace this with actual API logic
+      await Future.delayed(const Duration(seconds: 2));
+
+      if (adminName == 'admin@example.com' && password == 'admin123') {
+        Navigator.pop(context); // Close the loading dialog
+
+        // Navigate to Admin Home Page after successful login
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) =>  AdminHomePage()),
+        );
       } else {
-        message = 'An error occurred. Please try again.';
-        errorMessage(message);
+        throw Exception("Invalid credentials");
       }
+    } catch (e) {
+      Navigator.pop(context); // Close the loading dialog
+      errorMessage("Invalid username or password. Please try again.");
     }
   }
 
@@ -78,7 +72,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.blueGrey,
-        iconTheme: const IconThemeData(color: Colors.white),        
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SafeArea(
         child: Center(
@@ -86,12 +80,10 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // const SizedBox(height: 50),
                 Image.asset(
                   'lib/images/rr_logo.png',
-                  height: 400,
+                  height: 300,
                 ),
-                // const SizedBox(height: 10),
                 const Text(
                   'Sign in as Admin',
                   style: TextStyle(
@@ -102,8 +94,8 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                 ),
                 const SizedBox(height: 20),
                 MyTextField(
-                  controller: emailController,
-                  hintText: 'Email',
+                  controller: adminNameController,
+                  hintText: 'Admin Username',
                   obscureText: false,
                 ),
                 const SizedBox(height: 10),
