@@ -3,10 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:revrentals/admin/admin_auth.dart';
 import 'package:revrentals/components/my_button.dart';
 import 'package:revrentals/components/my_textfield.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:revrentals/user/profile_detail.dart';
-import 'package:revrentals/user/user_home.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -16,12 +12,10 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final emailController = TextEditingController();
+  final emailOrUsernameController = TextEditingController();
   final passwordController = TextEditingController();
   final usernameController = TextEditingController();
   final confirmPasswordController = TextEditingController();
-  final db = FirebaseFirestore.instance;
-  FirebaseAuth auth = FirebaseAuth.instance;
 
   bool isSignUpMode = false;
   int? _selectedRole = 0; // 0 for "Renter", 1 for "Seller"
@@ -47,85 +41,37 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> signInUser(BuildContext context) async {
-    showDialog(
-      context: context,
-      builder: (context) => const Center(child: CircularProgressIndicator()),
-    );
+    String input = emailOrUsernameController.text;
+    String password = passwordController.text;
 
-    String input = emailController.text;
-    String email;
-
-    try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailController.text,
-        password: passwordController.text,
-      );
-      Navigator.pop(context);
-      // Navigate to UserHomePage after successful login
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => UserHomePage()),
-      );
-    } on FirebaseAuthException catch (e) {
-      Navigator.pop(context);
-      showError(e.message ?? 'Failed to log in');
-    }
+    // Placeholder for login logic: Use Django API here
+    print('Login with: $input, Password: $password');
   }
 
   Future<void> signUpUser(BuildContext context) async {
-    showDialog(
-      context: context,
-      builder: (context) => const Center(child: CircularProgressIndicator()),
-    );
+    String username = usernameController.text;
+    String emailOrUsername = emailOrUsernameController.text;
+    String password = passwordController.text;
+    String confirmPassword = confirmPasswordController.text;
 
-    if (passwordController.text.isEmpty ||
-        emailController.text.isEmpty ||
-        confirmPasswordController.text.isEmpty) {
-      Navigator.pop(context);
-      showError("All fields are required.");
+    if (username.isEmpty ||
+        emailOrUsername.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty) {
+      showError(context, "All fields are required.");
       return;
     }
 
-    if (passwordController.text != confirmPasswordController.text) {
-      Navigator.pop(context);
-      showError("Passwords do not match.");
+    if (password != confirmPassword) {
+      showError(context, "Passwords do not match.");
       return;
     }
 
-    try {
-      UserCredential userCredential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailController.text,
-        password: passwordController.text,
-      );
-      Navigator.pop(context);
-      final user = userCredential.user;
-
-      // if (user != null) {
-      //   final uid = user.uid;
-      //   await db.collection('users').doc(user!.uid).set({
-      //     'username': usernameController.text,
-      //     'email': emailController.text,
-      //     'password': passwordController.text,
-      //     'role': _selectedRole == 1 ? 'Seller' : 'Renter',
-      //     'profile_complete': false,
-      //   });
-      // }
-
-      Navigator.pop(context);
-
-      // Navigate to Profile Details Page after successful signup
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const ProfileDetailsPage()),
-      );
-    } on FirebaseAuthException catch (e) {
-      Navigator.pop(context);
-      showError(e.message ?? 'Failed to sign up');
-    }
+    // Placeholder for sign-up logic: Use Django API here
+    print('Sign up with Username: $username, Email: $emailOrUsername');
   }
 
-  void showError(String message) {
+  void showError(BuildContext context, String message) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -139,30 +85,6 @@ class _LoginPageState extends State<LoginPage> {
         ],
       ),
     );
-  }
-
-  Future<void> resetPassword(BuildContext context) async {
-    if (emailController.text.isEmpty) {
-      showError("Please enter your email.");
-      return;
-    }
-
-    showDialog(
-      context: context,
-      builder: (context) => const Center(child: CircularProgressIndicator()),
-    );
-
-    String email;
-
-    try {
-      await FirebaseAuth.instance
-          .sendPasswordResetEmail(email: emailController.text);
-      Navigator.pop(context);
-      showError("Password reset email sent. Check your inbox.");
-    } on FirebaseAuthException catch (e) {
-      Navigator.pop(context);
-      showError(e.message ?? 'Failed to send password reset email');
-    }
   }
 
   void getAdminPage(BuildContext context) {
@@ -191,7 +113,6 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ],
                 ),
-                // const SizedBox(height: 10),
                 const Text(
                   'Welcome to RevRentals',
                   style: TextStyle(
@@ -217,25 +138,18 @@ class _LoginPageState extends State<LoginPage> {
                   },
                 ),
                 const SizedBox(height: 20),
-                if (isSignUpMode)
-                  // CupertinoSlidingSegmentedControl<int>(
-                  //   children: const {
-                  //     0: Text('Renter'),
-                  //     1: Text('Seller'),
-                  //   },
-                  //   groupValue: _selectedRole,
-                  //   onValueChanged: onRoleSelected,
-                  // ),
-
-                  // MyTextField(
-                  //   controller: usernameController,
-                  //   hintText: 'Username',
-                  //   obscureText: false,
-                  // ),
+                if (isSignUpMode) ...[
+                  MyTextField(
+                    controller: usernameController,
+                    hintText: 'Username',
+                    obscureText: false,
+                  ),
                   const SizedBox(height: 10),
+                ],
                 MyTextField(
-                  controller: emailController,
-                  hintText: isSignUpMode ? 'Email' : 'Email',
+                  controller: emailOrUsernameController,
+                  hintText:
+                      isSignUpMode ? 'Email' : 'Email or Username',
                   obscureText: false,
                 ),
                 const SizedBox(height: 10),
@@ -258,23 +172,20 @@ class _LoginPageState extends State<LoginPage> {
                   label: isSignUpMode ? 'Sign Up' : 'Log In',
                 ),
                 const SizedBox(height: 20),
-                // Forgot Password Section
-                if (!isSignUpMode) ...[
-                  TextButton(
-                    onPressed: () => resetPassword(context),
-                    child: const Text(
-                      'Forgot Password?',
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontWeight: FontWeight.bold,
-                      ),
+                if (!isSignUpMode) TextButton(
+                  onPressed: () {
+                    // Implement password reset functionality
+                    print('Password reset requested');
+                  },
+                  child: const Text(
+                    'Forgot Password?',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 20),
-                ],
-                // const SizedBox(height: 50),
-
-                const SizedBox(height: 10),
+                ),
+                const SizedBox(height: 20),
                 TextButton(
                   onPressed: () => getAdminPage(context),
                   child: const Text(
