@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:revrentals/pages/auth_page.dart';
+import 'package:revrentals/main_pages/auth_page.dart';
 import 'firebase_options.dart';
 
 void main() async {
