@@ -28,21 +28,45 @@ class MyApp extends StatelessWidget {
           //   seedColor: Colors.pink,
 
           // ),
-          textTheme: TextTheme(),
+          primaryColor: Colors.pink,
+          // accentColor: Colors.red,
+          
+          textTheme: TextTheme(
 
-          appBarTheme: const AppBarTheme(
-            centerTitle: true,
-            foregroundColor: Colors.white,
-            backgroundColor: Colors.blueGrey,
-            titleTextStyle: TextStyle(
-              color: Colors.white,
-              fontSize: 20.0,
-              fontWeight: FontWeight.normal
-            ),
-            iconTheme: IconThemeData(
-              color: Colors.white,
-            )
           ),
+          appBarTheme: const AppBarTheme(
+              centerTitle: true,
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.blueGrey,
+              iconTheme: IconThemeData(
+                color: Colors.white,
+              ),
+          ),
+
+      
+          elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 163, 196, 212),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  foregroundColor: Colors.white,
+                  iconColor: Colors.white)),
+          buttonTheme: ButtonThemeData(),
+
+          // textButtonTheme: TextButtonThemeData(
+          //     style: ButtonStyle(
+          //       foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+          //     ),
+          //     onPressed: () {},
+          //     child: const Text(
+          //       'Text Button',
+          //       style: TextStyle(
+          //         color: Colors.blue,
+          //         fontWeight: FontWeight.bold,
+          //       ),
+          //     ),
+          //     ),
+
           inputDecorationTheme: const InputDecorationTheme(
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(

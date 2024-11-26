@@ -92,7 +92,7 @@ class _AddListingPageState extends State<AddListingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Add Listing"),
+        title: Text("Add Listing"),
       ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -163,8 +163,7 @@ class _AddListingPageState extends State<AddListingPage> {
                     // Update attribute based on type selected
                     if (newValue == 'Motorcycle') {
                       vehicleAttributeLabel = 'Engine Type';
-                      vehicleAttributeController.text =
-                          'Enter the engine type';
+                      vehicleAttributeController.text = 'Enter the engine type';
                     } else if (newValue == 'Moped') {
                       vehicleAttributeLabel = 'Cargo Rack';
                       vehicleAttributeController.text =
@@ -180,13 +179,15 @@ class _AddListingPageState extends State<AddListingPage> {
               const SizedBox(height: 16),
               // Extra attribute field
               TextField(
-                controller: vehicleAttributeController,
-                decoration: InputDecoration(
-                    labelText: vehicleAttributeLabel,
+                  controller: vehicleAttributeController,
+                  decoration: InputDecoration(
+                    labelText: vehicleAttributeController.text.isEmpty
+                        ? 'Select a motorcycle type to see details'
+                        : vehicleAttributeLabel,
                     hintText: vehicleAttributeController.text.isEmpty
                         ? 'Select a motorcycle type to see details'
-                        : vehicleAttributeController.text,)
-              ),
+                        : vehicleAttributeController.text,
+                  )),
               const SizedBox(height: 16),
 
               // VIN form fields
@@ -413,7 +414,7 @@ class _AddListingPageState extends State<AddListingPage> {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color.fromARGB(255, 163, 196, 212),
-                foregroundColor: Colors.white,
+
               ),
               child: const Text('Save Listing'),
             ),

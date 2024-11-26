@@ -9,7 +9,7 @@ class AdminLotPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           "Lots",
         ),        
       ),
@@ -50,10 +50,7 @@ class AddLotPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Add New Lot"),
-        centerTitle: true,
-        backgroundColor: Colors.blueGrey,
-        foregroundColor: Colors.white,
+        title: Text("Add New Lot"),
       ),
       body: Center(
         child: Padding(
@@ -81,10 +78,6 @@ class AddLotPage extends StatelessWidget {
                   onPressed: () {
                     _validateAndAddLot(context);
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueGrey,
-                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                  ),
                   child: const Text("Add Lot", style: TextStyle(color: Colors.white),),
                 ),
               ],

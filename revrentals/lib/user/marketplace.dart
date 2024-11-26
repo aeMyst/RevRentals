@@ -111,16 +111,9 @@ class MotorcycleTab extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueGrey, // Button color
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              icon: const Icon(Icons.filter_list, color: Colors.white),
+              icon: const Icon(Icons.filter_list),
               label: const Text(
                 'Filter',
-                style: TextStyle(color: Colors.white),
               ),
               onPressed: () {
                 // TODO: Add filter functionality
@@ -143,17 +136,9 @@ class MotorcycleTab extends StatelessWidget {
             ),
             const SizedBox(width: 16),
             ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueGrey, // Button color
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              icon: const Icon(Icons.sort, color: Colors.white),
+              icon: const Icon(Icons.sort),
               label: const Text(
-                'Sort',
-                style: TextStyle(color: Colors.white),
-              ),
+                'Sort',              ),
               onPressed: () {
                 // TODO: Add sort functionality
                 showDialog(
@@ -331,16 +316,9 @@ class GearTab extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueGrey, // Button color
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              icon: const Icon(Icons.filter_list, color: Colors.white),
+              icon: const Icon(Icons.filter_list),
               label: const Text(
                 'Filter',
-                style: TextStyle(color: Colors.white),
               ),
               onPressed: () {
                 // TODO: Add filter functionality
@@ -363,16 +341,10 @@ class GearTab extends StatelessWidget {
             ),
             const SizedBox(width: 16),
             ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueGrey, // Button color
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              icon: const Icon(Icons.sort, color: Colors.white),
+ 
+              icon: const Icon(Icons.sort),
               label: const Text(
                 'Sort',
-                style: TextStyle(color: Colors.white),
               ),
               onPressed: () {
                 // TODO: Add sort functionality
@@ -553,16 +525,9 @@ class LotTab extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueGrey, // Button color
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              icon: const Icon(Icons.filter_list, color: Colors.white),
+              icon: const Icon(Icons.filter_list),
               label: const Text(
                 'Filter',
-                style: TextStyle(color: Colors.white),
               ),
               onPressed: () {
                 // TODO: Add filter functionality
@@ -585,16 +550,10 @@ class LotTab extends StatelessWidget {
             ),
             const SizedBox(width: 16),
             ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueGrey, // Button color
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              icon: const Icon(Icons.sort, color: Colors.white),
+      
+              icon: const Icon(Icons.sort),
               label: const Text(
                 'Sort',
-                style: TextStyle(color: Colors.white),
               ),
               onPressed: () {
                 // TODO: Add sort functionality
