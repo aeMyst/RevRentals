@@ -28,7 +28,7 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
 
   // sign out function
   void signUserOut(BuildContext context) {
-    FirebaseAuth.instance.signOut();
+    // FirebaseAuth.instance.signOut();
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => const AuthPage()));
   }
@@ -38,8 +38,20 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(2023),
+      firstDate: DateTime(2024),
       lastDate: DateTime(2100),
+            builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            primaryColor: Colors.blueGrey, // Button color
+            dialogBackgroundColor: Colors.white, // White background
+            buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.primary),
+            colorScheme: ColorScheme.light(
+                primary: Colors.blueGrey), // Adjust color scheme
+          ),
+          child: child!,
+        );
+      },
     );
     if (picked != null && picked != selectedStartDate)
       setState(() {
@@ -52,8 +64,20 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(2023),
+      firstDate: DateTime(2024),
       lastDate: DateTime(2100),
+            builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            primaryColor: Colors.blueGrey, // Button color
+            dialogBackgroundColor: Colors.white, // White background
+            buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.primary),
+            colorScheme: ColorScheme.light(
+                primary: Colors.blueGrey), // Adjust color scheme
+          ),
+          child: child!,
+        );
+      },
     );
     if (picked != null && picked != selectedEndDate)
       setState(() {
