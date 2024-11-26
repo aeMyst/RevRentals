@@ -46,7 +46,8 @@ class _GearDetailPageState extends State<GearDetailPage> {
           data: ThemeData.light().copyWith(
             primaryColor: Colors.blueGrey, // Button color
             dialogBackgroundColor: Colors.white, // White background
-            buttonTheme: const ButtonThemeData(textTheme: ButtonTextTheme.primary),
+            buttonTheme:
+                const ButtonThemeData(textTheme: ButtonTextTheme.primary),
             colorScheme: const ColorScheme.light(
                 primary: Colors.blueGrey), // Adjust color scheme
           ),
@@ -74,7 +75,8 @@ class _GearDetailPageState extends State<GearDetailPage> {
             primaryColor: Colors.blueGrey, // Button color
 
             dialogBackgroundColor: Colors.white, // White background
-            buttonTheme: const ButtonThemeData(textTheme: ButtonTextTheme.primary),
+            buttonTheme:
+                const ButtonThemeData(textTheme: ButtonTextTheme.primary),
             colorScheme: const ColorScheme.light(
                 primary: Colors.blueGrey), // Adjust color scheme
           ),

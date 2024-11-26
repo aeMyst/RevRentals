@@ -344,27 +344,27 @@ class LotTab extends StatelessWidget {
       scrollDirection: Axis.vertical,
       children: [
         LotCard(
-            lotAddress: '',
+            lotAddress: 'Example Lot 1',
             rentalPrice: 25.0,
             imagePath: 'lib/images/lots/public_parking.png',
             description: ''),
         LotCard(
-            lotAddress: '',
+            lotAddress: 'Example Lot 2',
             rentalPrice: 50.0,
             imagePath: 'lib/images/lots/outdoor_parking.png',
             description: ''),
         LotCard(
-            lotAddress: '',
+            lotAddress: 'Example Lot 3',
             rentalPrice: 75.0,
             imagePath: 'lib/images/lots/big_parking.png',
             description: ''),
         LotCard(
-            lotAddress: '',
+            lotAddress: 'Example Lot 4',
             rentalPrice: 100.0,
             imagePath: 'lib/images/lots/parking_garage.png',
             description: ''),
         LotCard(
-            lotAddress: '',
+            lotAddress: 'Example Lot 5',
             rentalPrice: 150.0,
             imagePath: 'lib/images/lots/storage_units.png',
             description: ''),
