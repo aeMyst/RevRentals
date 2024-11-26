@@ -13,9 +13,7 @@ class _UserHomePageState extends State<UserHomePage> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = [
-    MarketplacePage(), // Use the new MarketplacePage
-    // GearPage(),
-    // FavouritesPage(),
+    MarketplacePage(), 
     GaragePage(),
   ];
 
