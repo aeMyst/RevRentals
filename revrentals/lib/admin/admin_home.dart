@@ -26,18 +26,19 @@ class _AdminHomePageState extends State<AdminHomePage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+
         automaticallyImplyLeading: false, // Prevent back button
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.blueGrey,
         elevation: 0,
         title: const Text(
           "Admin Home",
-          style: TextStyle(color: Colors.black),
+          style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
         actions: [
           IconButton(
             onPressed: () => signUserOut(context),
-            icon: const Icon(Icons.logout, color: Colors.black),
+            icon: const Icon(Icons.logout, color: Colors.white),
           ),
         ],
       ),
@@ -71,20 +72,20 @@ class _AdminHomePageState extends State<AdminHomePage> {
           ),
         ),
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.grey[300],
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.home, color: Colors.black),
-              SizedBox(width: 8),
-              Text("Home", style: TextStyle(color: Colors.black)),
-            ],
-          ),
-        ),
-      ),
+      // bottomNavigationBar: BottomAppBar(
+      //   color: Colors.grey[300],
+      //   child: Padding(
+      //     padding: const EdgeInsets.symmetric(vertical: 8.0),
+      //     child: Row(
+      //       mainAxisAlignment: MainAxisAlignment.center,
+      //       children: [
+      //         Icon(Icons.home, color: Colors.black),
+      //         SizedBox(width: 8),
+      //         Text("Home", style: TextStyle(color: Colors.black)),
+      //       ],
+      //     ),
+      //   ),
+      // ),
     );
   }
 
@@ -96,7 +97,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
         width: 100,
         height: 100,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Colors.blueGrey,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -110,9 +111,9 @@ class _AdminHomePageState extends State<AdminHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 32, color: Colors.black),
+            Icon(icon, size: 32, color: Colors.white),
             SizedBox(height: 8),
-            Text(label, style: TextStyle(color: Colors.black)),
+            Text(label, style: TextStyle(color: Colors.white)),
           ],
         ),
       ),

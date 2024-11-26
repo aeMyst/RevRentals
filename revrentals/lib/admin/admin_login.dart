@@ -33,7 +33,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
       // Replace this with actual API logic
       await Future.delayed(const Duration(seconds: 2));
 
-      if (adminName == 'admin@example.com' && password == 'admin123') {
+      if (adminName == 'revrentals_admin' && password == 'admin123') {
         Navigator.pop(context); // Close the loading dialog
 
         // Navigate to Admin Home Page after successful login
