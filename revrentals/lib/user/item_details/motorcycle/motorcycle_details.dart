@@ -11,11 +11,11 @@ class MotorcycleDetailPage extends StatefulWidget {
   final String imagePath;
 
   const MotorcycleDetailPage({
-    Key? key,
+    super.key,
     required this.model,
     required this.rentalPrice,
     required this.imagePath,
-  }) : super(key: key);
+  });
 
    @override
   _MotorcycleDetailPageState createState() => _MotorcycleDetailPageState();
@@ -28,7 +28,7 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
 
   // sign out function
   void signUserOut(BuildContext context) {
-    FirebaseAuth.instance.signOut();
+    // FirebaseAuth.instance.signOut();
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => const AuthPage()));
   }
@@ -38,13 +38,26 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(2023),
+      firstDate: DateTime(2024),
       lastDate: DateTime(2100),
+            builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            primaryColor: Colors.blueGrey, // Button color
+            dialogBackgroundColor: Colors.white, // White background
+            buttonTheme: const ButtonThemeData(textTheme: ButtonTextTheme.primary),
+            colorScheme: const ColorScheme.light(
+                primary: Colors.blueGrey), // Adjust color scheme
+          ),
+          child: child!,
+        );
+      },
     );
-    if (picked != null && picked != selectedStartDate)
+    if (picked != null && picked != selectedStartDate) {
       setState(() {
         selectedStartDate = picked;
       });
+    }
   }
 
   // function to select end date
@@ -52,13 +65,26 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(2023),
+      firstDate: DateTime(2024),
       lastDate: DateTime(2100),
+            builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            primaryColor: Colors.blueGrey, // Button color
+            dialogBackgroundColor: Colors.white, // White background
+            buttonTheme: const ButtonThemeData(textTheme: ButtonTextTheme.primary),
+            colorScheme: const ColorScheme.light(
+                primary: Colors.blueGrey), // Adjust color scheme
+          ),
+          child: child!,
+        );
+      },
     );
-    if (picked != null && picked != selectedEndDate)
+    if (picked != null && picked != selectedEndDate) {
       setState(() {
         selectedEndDate = picked;
       });
+    }
   }
 
   // function to HANDLE RENTAL (TO-DO) -----------------
@@ -91,7 +117,7 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => MarketplacePage()),
+            MaterialPageRoute(builder: (context) => const MarketplacePage()),
           ),
         ),
         actions: [
@@ -199,7 +225,6 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
             Center(
               child: ElevatedButton(
                 onPressed: _rentMotorcycle,
-                child: const Text('Rent Motorcycle'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blueGrey,
                   foregroundColor: Colors.white,
@@ -210,6 +235,7 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
                     borderRadius: BorderRadius.circular(8), 
                   ),
                 ),
+                child: const Text('Rent Motorcycle'),
               ),
             ),
           ],

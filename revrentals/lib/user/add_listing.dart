@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AddListingPage extends StatefulWidget {
-  const AddListingPage({Key? key}) : super(key: key);
+  const AddListingPage({super.key});
 
   @override
   _AddListingPageState createState() => _AddListingPageState();
@@ -103,16 +103,6 @@ class _AddListingPageState extends State<AddListingPage> {
             Center(
               // Center the ToggleButtons widget within the available space
               child: ToggleButtons(
-                children: const [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text('Motorcycle', textAlign: TextAlign.center),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 32.0),
-                    child: Text('Gear', textAlign: TextAlign.center),
-                  ),
-                ],
                 isSelected: [isMotorcycleSelected, !isMotorcycleSelected],
                 onPressed: (int index) {
                   setState(() {
@@ -124,7 +114,17 @@ class _AddListingPageState extends State<AddListingPage> {
                 fillColor: Colors.blueGrey.withOpacity(0.2),
                 borderColor: Colors.blueGrey,
                 borderRadius: BorderRadius.circular(10),
-                constraints: BoxConstraints(minHeight: 50),
+                constraints: const BoxConstraints(minHeight: 50),
+                children: const [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Text('Motorcycle', textAlign: TextAlign.center),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 32.0),
+                    child: Text('Gear', textAlign: TextAlign.center),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 16),

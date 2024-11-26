@@ -5,7 +5,7 @@ import 'package:revrentals/admin/admin_agreement.dart';
 import 'package:revrentals/admin/admin_lot.dart';
 
 class AdminHomePage extends StatefulWidget {
-  AdminHomePage({super.key});
+  const AdminHomePage({super.key});
 
   @override
   State<AdminHomePage> createState() => _AdminHomePageState();
@@ -57,7 +57,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
                             builder: (context) => AdminLotPage()));
                     // Navigate to Lots screen
                   }),
-                  SizedBox(width: 24),
+                  const SizedBox(width: 24),
                   _buildMenuButton(Icons.file_copy, "Reservations", () {
                     // Navigate to Agreements screen
                     Navigator.push(
@@ -104,7 +104,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
               color: Colors.grey.withOpacity(0.3),
               spreadRadius: 4,
               blurRadius: 8,
-              offset: Offset(0, 3),
+              offset: const Offset(0, 3),
             ),
           ],
         ),
@@ -112,8 +112,8 @@ class _AdminHomePageState extends State<AdminHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(icon, size: 32, color: Colors.white),
-            SizedBox(height: 8),
-            Text(label, style: TextStyle(color: Colors.white)),
+            const SizedBox(height: 8),
+            Text(label, style: const TextStyle(color: Colors.white)),
           ],
         ),
       ),

@@ -125,7 +125,7 @@ import 'package:revrentals/user/notifications.dart';
 import 'package:revrentals/user/profile_detail.dart';
 
 class GearPage extends StatelessWidget {
-  const GearPage({Key? key}) : super(key: key);
+  const GearPage({super.key});
 
   void signUserOut(BuildContext context) {
     FirebaseAuth.instance.signOut();
@@ -140,7 +140,7 @@ class GearPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.blueGrey,
         leading: IconButton(
-          icon: Icon(Icons.notifications, color: Colors.white),
+          icon: const Icon(Icons.notifications, color: Colors.white),
           onPressed: () => Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => NotificationsPage()),
@@ -164,7 +164,7 @@ class GearPage extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(
-          children: [
+          children: const [
             GearItem(
               imagePath: 'lib/images/agv_pista.webp',
               name: 'AGV Pista GP RR',
@@ -198,7 +198,7 @@ class GearItem extends StatelessWidget {
   final String description;
   final double price;
 
-  const GearItem({
+  const GearItem({super.key, 
     required this.imagePath,
     required this.name,
     required this.description,

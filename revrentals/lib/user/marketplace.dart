@@ -1,15 +1,16 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:revrentals/main_pages/auth_page.dart';
+import 'package:revrentals/user/item_details/gear_details.dart';
+import 'package:revrentals/user/item_details/lot_details.dart';
 import 'package:revrentals/user/notifications.dart';
 import 'package:revrentals/user/profile_detail.dart';
-import 'package:revrentals/user/motorcycle_details.dart';
+import 'package:revrentals/user/item_details/motorcycle/motorcycle_details.dart';
 
 class MarketplacePage extends StatelessWidget {
-  const MarketplacePage({Key? key}) : super(key: key);
+  const MarketplacePage({super.key});
 
   void signUserOut(BuildContext context) {
-    FirebaseAuth.instance.signOut();
+    // FirebaseAuth.instance.signOut();
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => const AuthPage()));
   }
@@ -66,14 +67,14 @@ class MarketplacePage extends StatelessWidget {
               // ),
               // const SizedBox(height: 16),
               // Updated TabBar with 3 tabs (without 'Favorite' tab)
-              TabBar(
+              const TabBar(
                 tabs: [
-                  const Tab(text: 'Motorcycles'),
-                  const Tab(text: 'Gear'),
-                  const Tab(text: 'Storage Lots'),
+                  Tab(text: 'Motorcycles'),
+                  Tab(text: 'Gear'),
+                  Tab(text: 'Storage Lots'),
                 ],
               ),
-              const SizedBox(height: 16),
+              // const SizedBox(height: 16),
               Expanded(
                 child: TabBarView(
                   children: [
@@ -93,25 +94,27 @@ class MarketplacePage extends StatelessWidget {
 
 // Widget to display motorcycles in each tab
 class MotorcycleTab extends StatelessWidget {
+  const MotorcycleTab({super.key});
+
   @override
   Widget build(BuildContext context) {
     return ListView(
       scrollDirection: Axis.vertical,
       children: [
         MotorcycleCard(
-          imagePath: 'lib/images/ninja_zx4r.png',
+          imagePath: 'lib/images/motorcycle/ninja_zx4r.png',
           isFavorite: true,
           model: 'Kawasaki Ninja ZX-4R',
           rentalPrice: 150,
         ),
         MotorcycleCard(
-          imagePath: 'lib/images/moped.jpg',
+          imagePath: 'lib/images/motorcycle/scooter.png',
           isFavorite: false,
           model: 'Velocifero TENNIS 4000W',
           rentalPrice: 120,
         ),
         MotorcycleCard(
-          imagePath: 'lib/images/dirtbike.png',
+          imagePath: 'lib/images/motorcycle/dirtbike.png',
           isFavorite: false,
           model: 'Honda CRF250R',
           rentalPrice: 200,
@@ -127,7 +130,7 @@ class MotorcycleCard extends StatefulWidget {
   final String imagePath;
   final bool isFavorite;
 
-  MotorcycleCard({
+  const MotorcycleCard({super.key, 
     required this.model,
     required this.rentalPrice,
     required this.imagePath,
@@ -155,9 +158,8 @@ class _MotorcycleCardState extends State<MotorcycleCard> {
           ),
         );
       },
-      child: Container(
+      child: SizedBox(
         width: 200,
-        margin: const EdgeInsets.only(right: 16),
         child: Card(
           color: Colors.white,
           elevation: 3,
@@ -174,11 +176,11 @@ class _MotorcycleCardState extends State<MotorcycleCard> {
                   child: Image.asset(
                     widget.imagePath,
                     fit: BoxFit.cover,
-                    height: 100,
+                    height: 150,
                   ),
                 ),
                 if (widget.isFavorite)
-                  Positioned(
+                  const Positioned(
                     top: 8,
                     right: 8,
                     child: Icon(Icons.favorite, color: Colors.red),
@@ -212,29 +214,31 @@ class _MotorcycleCardState extends State<MotorcycleCard> {
 }
 
 class GearTab extends StatelessWidget {
+  const GearTab({super.key});
+
   @override
   Widget build(BuildContext context) {
     return ListView(
       scrollDirection: Axis.vertical,
       children: const [
         GearItem(
-          imagePath: 'lib/images/agv_pista.webp',
+          imagePath: 'lib/images/gear/agv_pista.webp',
           name: 'AGV Pista GP RR',
           description: '',
-          price: 0,
+          rentalPrice: 100.0,
         ),
         GearItem(
-          imagePath: 'lib/images/gloves.png',
+          imagePath: 'lib/images/gear/gloves.png',
           name: 'Alpinestars Stella SMX-2 Air Carbon V2',
           description:
               'High-quality leather gloves for comfort and protection.',
-          price: 35.50,
+          rentalPrice: 35.50,
         ),
         GearItem(
-          imagePath: 'lib/images/jacket.jpg',
+          imagePath: 'lib/images/gear/jacket.jpg',
           name: 'Alpinestars GPR Plus Jacket',
           description: 'Leather jacket with armor protection.',
-          price: 120.99,
+          rentalPrice: 120.99,
         ),
       ],
     );
@@ -245,13 +249,13 @@ class GearItem extends StatefulWidget {
   final String imagePath;
   final String name;
   final String description;
-  final double price;
+  final double rentalPrice;
 
-  const GearItem({
-    required this.imagePath,
+  const GearItem({super.key, 
     required this.name,
+    required this.rentalPrice,
+    required this.imagePath,
     required this.description,
-    required this.price,
   });
 
   @override
@@ -261,53 +265,70 @@ class GearItem extends StatefulWidget {
 class _GearItemState extends State<GearItem> {
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 3,
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Gear image
-            Image.asset(
-              widget.imagePath,
-              height: 80,
-              width: 80,
-              fit: BoxFit.cover,
+    return GestureDetector(
+      onTap: () {
+        // Navigate to the GearDetailPage when the card is tapped
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => GearDetailPage(
+              imagePath: widget.imagePath,
+              name: widget.name,
+              description: widget.description,
+              rentalPrice: widget.rentalPrice,
             ),
-            const SizedBox(width: 16),
-            // Gear details
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.name,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
+          ),
+        );
+      },
+      child: SizedBox(
+        width: 200,
+        child: Card(
+          color: Colors.white,
+          elevation: 3,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Gear image
+                Center(
+                  child: Image.asset(
+                    widget.imagePath,
+                    fit: BoxFit.cover,
+                    height: 150,
                   ),
-                  const SizedBox(height: 4),
+                ),
+                const SizedBox(height: 10),
+                // Gear name
+                Text(
+                  widget.name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                // Rental price per day
+                Text(
+                  'Per Day: \$${widget.rentalPrice.toStringAsFixed(2)}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                // Description (if available)
+                if (widget.description.isNotEmpty)
                   Text(
                     widget.description,
                     style: TextStyle(color: Colors.grey[700]),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '\$${widget.price.toStringAsFixed(2)}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -315,35 +336,127 @@ class _GearItemState extends State<GearItem> {
 }
 
 class LotTab extends StatelessWidget {
+  const LotTab({super.key});
+
   @override
   Widget build(BuildContext context) {
     return ListView(
       scrollDirection: Axis.vertical,
-      children: [],
+      children: [
+        LotCard(
+            lotAddress: 'Example Lot 1',
+            rentalPrice: 25.0,
+            imagePath: 'lib/images/lots/public_parking.png',
+            description: ''),
+        LotCard(
+            lotAddress: 'Example Lot 2',
+            rentalPrice: 50.0,
+            imagePath: 'lib/images/lots/outdoor_parking.png',
+            description: ''),
+        LotCard(
+            lotAddress: 'Example Lot 3',
+            rentalPrice: 75.0,
+            imagePath: 'lib/images/lots/big_parking.png',
+            description: ''),
+        LotCard(
+            lotAddress: 'Example Lot 4',
+            rentalPrice: 100.0,
+            imagePath: 'lib/images/lots/parking_garage.png',
+            description: ''),
+        LotCard(
+            lotAddress: 'Example Lot 5',
+            rentalPrice: 150.0,
+            imagePath: 'lib/images/lots/storage_units.png',
+            description: ''),
+      ],
     );
   }
 }
 
-// class LotCard extends StatefulWidget {
-//   final String lotAddress;
-//   final double rentalPrice;
-//   final String imagePath;
+class LotCard extends StatefulWidget {
+  final String lotAddress;
+  final String description;
+  final double rentalPrice;
+  final String imagePath;
 
-//   LotCard({
-//     required this.lotAddress,
-//     required this.rentalPrice,
-//     required this.imagePath,
-//   })
-  
-//   @override
-//   // ignore: library_private_types_in_public_api
-//   _LotCardState createState() => _LotCardState();
-// }
+  const LotCard({super.key, 
+    required this.lotAddress,
+    required this.rentalPrice,
+    required this.imagePath,
+    required this.description,
+  });
 
-// class _LotCardState extends State<LotCard> {
-//   @override
-//   Widget build(BuildContext context) {
-//     // TODO: implement build
-//     throw UnimplementedError();
-//   }
-// }
+  @override
+  State<LotCard> createState() => _LotCardState();
+}
+
+class _LotCardState extends State<LotCard> {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        // Navigate to LotDetailsPage with the passed details
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LotDetailsPage(
+              lotAddress: widget.lotAddress,
+              description: widget.description,
+              rentalPrice: widget.rentalPrice,
+              imagePath: widget.imagePath,
+            ),
+          ),
+        );
+      },
+      child: SizedBox(
+        width: 200,
+        child: Card(
+          color: Colors.white,
+          elevation: 3,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Image.asset(
+                    widget.imagePath,
+                    fit: BoxFit.cover,
+                    height: 200,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  widget.lotAddress,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                // Rental price per day
+                Text(
+                  'Per Day: \$${widget.rentalPrice.toStringAsFixed(2)}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                // Description (if available)
+                if (widget.description.isNotEmpty)
+                  Text(
+                    widget.description,
+                    style: TextStyle(color: Colors.grey[700]),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

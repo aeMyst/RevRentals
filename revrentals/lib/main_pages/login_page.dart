@@ -7,7 +7,7 @@ import 'package:revrentals/user/profile_detail.dart';
 import 'package:revrentals/user/user_home.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();

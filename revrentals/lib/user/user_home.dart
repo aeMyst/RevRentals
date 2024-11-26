@@ -1,10 +1,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:revrentals/user/garage.dart';
-import 'package:revrentals/user/gear.dart';
+import 'package:revrentals/user/item_details/gear.dart';
 import 'package:revrentals/user/marketplace.dart';
 
 class UserHomePage extends StatefulWidget {
+  const UserHomePage({super.key});
+
   @override
   State<UserHomePage> createState() => _UserHomePageState();
 }
@@ -13,10 +15,8 @@ class _UserHomePageState extends State<UserHomePage> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = [
-    MarketplacePage(), // Use the new MarketplacePage
-    // GearPage(),
-    // FavouritesPage(),
-    GaragePage(),
+    const MarketplacePage(), 
+    const GaragePage(),
   ];
 
   @override

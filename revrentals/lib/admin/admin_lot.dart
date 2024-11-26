@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 
 class AdminLotPage extends StatelessWidget {
+  const AdminLotPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,8 +19,8 @@ class AdminLotPage extends StatelessWidget {
         centerTitle: true,
         
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0), // Added padding around the body
+      body: const Padding(
+        padding: EdgeInsets.all(16.0), // Added padding around the body
         child: Center(
           child: Text(
             "List of lots will be displayed here.",
@@ -46,6 +48,8 @@ class AdminLotPage extends StatelessWidget {
 
 class AddLotPage extends StatelessWidget {
   final TextEditingController addressController = TextEditingController();
+
+  AddLotPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -106,7 +110,7 @@ class AddLotPage extends StatelessWidget {
     } else {
       // Add logic to handle a valid lot address
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Lot added successfully!")),
+        const SnackBar(content: Text("Lot added successfully!")),
       );
 
       addressController.clear(); // Clear the input field after submission

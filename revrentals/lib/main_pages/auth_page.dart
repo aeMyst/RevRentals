@@ -35,7 +35,7 @@ class AuthPage extends StatelessWidget {
                 }
                 if (snapshot.hasData && snapshot.data == false) {
                   // Profile is not complete; navigate to profile detail page
-                  return ProfileDetailsPage();
+                  return const ProfileDetailsPage();
                 } else {
                   // Profile is complete or some error occurred; go to home page
                   return UserHomePage();
@@ -44,7 +44,7 @@ class AuthPage extends StatelessWidget {
             );
           } else {
             // User is not logged in
-            return LoginPage();
+            return const LoginPage();
           }
         },
       ),
