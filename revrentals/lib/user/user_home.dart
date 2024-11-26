@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:revrentals/user/garage.dart';
 import 'package:revrentals/user/item_details/gear.dart';
-import 'package:revrentals/user/marketplace.dart';
+import 'package:revrentals/user/marketplace/marketplace.dart';
 
 class UserHomePage extends StatefulWidget {
   const UserHomePage({super.key});
