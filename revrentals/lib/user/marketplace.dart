@@ -18,7 +18,7 @@ class MarketplacePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3, // Number of tabs reduced to 3 (without Favorites tab)
+      length: 3,
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
@@ -46,28 +46,14 @@ class MarketplacePage extends StatelessWidget {
           ],
         ),
         body: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.only(left: 16.0, right: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // const SizedBox(height: 8),
-              // Container(
-              //   decoration: BoxDecoration(
-              //     color: Colors.grey[200],
-              //     borderRadius: BorderRadius.circular(10),
-              //   ),
-              //   padding: const EdgeInsets.symmetric(horizontal: 8),
-              //   child: const TextField(
-              //     decoration: InputDecoration(
-              //       hintText: 'Find motorcycle, etc',
-              //       border: InputBorder.none,
-              //       icon: Icon(Icons.search),
-              //     ),
-              //   ),
-              // ),
-              // const SizedBox(height: 16),
-              // Updated TabBar with 3 tabs (without 'Favorite' tab)
               const TabBar(
+                labelColor: Colors.blueGrey,
+                indicatorColor: Colors.blueGrey,
+                indicatorPadding: EdgeInsets.only(bottom: 8),
                 tabs: [
                   Tab(text: 'Motorcycles'),
                   Tab(text: 'Gear'),
@@ -94,30 +80,128 @@ class MarketplacePage extends StatelessWidget {
 
 // Widget to display motorcycles in each tab
 class MotorcycleTab extends StatelessWidget {
-  const MotorcycleTab({super.key});
-
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      scrollDirection: Axis.vertical,
+    return Column(
       children: [
-        MotorcycleCard(
-          imagePath: 'lib/images/motorcycle/ninja_zx4r.png',
-          isFavorite: true,
-          model: 'Kawasaki Ninja ZX-4R',
-          rentalPrice: 150,
+        const SizedBox(height: 16),
+        // Search Bar Row
+        Row(
+          children: [
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: const TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Find motorcycle, etc',
+                    border: InputBorder.none,
+                    icon: Icon(Icons.search),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
-        MotorcycleCard(
-          imagePath: 'lib/images/motorcycle/scooter.png',
-          isFavorite: false,
-          model: 'Velocifero TENNIS 4000W',
-          rentalPrice: 120,
+        const SizedBox(height: 8),
+        // Filter and Sort Buttons Row
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueGrey, // Button color
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              icon: const Icon(Icons.filter_list, color: Colors.white),
+              label: const Text(
+                'Filter',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () {
+                // TODO: Add filter functionality
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('Filter Options'),
+                      content: const Text('Filter functionality coming soon!'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Close'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+            const SizedBox(width: 16),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueGrey, // Button color
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              icon: const Icon(Icons.sort, color: Colors.white),
+              label: const Text(
+                'Sort',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () {
+                // TODO: Add sort functionality
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('Sort Options'),
+                      content: const Text('Sort functionality coming soon!'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Close'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+          ],
         ),
-        MotorcycleCard(
-          imagePath: 'lib/images/motorcycle/dirtbike.png',
-          isFavorite: false,
-          model: 'Honda CRF250R',
-          rentalPrice: 200,
+        const SizedBox(height: 16),
+        // Motorcycle List
+        Expanded(
+          child: ListView(
+            scrollDirection: Axis.vertical,
+            children: [
+              MotorcycleCard(
+                imagePath: 'lib/images/ninja_zx4r.png',
+                isFavorite: true,
+                model: 'Kawasaki Ninja ZX-4R',
+                rentalPrice: 150,
+              ),
+              MotorcycleCard(
+                imagePath: 'lib/images/moped.jpg',
+                isFavorite: false,
+                model: 'Velocifero TENNIS 4000W',
+                rentalPrice: 120,
+              ),
+              MotorcycleCard(
+                imagePath: 'lib/images/dirtbike.png',
+                isFavorite: false,
+                model: 'Honda CRF250R',
+                rentalPrice: 200,
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -130,7 +214,8 @@ class MotorcycleCard extends StatefulWidget {
   final String imagePath;
   final bool isFavorite;
 
-  const MotorcycleCard({super.key, 
+  const MotorcycleCard({
+    super.key,
     required this.model,
     required this.rentalPrice,
     required this.imagePath,
@@ -213,32 +298,131 @@ class _MotorcycleCardState extends State<MotorcycleCard> {
   }
 }
 
+// Widget to display motorcycles in each tab
 class GearTab extends StatelessWidget {
-  const GearTab({super.key});
-
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      scrollDirection: Axis.vertical,
-      children: const [
-        GearItem(
-          imagePath: 'lib/images/gear/agv_pista.webp',
-          name: 'AGV Pista GP RR',
-          description: '',
-          rentalPrice: 100.0,
+    return Column(
+      children: [
+        const SizedBox(height: 16),
+        // Search Bar Row
+        Row(
+          children: [
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: const TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Find motorcycle, etc',
+                    border: InputBorder.none,
+                    icon: Icon(Icons.search),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
-        GearItem(
-          imagePath: 'lib/images/gear/gloves.png',
-          name: 'Alpinestars Stella SMX-2 Air Carbon V2',
-          description:
-              'High-quality leather gloves for comfort and protection.',
-          rentalPrice: 35.50,
+        const SizedBox(height: 8),
+        // Filter and Sort Buttons Row
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueGrey, // Button color
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              icon: const Icon(Icons.filter_list, color: Colors.white),
+              label: const Text(
+                'Filter',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () {
+                // TODO: Add filter functionality
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('Filter Options'),
+                      content: const Text('Filter functionality coming soon!'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Close'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+            const SizedBox(width: 16),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueGrey, // Button color
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              icon: const Icon(Icons.sort, color: Colors.white),
+              label: const Text(
+                'Sort',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () {
+                // TODO: Add sort functionality
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('Sort Options'),
+                      content: const Text('Sort functionality coming soon!'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Close'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+          ],
         ),
-        GearItem(
-          imagePath: 'lib/images/gear/jacket.jpg',
-          name: 'Alpinestars GPR Plus Jacket',
-          description: 'Leather jacket with armor protection.',
-          rentalPrice: 120.99,
+        const SizedBox(height: 16),
+        // Motorcycle List
+        Expanded(
+          child: ListView(
+            scrollDirection: Axis.vertical,
+            children: [
+              GearItem(
+                imagePath: 'lib/images/gear/agv_pista.webp',
+                name: 'AGV Pista GP RR',
+                description: '',
+                rentalPrice: 100.0,
+              ),
+              GearItem(
+                imagePath: 'lib/images/gear/gloves.png',
+                name: 'Alpinestars Stella SMX-2 Air Carbon V2',
+                description:
+                    'High-quality leather gloves for comfort and protection.',
+                rentalPrice: 35.50,
+              ),
+              GearItem(
+                imagePath: 'lib/images/gear/jacket.jpg',
+                name: 'Alpinestars GPR Plus Jacket',
+                description: 'Leather jacket with armor protection.',
+                rentalPrice: 120.99,
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -251,7 +435,8 @@ class GearItem extends StatefulWidget {
   final String description;
   final double rentalPrice;
 
-  const GearItem({super.key, 
+  const GearItem({
+    super.key,
     required this.name,
     required this.rentalPrice,
     required this.imagePath,
@@ -335,39 +520,138 @@ class _GearItemState extends State<GearItem> {
   }
 }
 
+// Widget to display motorcycles in each tab
 class LotTab extends StatelessWidget {
-  const LotTab({super.key});
-
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      scrollDirection: Axis.vertical,
+    return Column(
       children: [
-        LotCard(
-            lotAddress: 'Example Lot 1',
-            rentalPrice: 25.0,
-            imagePath: 'lib/images/lots/public_parking.png',
-            description: ''),
-        LotCard(
-            lotAddress: 'Example Lot 2',
-            rentalPrice: 50.0,
-            imagePath: 'lib/images/lots/outdoor_parking.png',
-            description: ''),
-        LotCard(
-            lotAddress: 'Example Lot 3',
-            rentalPrice: 75.0,
-            imagePath: 'lib/images/lots/big_parking.png',
-            description: ''),
-        LotCard(
-            lotAddress: 'Example Lot 4',
-            rentalPrice: 100.0,
-            imagePath: 'lib/images/lots/parking_garage.png',
-            description: ''),
-        LotCard(
-            lotAddress: 'Example Lot 5',
-            rentalPrice: 150.0,
-            imagePath: 'lib/images/lots/storage_units.png',
-            description: ''),
+        const SizedBox(height: 16),
+        // Search Bar Row
+        Row(
+          children: [
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: const TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Find motorcycle, etc',
+                    border: InputBorder.none,
+                    icon: Icon(Icons.search),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        // Filter and Sort Buttons Row
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueGrey, // Button color
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              icon: const Icon(Icons.filter_list, color: Colors.white),
+              label: const Text(
+                'Filter',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () {
+                // TODO: Add filter functionality
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('Filter Options'),
+                      content: const Text('Filter functionality coming soon!'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Close'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+            const SizedBox(width: 16),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueGrey, // Button color
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              icon: const Icon(Icons.sort, color: Colors.white),
+              label: const Text(
+                'Sort',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () {
+                // TODO: Add sort functionality
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('Sort Options'),
+                      content: const Text('Sort functionality coming soon!'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Close'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        // Motorcycle List
+        Expanded(
+          child: ListView(
+            scrollDirection: Axis.vertical,
+            children: [
+              LotCard(
+                  lotAddress: 'Example Lot 1',
+                  rentalPrice: 25.0,
+                  imagePath: 'lib/images/lots/public_parking.png',
+                  description: ''),
+              LotCard(
+                  lotAddress: 'Example Lot 2',
+                  rentalPrice: 50.0,
+                  imagePath: 'lib/images/lots/outdoor_parking.png',
+                  description: ''),
+              LotCard(
+                  lotAddress: 'Example Lot 3',
+                  rentalPrice: 75.0,
+                  imagePath: 'lib/images/lots/big_parking.png',
+                  description: ''),
+              LotCard(
+                  lotAddress: 'Example Lot 4',
+                  rentalPrice: 100.0,
+                  imagePath: 'lib/images/lots/parking_garage.png',
+                  description: ''),
+              LotCard(
+                  lotAddress: 'Example Lot 5',
+                  rentalPrice: 150.0,
+                  imagePath: 'lib/images/lots/storage_units.png',
+                  description: ''),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -379,7 +663,8 @@ class LotCard extends StatefulWidget {
   final double rentalPrice;
   final String imagePath;
 
-  const LotCard({super.key, 
+  const LotCard({
+    super.key,
     required this.lotAddress,
     required this.rentalPrice,
     required this.imagePath,
@@ -425,7 +710,7 @@ class _LotCardState extends State<LotCard> {
                   child: Image.asset(
                     widget.imagePath,
                     fit: BoxFit.cover,
-                    height: 200,
+                    height: 150,
                   ),
                 ),
                 const SizedBox(height: 10),

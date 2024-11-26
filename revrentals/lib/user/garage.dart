@@ -102,6 +102,8 @@ class GaragePage extends StatelessWidget {
             ),
           ],
           bottom: const TabBar(
+            indicatorColor: Colors.white,
+            indicatorPadding: EdgeInsets.only(bottom: 8),
             tabs: [
               Tab(text: 'Listed'),
               Tab(text: 'Rented'),
