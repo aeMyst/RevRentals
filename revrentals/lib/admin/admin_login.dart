@@ -31,7 +31,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
     try {
       // Simulate an API call to Django backend
       // Replace this with actual API logic
-      await Future.delayed(const Duration(seconds: 2));
+      // await Future.delayed(const Duration(seconds: 2));
 
       if (adminName == 'revrentals_admin' && password == 'admin123') {
         Navigator.pop(context); // Close the loading dialog
@@ -41,12 +41,10 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
           context,
           MaterialPageRoute(builder: (context) =>  AdminHomePage()),
         );
-      } else {
-        throw Exception("Invalid credentials");
-      }
+      } 
     } catch (e) {
       Navigator.pop(context); // Close the loading dialog
-      errorMessage("Invalid username or password. Please try again.");
+      // errorMessage("Invalid username or password. Please try again.");
     }
   }
 

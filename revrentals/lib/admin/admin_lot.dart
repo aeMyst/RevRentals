@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 
 class AdminLotPage extends StatelessWidget {
@@ -11,8 +12,10 @@ class AdminLotPage extends StatelessWidget {
         title: const Text(
           "Lots",
           style: TextStyle(color: Colors.white),
+
         ),
         centerTitle: true,
+        
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0), // Added padding around the body
@@ -105,7 +108,7 @@ class AddLotPage extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Lot added successfully!")),
       );
-      Navigator.push(context, MaterialPageRoute(builder: (context) => AdminLotPage()));
+
       addressController.clear(); // Clear the input field after submission
 
     }
