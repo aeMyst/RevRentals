@@ -183,19 +183,19 @@ class MotorcycleTab extends StatelessWidget {
             scrollDirection: Axis.vertical,
             children: [
               MotorcycleCard(
-                imagePath: 'lib/images/ninja_zx4r.png',
+                imagePath: 'lib/images/motorcycle/ninja_zx4r.png',
                 isFavorite: true,
                 model: 'Kawasaki Ninja ZX-4R',
                 rentalPrice: 150,
               ),
               MotorcycleCard(
-                imagePath: 'lib/images/moped.jpg',
+                imagePath: 'lib/images/motorcycle/scooter.png',
                 isFavorite: false,
                 model: 'Velocifero TENNIS 4000W',
                 rentalPrice: 120,
               ),
               MotorcycleCard(
-                imagePath: 'lib/images/dirtbike.png',
+                imagePath: 'lib/images/motorcycle/dirtbike.png',
                 isFavorite: false,
                 model: 'Honda CRF250R',
                 rentalPrice: 200,
@@ -623,7 +623,7 @@ class LotTab extends StatelessWidget {
         Expanded(
           child: ListView(
             scrollDirection: Axis.vertical,
-            children: [
+            children: const [
               LotCard(
                   lotAddress: 'Example Lot 1',
                   rentalPrice: 25.0,
