@@ -17,7 +17,6 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
   final licenseNumberController = TextEditingController();
   final addressController = TextEditingController();
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<void> saveProfileDetails() async {
     if (firstNameController.text.isEmpty ||

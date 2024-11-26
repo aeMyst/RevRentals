@@ -20,17 +20,11 @@ class _LoginPageState extends State<LoginPage> {
   final confirmPasswordController = TextEditingController();
 
   bool isSignUpMode = false;
-  int? _selectedRole = 0; // 0 for "Renter", 1 for "Seller"
+
 
   void toggleAuthMode(bool isSignUp) {
     setState(() {
       isSignUpMode = isSignUp;
-    });
-  }
-
-  void onRoleSelected(int? newRole) {
-    setState(() {
-      _selectedRole = newRole;
     });
   }
 
@@ -204,19 +198,6 @@ class _LoginPageState extends State<LoginPage> {
                   label: isSignUpMode ? 'Sign Up' : 'Log In',
                 ),
                 const SizedBox(height: 20),
-                // if (!isSignUpMode) TextButton(
-                //   onPressed: () {
-                //     // Implement password reset functionality
-                //     print('Password reset requested');
-                //   },
-                //   child: const Text(
-                //     'Forgot Password?',
-                //     style: TextStyle(
-                //       color: Colors.blue,
-                //       fontWeight: FontWeight.bold,
-                //     ),
-                //   ),
-                // ),
                 const SizedBox(height: 20),
                 TextButton(
                   onPressed: () => getAdminPage(context),
