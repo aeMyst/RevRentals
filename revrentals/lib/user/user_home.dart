@@ -14,7 +14,7 @@ class _UserHomePageState extends State<UserHomePage> {
 
   final List<Widget> _pages = [
     MarketplacePage(), // Use the new MarketplacePage
-    GearPage(),
+    // GearPage(),
     // FavouritesPage(),
     GaragePage(),
   ];
@@ -39,10 +39,10 @@ class _UserHomePageState extends State<UserHomePage> {
             icon: Icon(Icons.two_wheeler),
             label: 'Marketplace',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.sports_motorsports),
-            label: 'Gear',
-          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.sports_motorsports),
+          //   label: 'Gear',
+          // ),
           BottomNavigationBarItem(
             icon: Icon(Icons.warehouse),
             label: 'Garage',
