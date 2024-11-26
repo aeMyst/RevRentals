@@ -5,7 +5,7 @@ import 'package:revrentals/components/my_button.dart';
 import 'package:revrentals/user/user_home.dart';
 
 class ProfileDetailsPage extends StatefulWidget {
-  const ProfileDetailsPage({Key? key}) : super(key: key);
+  const ProfileDetailsPage({super.key});
 
   @override
   State<ProfileDetailsPage> createState() => _ProfileDetailsPageState();
@@ -57,7 +57,7 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.blueGrey,
       ),
       body: SingleChildScrollView(
@@ -114,6 +114,8 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
 }
 
 class DisplayProfileDetailsPage extends StatefulWidget {
+  const DisplayProfileDetailsPage({super.key});
+
   @override
   _DisplayProfileDetailsPageState createState() =>
       _DisplayProfileDetailsPageState();
@@ -141,7 +143,7 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
       // POST Request to update profile details here
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Profile updated successfully')),
+          const SnackBar(content: Text('Profile updated successfully')),
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -159,16 +161,16 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
       return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          iconTheme: IconThemeData(
+          iconTheme: const IconThemeData(
             color: Colors.white,
           ),
-          title: Text(
+          title: const Text(
             'Profile Details',
             style: TextStyle(color: Colors.white),
           ),
           backgroundColor: Colors.blueGrey,
         ),
-        body: Center(
+        body: const Center(
           child: Text('No user is currently logged in.',
               style: TextStyle(fontSize: 18)),
         ),
@@ -183,7 +185,7 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
           // TODO: Fix issue of loading empty profile details page
           (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
-          return SizedBox.shrink();
+          return const SizedBox.shrink();
         }
 
         // Load data from profile table here
@@ -191,10 +193,10 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
         return Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
-            iconTheme: IconThemeData(
+            iconTheme: const IconThemeData(
               color: Colors.white,
             ),
-            title: Text(
+            title: const Text(
               'Profile Details',
               style: TextStyle(color: Colors.white),
             ),
@@ -209,28 +211,28 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
                 children: [
                   TextFormField(
                     controller: _firstNameController,
-                    decoration: InputDecoration(labelText: 'First Name'),
+                    decoration: const InputDecoration(labelText: 'First Name'),
                     validator: (value) =>
                         value!.isEmpty ? 'Please enter your first name' : null,
                   ),
                   const SizedBox(height: 8),
                   TextFormField(
                     controller: _lastNameController,
-                    decoration: InputDecoration(labelText: 'Last Name'),
+                    decoration: const InputDecoration(labelText: 'Last Name'),
                     validator: (value) =>
                         value!.isEmpty ? 'Please enter your last name' : null,
                   ),
                   const SizedBox(height: 8),
                   TextFormField(
                     controller: _emailController,
-                    decoration: InputDecoration(labelText: 'Email'),
+                    decoration: const InputDecoration(labelText: 'Email'),
                     validator: (value) =>
                         value!.isEmpty ? 'Please enter your email' : null,
                   ),
                   const SizedBox(height: 8),
                   TextFormField(
                     controller: _addressController,
-                    decoration: InputDecoration(labelText: 'Address'),
+                    decoration: const InputDecoration(labelText: 'Address'),
                     validator: (value) =>
                         value!.isEmpty ? 'Please enter your address' : null,
                   ),

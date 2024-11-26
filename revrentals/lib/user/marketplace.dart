@@ -7,7 +7,7 @@ import 'package:revrentals/user/profile_detail.dart';
 import 'package:revrentals/user/item_details/motorcycle/motorcycle_details.dart';
 
 class MarketplacePage extends StatelessWidget {
-  const MarketplacePage({Key? key}) : super(key: key);
+  const MarketplacePage({super.key});
 
   void signUserOut(BuildContext context) {
     // FirebaseAuth.instance.signOut();
@@ -94,6 +94,8 @@ class MarketplacePage extends StatelessWidget {
 
 // Widget to display motorcycles in each tab
 class MotorcycleTab extends StatelessWidget {
+  const MotorcycleTab({super.key});
+
   @override
   Widget build(BuildContext context) {
     return ListView(
@@ -128,7 +130,7 @@ class MotorcycleCard extends StatefulWidget {
   final String imagePath;
   final bool isFavorite;
 
-  MotorcycleCard({
+  const MotorcycleCard({super.key, 
     required this.model,
     required this.rentalPrice,
     required this.imagePath,
@@ -156,7 +158,7 @@ class _MotorcycleCardState extends State<MotorcycleCard> {
           ),
         );
       },
-      child: Container(
+      child: SizedBox(
         width: 200,
         child: Card(
           color: Colors.white,
@@ -178,7 +180,7 @@ class _MotorcycleCardState extends State<MotorcycleCard> {
                   ),
                 ),
                 if (widget.isFavorite)
-                  Positioned(
+                  const Positioned(
                     top: 8,
                     right: 8,
                     child: Icon(Icons.favorite, color: Colors.red),
@@ -212,6 +214,8 @@ class _MotorcycleCardState extends State<MotorcycleCard> {
 }
 
 class GearTab extends StatelessWidget {
+  const GearTab({super.key});
+
   @override
   Widget build(BuildContext context) {
     return ListView(
@@ -247,7 +251,7 @@ class GearItem extends StatefulWidget {
   final String description;
   final double rentalPrice;
 
-  const GearItem({
+  const GearItem({super.key, 
     required this.name,
     required this.rentalPrice,
     required this.imagePath,
@@ -276,7 +280,7 @@ class _GearItemState extends State<GearItem> {
           ),
         );
       },
-      child: Container(
+      child: SizedBox(
         width: 200,
         child: Card(
           color: Colors.white,
@@ -332,6 +336,8 @@ class _GearItemState extends State<GearItem> {
 }
 
 class LotTab extends StatelessWidget {
+  const LotTab({super.key});
+
   @override
   Widget build(BuildContext context) {
     return ListView(
@@ -373,7 +379,7 @@ class LotCard extends StatefulWidget {
   final double rentalPrice;
   final String imagePath;
 
-  LotCard({
+  const LotCard({super.key, 
     required this.lotAddress,
     required this.rentalPrice,
     required this.imagePath,
@@ -402,7 +408,7 @@ class _LotCardState extends State<LotCard> {
           ),
         );
       },
-      child: Container(
+      child: SizedBox(
         width: 200,
         child: Card(
           color: Colors.white,

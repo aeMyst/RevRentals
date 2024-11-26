@@ -11,11 +11,11 @@ class MotorcycleCard extends StatelessWidget {
   final String imagePath;
 
   const MotorcycleCard({
-    Key? key,
+    super.key,
     required this.model,
     required this.rentalPrice,
     required this.imagePath,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +64,7 @@ class MotorcycleCard extends StatelessWidget {
 }
 
 class GaragePage extends StatelessWidget {
-  const GaragePage({Key? key}) : super(key: key);
+  const GaragePage({super.key});
 
   void signUserOut(BuildContext context) {
     FirebaseAuth.instance.signOut();
@@ -135,6 +135,8 @@ class GaragePage extends StatelessWidget {
 
 // Widget to display listed motorcycles
 class ListedTab extends StatelessWidget {
+  const ListedTab({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -168,7 +170,7 @@ class ListedTab extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => AddListingPage(),
+                  builder: (context) => const AddListingPage(),
                 ),
               );
             },
@@ -183,11 +185,13 @@ class ListedTab extends StatelessWidget {
 
 // Widget to display rented motorcycles
 class RentedTab extends StatelessWidget {
+  const RentedTab({super.key});
+
   @override
   Widget build(BuildContext context) {
     return ListView(
       scrollDirection: Axis.vertical,
-      children: [
+      children: const [
         // MotorcycleCard(
         //   imagePath: 'lib/images/ninja_zx4r.png',
         //   model: 'Kawasaki Ninja ZX-4R',

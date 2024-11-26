@@ -5,6 +5,8 @@ import 'package:revrentals/user/item_details/gear.dart';
 import 'package:revrentals/user/marketplace.dart';
 
 class UserHomePage extends StatefulWidget {
+  const UserHomePage({super.key});
+
   @override
   State<UserHomePage> createState() => _UserHomePageState();
 }
@@ -13,8 +15,8 @@ class _UserHomePageState extends State<UserHomePage> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = [
-    MarketplacePage(), 
-    GaragePage(),
+    const MarketplacePage(), 
+    const GaragePage(),
   ];
 
   @override

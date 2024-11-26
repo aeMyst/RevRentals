@@ -4,7 +4,7 @@ import 'package:revrentals/components/my_textfield.dart';
 import 'package:revrentals/components/my_button.dart';
 
 class AdminLoginPage extends StatefulWidget {
-  const AdminLoginPage({Key? key}) : super(key: key);
+  const AdminLoginPage({super.key});
 
   @override
   _AdminLoginPageState createState() => _AdminLoginPageState();

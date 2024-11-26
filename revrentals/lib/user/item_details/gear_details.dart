@@ -12,12 +12,12 @@ class GearDetailPage extends StatefulWidget {
   final String description;
 
   const GearDetailPage({
-    Key? key,
+    super.key,
     required this.name,
     required this.rentalPrice,
     required this.imagePath,
     required this.description,
-  }) : super(key: key);
+  });
 
   @override
   _GearDetailPageState createState() => _GearDetailPageState();
@@ -46,18 +46,19 @@ class _GearDetailPageState extends State<GearDetailPage> {
           data: ThemeData.light().copyWith(
             primaryColor: Colors.blueGrey, // Button color
             dialogBackgroundColor: Colors.white, // White background
-            buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.primary),
-            colorScheme: ColorScheme.light(
+            buttonTheme: const ButtonThemeData(textTheme: ButtonTextTheme.primary),
+            colorScheme: const ColorScheme.light(
                 primary: Colors.blueGrey), // Adjust color scheme
           ),
           child: child!,
         );
       },
     );
-    if (picked != null && picked != selectedStartDate)
+    if (picked != null && picked != selectedStartDate) {
       setState(() {
         selectedStartDate = picked;
       });
+    }
   }
 
   // Function to select end rental date with white background
@@ -73,18 +74,19 @@ class _GearDetailPageState extends State<GearDetailPage> {
             primaryColor: Colors.blueGrey, // Button color
 
             dialogBackgroundColor: Colors.white, // White background
-            buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.primary),
-            colorScheme: ColorScheme.light(
+            buttonTheme: const ButtonThemeData(textTheme: ButtonTextTheme.primary),
+            colorScheme: const ColorScheme.light(
                 primary: Colors.blueGrey), // Adjust color scheme
           ),
           child: child!,
         );
       },
     );
-    if (picked != null && picked != selectedEndDate)
+    if (picked != null && picked != selectedEndDate) {
       setState(() {
         selectedEndDate = picked;
       });
+    }
   }
 
   // Function to handle gear rental
@@ -116,27 +118,7 @@ class _GearDetailPageState extends State<GearDetailPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.blueGrey,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => MarketplacePage()),
-          ),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () => signUserOut(context),
-            icon: const Icon(Icons.logout, color: Colors.white),
-          ),
-          IconButton(
-            icon: const Icon(Icons.person, color: Colors.white),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => DisplayProfileDetailsPage()),
-            ),
-          ),
-        ],
+        foregroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -237,7 +219,6 @@ class _GearDetailPageState extends State<GearDetailPage> {
             Center(
               child: ElevatedButton(
                 onPressed: _rentGear,
-                child: const Text('Rent Gear'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blueGrey,
                   foregroundColor: Colors.white,
@@ -248,6 +229,7 @@ class _GearDetailPageState extends State<GearDetailPage> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
+                child: const Text('Rent Gear'),
               ),
             ),
           ],

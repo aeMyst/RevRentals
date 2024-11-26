@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 
 
 class NotificationsPage extends StatelessWidget {
+  const NotificationsPage({super.key});
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Notifications'),
+        title: const Text('Notifications'),
         centerTitle: true,
         backgroundColor: Colors.blueGrey,
         foregroundColor: Colors.white,

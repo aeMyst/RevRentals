@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class AdminAgreementPage extends StatelessWidget {
+  const AdminAgreementPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -9,10 +11,10 @@ class AdminAgreementPage extends StatelessWidget {
                 iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.blueGrey,
         foregroundColor: Colors.white,
-        title: Text('Reservations'),
+        title: const Text('Reservations'),
         centerTitle: true,
       ),
-      body: Center(child: const Text('Reservations here'),),
+      body: const Center(child: Text('Reservations here'),),
     );
   }
 }
