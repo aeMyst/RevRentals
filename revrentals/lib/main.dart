@@ -17,12 +17,29 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       // title: 'RevRentals',
       // theme: ThemeData(
       //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
       //   useMaterial3: true,
       // ),
+      theme: ThemeData(
+          // colorScheme: ColorScheme.fromSeed(
+          //   seedColor: Colors.pink,
+
+          // ),
+          // textTheme: TextTheme(),
+
+
+          inputDecorationTheme: const InputDecorationTheme(
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                  width: 2, color: Color.fromARGB(255, 188, 205, 214)),
+            ),
+            focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                    width: 2, color: Color.fromARGB(255, 135, 158, 170))),
+          )),
       home: AuthPage(),
     );
   }

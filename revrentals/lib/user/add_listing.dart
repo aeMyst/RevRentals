@@ -17,6 +17,8 @@ class _AddListingPageState extends State<AddListingPage> {
   final TextEditingController insuranceController = TextEditingController();
   final TextEditingController vinController = TextEditingController();
   final TextEditingController registrationController = TextEditingController();
+  final TextEditingController vehicleAttributeController =
+      TextEditingController();
 
   final TextEditingController gearSizeController = TextEditingController();
   final TextEditingController brandController = TextEditingController();
@@ -28,6 +30,7 @@ class _AddListingPageState extends State<AddListingPage> {
   // Dropdown field
   String? selectedMotorcycleType = 'Motorcycle'; // Default selected value
   String? selectedGearType = 'Helmet';
+  String vehicleAttributeLabel = '';
 
   @override
   void dispose() {
@@ -35,6 +38,7 @@ class _AddListingPageState extends State<AddListingPage> {
     rentalPriceController.dispose();
     imagePathController.dispose();
     gearSizeController.dispose();
+    vehicleAttributeController.dispose();
     super.dispose();
   }
 
@@ -109,6 +113,7 @@ class _AddListingPageState extends State<AddListingPage> {
                     isMotorcycleSelected = index == 0;
                   });
                 },
+                splashColor: Colors.blueGrey.withOpacity(0.5),
                 color: Colors.grey,
                 selectedColor: Colors.blueGrey,
                 fillColor: Colors.blueGrey.withOpacity(0.2),
@@ -157,10 +162,39 @@ class _AddListingPageState extends State<AddListingPage> {
                 onChanged: (String? newValue) {
                   setState(() {
                     selectedMotorcycleType = newValue;
+
+                    // Update attribute based on type selected
+                    if (newValue == 'Motorcycle') {
+                      vehicleAttributeLabel = 'Engine Type';
+                      vehicleAttributeController.text =
+                          'Enter the engine type';
+                    } else if (newValue == 'Moped') {
+                      vehicleAttributeLabel = 'Cargo Rack';
+                      vehicleAttributeController.text =
+                          'Enter the cargo rack type';
+                    } else if (newValue == 'Dirtbike') {
+                      vehicleAttributeLabel = 'Terrain Type';
+                      vehicleAttributeController.text =
+                          'Enter the terrain type';
+                    }
                   });
                 },
               ),
               const SizedBox(height: 16),
+              // Extra attribute field
+              TextField(
+                controller: vehicleAttributeController,
+                decoration: InputDecoration(
+                    labelText: vehicleAttributeLabel,
+                    hintText: vehicleAttributeController.text.isEmpty
+                        ? 'Select a motorcycle type to see details'
+                        : vehicleAttributeController.text,
+                    enabledBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(width: 3, color: Colors.blueGrey))),
+              ),
+              const SizedBox(height: 16),
+
               // VIN form fields
               TextField(
                 controller: vinController,
@@ -231,7 +265,6 @@ class _AddListingPageState extends State<AddListingPage> {
                   border: OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(height: 16),
 
               // // Image path form field
               // TextField(
@@ -333,9 +366,8 @@ class _AddListingPageState extends State<AddListingPage> {
               // ),
             ],
 
-            const SizedBox(height: 32),
+            const SizedBox(height: 16),
             ElevatedButton(
-              
               onPressed: () {
                 // Collect values from the text fields
                 String model = modelController.text;
@@ -385,14 +417,11 @@ class _AddListingPageState extends State<AddListingPage> {
                 print('Rental Price: $rentalPrice');
                 print('Image Path: $imagePath');
               },
-              
               style: ElevatedButton.styleFrom(
-          
                 backgroundColor: const Color.fromARGB(255, 163, 196, 212),
                 foregroundColor: Colors.white,
               ),
               child: const Text('Save Listing'),
-
             ),
           ],
         ),
