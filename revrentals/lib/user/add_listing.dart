@@ -188,10 +188,7 @@ class _AddListingPageState extends State<AddListingPage> {
                     labelText: vehicleAttributeLabel,
                     hintText: vehicleAttributeController.text.isEmpty
                         ? 'Select a motorcycle type to see details'
-                        : vehicleAttributeController.text,
-                    enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(width: 3, color: Colors.blueGrey))),
+                        : vehicleAttributeController.text,)
               ),
               const SizedBox(height: 16),
 
