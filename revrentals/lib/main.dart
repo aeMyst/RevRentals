@@ -28,22 +28,21 @@ class MyApp extends StatelessWidget {
           //   seedColor: Colors.pink,
 
           // ),
-          primaryColor: Colors.pink,
+          // primaryColor: Colors.pink,
           // accentColor: Colors.red,
-          
-          textTheme: TextTheme(
-
-          ),
+          dialogBackgroundColor: Colors.white,
+          textTheme: TextTheme(),
           appBarTheme: const AppBarTheme(
-              centerTitle: true,
-              foregroundColor: Colors.white,
-              backgroundColor: Colors.blueGrey,
-              iconTheme: IconThemeData(
-                color: Colors.white,
-              ),
+            centerTitle: true,
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.blueGrey,
+            iconTheme: IconThemeData(
+              color: Colors.white,
+            ),
           ),
-
-      
+          dropdownMenuTheme: const DropdownMenuThemeData(
+            inputDecorationTheme: InputDecorationTheme(fillColor: Colors.white),
+          ),
           elevatedButtonTheme: ElevatedButtonThemeData(
               style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromARGB(255, 163, 196, 212),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:revrentals/main_pages/auth_page.dart';
 import 'package:revrentals/user/item_details/gear_details.dart';
 import 'package:revrentals/user/item_details/lot_details.dart';
-import 'package:revrentals/user/notifications.dart';
+import 'package:revrentals/user/notifications/notifications.dart';
 import 'package:revrentals/user/profile_detail.dart';
 import 'package:revrentals/user/item_details/motorcycle/motorcycle_details.dart';
 

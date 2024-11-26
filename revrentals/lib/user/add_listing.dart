@@ -140,7 +140,6 @@ class _AddListingPageState extends State<AddListingPage> {
                 value: selectedMotorcycleType,
                 decoration: const InputDecoration(
                   labelText: 'Motorcycle Type',
-                  border: OutlineInputBorder(),
                 ),
                 items: const [
                   DropdownMenuItem<String>(

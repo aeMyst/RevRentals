@@ -121,7 +121,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:revrentals/main_pages/auth_page.dart';
-import 'package:revrentals/user/notifications.dart';
+import 'package:revrentals/user/notifications/notifications.dart';
 import 'package:revrentals/user/profile_detail.dart';
 
 class GearPage extends StatelessWidget {
