@@ -79,9 +79,8 @@ class GaragePage extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: Colors.blueGrey,
           leading: IconButton(
-            icon: const Icon(Icons.notifications, color: Colors.white),
+            icon: const Icon(Icons.notifications),
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => NotificationsPage()),

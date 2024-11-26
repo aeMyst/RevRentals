@@ -22,25 +22,24 @@ class MarketplacePage extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: Colors.blueGrey,
           leading: IconButton(
-            icon: const Icon(Icons.notifications, color: Colors.white),
+            icon: const Icon(Icons.notifications),
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => NotificationsPage()),
+              MaterialPageRoute(builder: (context) => const NotificationsPage()),
             ),
           ),
           actions: [
             IconButton(
               onPressed: () => signUserOut(context),
-              icon: const Icon(Icons.logout, color: Colors.white),
+              icon: const Icon(Icons.logout),
             ),
             IconButton(
-              icon: const Icon(Icons.person, color: Colors.white),
+              icon: const Icon(Icons.person),
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => DisplayProfileDetailsPage()),
+                    builder: (context) => const DisplayProfileDetailsPage()),
               ),
             ),
           ],

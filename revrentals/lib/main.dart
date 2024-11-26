@@ -28,9 +28,21 @@ class MyApp extends StatelessWidget {
           //   seedColor: Colors.pink,
 
           // ),
-          // textTheme: TextTheme(),
+          textTheme: TextTheme(),
 
-
+          appBarTheme: const AppBarTheme(
+            centerTitle: true,
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.blueGrey,
+            titleTextStyle: TextStyle(
+              color: Colors.white,
+              fontSize: 20.0,
+              fontWeight: FontWeight.normal
+            ),
+            iconTheme: IconThemeData(
+              color: Colors.white,
+            )
+          ),
           inputDecorationTheme: const InputDecorationTheme(
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(

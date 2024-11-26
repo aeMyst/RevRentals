@@ -8,11 +8,7 @@ class AdminAgreementPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-                iconTheme: const IconThemeData(color: Colors.white),
-        backgroundColor: Colors.blueGrey,
-        foregroundColor: Colors.white,
         title: const Text('Reservations'),
-        centerTitle: true,
       ),
       body: const Center(child: Text('Reservations here'),),
     );

@@ -26,19 +26,14 @@ class _AdminHomePageState extends State<AdminHomePage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-
         automaticallyImplyLeading: false, // Prevent back button
-        backgroundColor: Colors.blueGrey,
-        elevation: 0,
         title: const Text(
           "Admin Home",
-          style: TextStyle(color: Colors.white),
         ),
-        centerTitle: true,
         actions: [
           IconButton(
             onPressed: () => signUserOut(context),
-            icon: const Icon(Icons.logout, color: Colors.white),
+            icon: const Icon(Icons.logout),
           ),
         ],
       ),

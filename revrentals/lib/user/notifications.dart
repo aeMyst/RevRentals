@@ -11,9 +11,6 @@ class NotificationsPage extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Notifications'),
-        centerTitle: true,
-        backgroundColor: Colors.blueGrey,
-        foregroundColor: Colors.white,
       ),
       body: ListView(
         children: const [

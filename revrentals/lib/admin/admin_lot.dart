@@ -9,15 +9,9 @@ class AdminLotPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.blueGrey,
-        foregroundColor: Colors.white,
         title: const Text(
           "Lots",
-          style: TextStyle(color: Colors.white),
-
-        ),
-        centerTitle: true,
-        
+        ),        
       ),
       body: const Padding(
         padding: EdgeInsets.all(16.0), // Added padding around the body

@@ -79,8 +79,6 @@ class _LoginPageState extends State<LoginPage> {
 
     bool mockSuccess = true; // Change to false to simulate failure
 
-    Navigator.pop(context);
-
     if (mockSuccess) {
       Navigator.push(
         context,

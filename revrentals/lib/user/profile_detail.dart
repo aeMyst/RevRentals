@@ -17,7 +17,6 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
   final licenseNumberController = TextEditingController();
   final addressController = TextEditingController();
 
-
   Future<void> saveProfileDetails() async {
     if (firstNameController.text.isEmpty ||
         lastNameController.text.isEmpty ||
@@ -51,14 +50,18 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        iconTheme: const IconThemeData(color: Colors.white),
-        backgroundColor: Colors.blueGrey,
+
+            leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context); // Navigate back to the previous screen
+          },
+        ),
       ),
       body: SingleChildScrollView(
         child: Center(
@@ -85,19 +88,23 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                const SizedBox(height: 16),
                 TextField(
                   controller: firstNameController,
                   decoration: const InputDecoration(labelText: "First Name"),
                 ),
+                const SizedBox(height: 8),
                 TextField(
                   controller: lastNameController,
                   decoration: const InputDecoration(labelText: "Last Name"),
                 ),
+                const SizedBox(height: 8),
                 TextField(
                   controller: licenseNumberController,
                   decoration:
                       const InputDecoration(labelText: "License Number"),
                 ),
+                const SizedBox(height: 8),
                 TextField(
                   controller: addressController,
                   decoration: const InputDecoration(labelText: "Address"),
@@ -140,7 +147,7 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
   void _updateProfile(String uid) async {
     if (_formKey.currentState!.validate()) {
       try {
-      // POST Request to update profile details here
+        // POST Request to update profile details here
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Profile updated successfully')),
@@ -161,14 +168,9 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
       return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          iconTheme: const IconThemeData(
-            color: Colors.white,
-          ),
           title: const Text(
-            'Profile Details',
-            style: TextStyle(color: Colors.white),
+            'Profile',
           ),
-          backgroundColor: Colors.blueGrey,
         ),
         body: const Center(
           child: Text('No user is currently logged in.',
@@ -193,14 +195,9 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
         return Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
-            iconTheme: const IconThemeData(
-              color: Colors.white,
-            ),
             title: const Text(
-              'Profile Details',
-              style: TextStyle(color: Colors.white),
+              'Profile',
             ),
-            backgroundColor: Colors.blueGrey,
           ),
           body: Padding(
             padding: const EdgeInsets.all(16.0),

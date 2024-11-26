@@ -92,10 +92,7 @@ class _AddListingPageState extends State<AddListingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blueGrey,
-        foregroundColor: Colors.white,
         title: const Text("Add Listing"),
-        centerTitle: true,
       ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
