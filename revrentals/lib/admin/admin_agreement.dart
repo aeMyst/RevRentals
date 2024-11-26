@@ -7,8 +7,12 @@ class AdminAgreementPage extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: AppBar(
                 iconTheme: const IconThemeData(color: Colors.white),
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.blueGrey,
+        foregroundColor: Colors.white,
+        title: Text('Reservations'),
+        centerTitle: true,
       ),
+      body: Center(child: const Text('Reservations here'),),
     );
   }
 }

@@ -53,12 +53,12 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.pop(context); // Close the loading dialog
 
       // Navigate to Admin Home Page after successful login
-      Navigator.pushReplacement(
+      Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => UserHomePage()),
       );
     } else {
-      throw Exception("Invalid credentials");
+      showError(context, "Invalid login credentials");
     }
   }
 
@@ -100,16 +100,23 @@ class _LoginPageState extends State<LoginPage> {
   void showError(BuildContext context, String message) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Error"),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text("OK"),
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: const Text(
+            "Error",
           ),
-        ],
-      ),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
     );
   }
 
