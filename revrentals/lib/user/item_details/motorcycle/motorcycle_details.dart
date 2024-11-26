@@ -112,14 +112,8 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        foregroundColor: Colors.white,
         backgroundColor: Colors.blueGrey,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const MarketplacePage()),
-          ),
-        ),
         actions: [
           IconButton(
             onPressed: () => signUserOut(context),
