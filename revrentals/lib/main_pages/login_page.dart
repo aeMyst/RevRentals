@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:revrentals/admin/admin_auth.dart';
 import 'package:revrentals/components/my_button.dart';
 import 'package:revrentals/components/my_textfield.dart';
+import 'package:revrentals/user/profile_detail.dart';
 import 'package:revrentals/user/user_home.dart';
 import '../services/auth_service.dart'; // Import AuthService
 
@@ -105,7 +106,7 @@ class _LoginPageState extends State<LoginPage> {
       if (response['success']) {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const UserHomePage()),
+          MaterialPageRoute(builder: (context) => const ProfileDetailsPage()),
         );
       } else {
         showError(context, response['error']);
