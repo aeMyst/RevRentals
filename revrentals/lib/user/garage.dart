@@ -83,7 +83,8 @@ class GaragePage extends StatelessWidget {
             icon: const Icon(Icons.notifications),
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => NotificationsPage()),
+              MaterialPageRoute(
+                  builder: (context) => const NotificationsPage()),
             ),
           ),
           actions: [
@@ -96,7 +97,7 @@ class GaragePage extends StatelessWidget {
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => DisplayProfileDetailsPage()),
+                    builder: (context) => const DisplayProfileDetailsPage()),
               ),
             ),
           ],
@@ -107,21 +108,20 @@ class GaragePage extends StatelessWidget {
               Tab(text: 'Listed'),
               Tab(text: 'Rented'),
             ],
-  
             labelColor: Colors.white,
             unselectedLabelColor: Colors.grey,
           ),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
+        body: const Padding(
+          padding: EdgeInsets.all(16.0),
           child: Column(
             children: [
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               Expanded(
                 child: TabBarView(
                   children: [
                     ListedTab(), // Listed tab
-                    RentedTab(),  // Rented tab
+                    RentedTab(), // Rented tab
                   ],
                 ),
               ),
@@ -132,7 +132,6 @@ class GaragePage extends StatelessWidget {
     );
   }
 }
-
 
 // Widget to display listed motorcycles
 class ListedTab extends StatelessWidget {
@@ -211,5 +210,4 @@ class RentedTab extends StatelessWidget {
       ],
     );
   }
-
 }

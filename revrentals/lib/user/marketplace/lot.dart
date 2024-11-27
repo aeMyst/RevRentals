@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:revrentals/user/item_details/lot_details.dart';
+
 // Widget to display motorcycles in each tab
 class LotTab extends StatelessWidget {
+  const LotTab({super.key});
 
-    void _showFilterDialog(BuildContext context) {
+  void _showFilterDialog(BuildContext context) {
     String selectedPriceRange = 'Any';
 
     final List<String> priceRanges = [
@@ -13,7 +15,6 @@ class LotTab extends StatelessWidget {
       'Under \$200',
       'Above \$200'
     ];
-
 
     showDialog(
       context: context,
@@ -46,8 +47,6 @@ class LotTab extends StatelessWidget {
                       });
                     },
                   ),
-
-                 
                 ],
               ),
               actions: [
@@ -58,8 +57,7 @@ class LotTab extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () {
                     // Handle the filter logic here
-                    print(
-                        'Price Range: $selectedPriceRange');
+                    print('Price Range: $selectedPriceRange');
                     Navigator.pop(context);
                   },
                   child: const Text('Apply'),
@@ -72,7 +70,7 @@ class LotTab extends StatelessWidget {
     );
   }
 
-   void _showSortDialog(BuildContext context) {
+  void _showSortDialog(BuildContext context) {
     String selectedSortOption = 'None';
     final List<String> sortOptions = [
       'None',
@@ -145,12 +143,11 @@ class LotTab extends StatelessWidget {
               ),
               onPressed: () {
                 // TODO: Add filter functionality
-_showFilterDialog(context);
+                _showFilterDialog(context);
               },
             ),
             const SizedBox(width: 16),
             ElevatedButton.icon(
-      
               icon: const Icon(Icons.sort),
               label: const Text(
                 'Sort',

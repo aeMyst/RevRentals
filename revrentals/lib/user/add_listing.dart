@@ -92,7 +92,7 @@ class _AddListingPageState extends State<AddListingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Add Listing"),
+        title: const Text("Add Listing"),
       ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -413,7 +413,6 @@ class _AddListingPageState extends State<AddListingPage> {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color.fromARGB(255, 163, 196, 212),
-
               ),
               child: const Text('Save Listing'),
             ),

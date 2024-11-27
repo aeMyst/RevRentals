@@ -3,6 +3,8 @@ import 'package:revrentals/user/item_details/gear_details.dart';
 
 // Widget to display motorcycles in each tab
 class GearTab extends StatelessWidget {
+  const GearTab({super.key});
+
   void _showFilterDialog(BuildContext context) {
     String selectedGear = 'All';
     String selectedPriceRange = 'Any';
@@ -284,7 +286,7 @@ class GearTab extends StatelessWidget {
         Expanded(
           child: ListView(
             scrollDirection: Axis.vertical,
-            children: [
+            children: const [
               GearItem(
                 imagePath: 'lib/images/gear/agv_pista.webp',
                 name: 'AGV Pista GP RR',

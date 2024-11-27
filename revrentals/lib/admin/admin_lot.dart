@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class AdminLotPage extends StatelessWidget {
@@ -9,9 +8,9 @@ class AdminLotPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           "Lots",
-        ),        
+        ),
       ),
       body: const Padding(
         padding: EdgeInsets.all(16.0), // Added padding around the body
@@ -50,7 +49,7 @@ class AddLotPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text("Add New Lot"),
+        title: const Text("Add New Lot"),
       ),
       body: Center(
         child: Padding(
@@ -78,7 +77,10 @@ class AddLotPage extends StatelessWidget {
                   onPressed: () {
                     _validateAndAddLot(context);
                   },
-                  child: const Text("Add Lot", style: TextStyle(color: Colors.white),),
+                  child: const Text(
+                    "Add Lot",
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ],
             ),
@@ -101,7 +103,6 @@ class AddLotPage extends StatelessWidget {
       );
 
       addressController.clear(); // Clear the input field after submission
-
     }
   }
 

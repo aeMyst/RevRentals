@@ -7,7 +7,7 @@ import 'package:revrentals/user/user_home.dart';
 
 class AuthPage extends StatelessWidget {
   const AuthPage({super.key});
-  
+
   Future<bool> _isProfileComplete(User user) async {
     final userDoc = await FirebaseFirestore.instance
         .collection('users')
@@ -38,7 +38,7 @@ class AuthPage extends StatelessWidget {
                   return const ProfileDetailsPage();
                 } else {
                   // Profile is complete or some error occurred; go to home page
-                  return UserHomePage();
+                  return const UserHomePage();
                 }
               },
             );

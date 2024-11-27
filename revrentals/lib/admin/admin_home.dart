@@ -49,7 +49,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => AdminLotPage()));
+                            builder: (context) => const AdminLotPage()));
                     // Navigate to Lots screen
                   }),
                   const SizedBox(width: 24),
@@ -58,7 +58,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => AdminAgreementPage()),
+                          builder: (context) => const AdminAgreementPage()),
                     );
                   }),
                 ],

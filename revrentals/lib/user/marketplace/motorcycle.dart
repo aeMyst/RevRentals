@@ -3,6 +3,8 @@ import 'package:revrentals/user/item_details/motorcycle/motorcycle_details.dart'
 
 // Widget to display motorcycles in each tab
 class MotorcycleTab extends StatelessWidget {
+  const MotorcycleTab({super.key});
+
   void _showFilterDialog(BuildContext context) {
     String selectedVehicle = 'All';
     String selectedPriceRange = 'Any';
@@ -281,7 +283,7 @@ class MotorcycleTab extends StatelessWidget {
         Expanded(
           child: ListView(
             scrollDirection: Axis.vertical,
-            children: [
+            children: const [
               MotorcycleCard(
                 imagePath: 'lib/images/motorcycle/ninja_zx4r.png',
                 isFavorite: true,

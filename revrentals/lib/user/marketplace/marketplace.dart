@@ -1,13 +1,10 @@
- import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:revrentals/main_pages/auth_page.dart';
-import 'package:revrentals/user/item_details/gear_details.dart';
-import 'package:revrentals/user/item_details/lot_details.dart';
 import 'package:revrentals/user/marketplace/gear.dart';
 import 'package:revrentals/user/marketplace/lot.dart';
 import 'package:revrentals/user/marketplace/motorcycle.dart';
 import 'package:revrentals/user/notifications/notifications.dart';
 import 'package:revrentals/user/profile_detail.dart';
-import 'package:revrentals/user/item_details/motorcycle/motorcycle_details.dart';
 
 class MarketplacePage extends StatelessWidget {
   const MarketplacePage({super.key});
@@ -29,7 +26,8 @@ class MarketplacePage extends StatelessWidget {
             icon: const Icon(Icons.notifications),
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const NotificationsPage()),
+              MaterialPageRoute(
+                  builder: (context) => const NotificationsPage()),
             ),
           ),
           actions: [
@@ -79,6 +77,3 @@ class MarketplacePage extends StatelessWidget {
     );
   }
 }
-
-
-

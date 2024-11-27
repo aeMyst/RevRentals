@@ -143,7 +143,7 @@ class GearPage extends StatelessWidget {
           icon: const Icon(Icons.notifications, color: Colors.white),
           onPressed: () => Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => NotificationsPage()),
+            MaterialPageRoute(builder: (context) => const NotificationsPage()),
           ),
         ),
         actions: [
@@ -156,7 +156,7 @@ class GearPage extends StatelessWidget {
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => DisplayProfileDetailsPage()),
+                  builder: (context) => const DisplayProfileDetailsPage()),
             ),
           ),
         ],
@@ -198,7 +198,8 @@ class GearItem extends StatelessWidget {
   final String description;
   final double price;
 
-  const GearItem({super.key, 
+  const GearItem({
+    super.key,
     required this.imagePath,
     required this.name,
     required this.description,

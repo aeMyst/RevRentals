@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
           // primaryColor: Colors.pink,
           // accentColor: Colors.red,
           dialogBackgroundColor: Colors.white,
-          textTheme: TextTheme(),
+          textTheme: const TextTheme(),
           appBarTheme: const AppBarTheme(
             centerTitle: true,
             foregroundColor: Colors.white,
@@ -50,7 +50,7 @@ class MyApp extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10)),
                   foregroundColor: Colors.white,
                   iconColor: Colors.white)),
-          buttonTheme: ButtonThemeData(),
+          buttonTheme: const ButtonThemeData(),
 
           // textButtonTheme: TextButtonThemeData(
           //     style: ButtonStyle(
@@ -75,7 +75,7 @@ class MyApp extends StatelessWidget {
                 borderSide: BorderSide(
                     width: 2, color: Color.fromARGB(255, 135, 158, 170))),
           )),
-      home: AuthPage(),
+      home: const AuthPage(),
     );
   }
 }

@@ -31,7 +31,7 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
     //
 
     Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => UserHomePage()));
+        context, MaterialPageRoute(builder: (context) => const UserHomePage()));
   }
 
   void showError(String message) {
@@ -55,8 +55,7 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-
-            leading: IconButton(
+        leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context); // Navigate back to the previous screen

@@ -1,8 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:revrentals/main_pages/auth_page.dart';
-import 'package:revrentals/user/marketplace/marketplace.dart';
-import 'package:revrentals/user/profile_detail.dart';
 import 'package:intl/intl.dart';
 
 class GearDetailPage extends StatefulWidget {

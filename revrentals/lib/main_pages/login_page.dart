@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:revrentals/admin/admin_auth.dart';
 import 'package:revrentals/components/my_button.dart';
 import 'package:revrentals/components/my_textfield.dart';
-import 'package:revrentals/user/profile_detail.dart';
 import 'package:revrentals/user/user_home.dart';
+import '../services/auth_service.dart'; // Import AuthService
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -18,9 +18,10 @@ class _LoginPageState extends State<LoginPage> {
   final passwordController = TextEditingController();
   final usernameController = TextEditingController();
   final confirmPasswordController = TextEditingController();
+  final AuthService _authService = AuthService(); // Initialize the AuthService
 
   bool isSignUpMode = false;
-
+  bool isLoading = false; // To manage loading state
 
   void toggleAuthMode(bool isSignUp) {
     setState(() {
@@ -37,22 +38,37 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> signInUser(BuildContext context) async {
-    String input = emailOrUsernameController.text;
+    String input = emailOrUsernameController.text.trim();
     String password = passwordController.text;
 
-    // Placeholder for login logic: Use Django API here;
+    if (input.isEmpty || password.isEmpty) {
+      showError(context, "Email/Username and Password are required.");
+      return;
+    }
 
-    if ((input == 'test' || input == 'test@gmail.com') &&
-        password == 'test123') {
-      Navigator.pop(context); // Close the loading dialog
+    setState(() {
+      isLoading = true; // Show loading indicator
+    });
 
-      // Navigate to Admin Home Page after successful login
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => UserHomePage()),
-      );
-    } else {
-      showError(context, "Invalid login credentials");
+    try {
+      final response = await _authService.login(input, password);
+
+      if (response['success']) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => UserHomePage(userData: response['user']),
+          ),
+        );
+      } else {
+        showError(context, response['error']);
+      }
+    } catch (e) {
+      showError(context, "An error occurred. Please try again.");
+    } finally {
+      setState(() {
+        isLoading = false; // Hide loading indicator
+      });
     }
   }
 
@@ -75,17 +91,31 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    // Placeholder for sign-up logic: Use Django API here
+    setState(() {
+      isLoading = true;
+    });
 
-    bool mockSuccess = true; // Change to false to simulate failure
+    try {
+      final response = await _authService.register({
+        "username": username,
+        "email": emailOrUsername,
+        "password": password,
+      });
 
-    if (mockSuccess) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const ProfileDetailsPage()),
-      );
-    } else {
-      showError(context, "Sign-up failed. Please try again.");
+      if (response['success']) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const UserHomePage()),
+        );
+      } else {
+        showError(context, response['error']);
+      }
+    } catch (e) {
+      showError(context, "An error occurred. Please try again.");
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -192,15 +222,16 @@ class _LoginPageState extends State<LoginPage> {
                 ],
                 const SizedBox(height: 15),
                 MyButton(
-                  onTap: () => authenticateUser(context),
-                  label: isSignUpMode ? 'Sign Up' : 'Log In',
+                  onTap: () =>
+                      authenticateUser(context), // Call authenticate function
+                  label: isLoading
+                      ? 'Loading...'
+                      : (isSignUpMode ? 'Sign Up' : 'Log In'),
                 ),
-                const SizedBox(height: 20),
                 const SizedBox(height: 20),
                 TextButton(
                   onPressed: () => getAdminPage(context),
-                  
-                  child: Text(
+                  child: const Text(
                     'Sign in as Admin',
                     style: TextStyle(
                       color: Colors.blue,

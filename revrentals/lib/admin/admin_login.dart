@@ -39,9 +39,9 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
         // Navigate to Admin Home Page after successful login
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) =>  AdminHomePage()),
+          MaterialPageRoute(builder: (context) => const AdminHomePage()),
         );
-      } 
+      }
     } catch (e) {
       Navigator.pop(context); // Close the loading dialog
       // errorMessage("Invalid username or password. Please try again.");
@@ -68,8 +68,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-      ),
+      appBar: AppBar(),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(

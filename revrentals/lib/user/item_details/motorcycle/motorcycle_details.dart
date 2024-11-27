@@ -6,7 +6,7 @@ import 'package:revrentals/user/profile_detail.dart';
 import 'package:intl/intl.dart';
 
 class MotorcycleDetailPage extends StatefulWidget {
-  final String model;         
+  final String model;
   final double rentalPrice;
   final String imagePath;
 
@@ -17,12 +17,11 @@ class MotorcycleDetailPage extends StatefulWidget {
     required this.imagePath,
   });
 
-   @override
+  @override
   _MotorcycleDetailPageState createState() => _MotorcycleDetailPageState();
 }
 
 class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
-  
   DateTime? selectedStartDate;
   DateTime? selectedEndDate;
 
@@ -40,12 +39,13 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
       initialDate: DateTime.now(),
       firstDate: DateTime(2024),
       lastDate: DateTime(2100),
-            builder: (BuildContext context, Widget? child) {
+      builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
             primaryColor: Colors.blueGrey, // Button color
             dialogBackgroundColor: Colors.white, // White background
-            buttonTheme: const ButtonThemeData(textTheme: ButtonTextTheme.primary),
+            buttonTheme:
+                const ButtonThemeData(textTheme: ButtonTextTheme.primary),
             colorScheme: const ColorScheme.light(
                 primary: Colors.blueGrey), // Adjust color scheme
           ),
@@ -67,12 +67,13 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
       initialDate: DateTime.now(),
       firstDate: DateTime(2024),
       lastDate: DateTime(2100),
-            builder: (BuildContext context, Widget? child) {
+      builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
             primaryColor: Colors.blueGrey, // Button color
             dialogBackgroundColor: Colors.white, // White background
-            buttonTheme: const ButtonThemeData(textTheme: ButtonTextTheme.primary),
+            buttonTheme:
+                const ButtonThemeData(textTheme: ButtonTextTheme.primary),
             colorScheme: const ColorScheme.light(
                 primary: Colors.blueGrey), // Adjust color scheme
           ),
@@ -88,24 +89,26 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
   }
 
   // function to HANDLE RENTAL (TO-DO) -----------------
-   void _rentMotorcycle() {
-  if (selectedStartDate != null && selectedEndDate != null) {
-    // if dates are selected, show success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Motorcycle rented from ${DateFormat('yyyy-MM-dd').format(selectedStartDate!)} to ${DateFormat('yyyy-MM-dd').format(selectedEndDate!)}'),
-        duration: const Duration(seconds: 3),  
-      ),
-    );
-    print('Motorcycle rented from ${DateFormat('yyyy-MM-dd').format(selectedStartDate!)} to ${DateFormat('yyyy-MM-dd').format(selectedEndDate!)}');
-  } else {
-    // show error message if dates aren't selected
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Please select both start and end dates.')),
-    );
+  void _rentMotorcycle() {
+    if (selectedStartDate != null && selectedEndDate != null) {
+      // if dates are selected, show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              'Motorcycle rented from ${DateFormat('yyyy-MM-dd').format(selectedStartDate!)} to ${DateFormat('yyyy-MM-dd').format(selectedEndDate!)}'),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+      print(
+          'Motorcycle rented from ${DateFormat('yyyy-MM-dd').format(selectedStartDate!)} to ${DateFormat('yyyy-MM-dd').format(selectedEndDate!)}');
+    } else {
+      // show error message if dates aren't selected
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Please select both start and end dates.')),
+      );
+    }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -124,7 +127,7 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => DisplayProfileDetailsPage()),
+                  builder: (context) => const DisplayProfileDetailsPage()),
             ),
           ),
         ],
@@ -137,7 +140,7 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
             // image
             Center(
               child: Image.asset(
-                widget.imagePath,  
+                widget.imagePath,
                 fit: BoxFit.contain,
                 height: 300,
                 width: 300,
@@ -148,7 +151,7 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
             // motorcycle title
             Center(
               child: Text(
-                widget.model,  
+                widget.model,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 24,
@@ -160,7 +163,7 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
             // motorcycle price
             Center(
               child: Text(
-                'Per day: \$${widget.rentalPrice.toStringAsFixed(2)} CAD',  
+                'Per day: \$${widget.rentalPrice.toStringAsFixed(2)} CAD',
                 style: const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 16,
@@ -170,48 +173,50 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
             const SizedBox(height: 20),
 
             // select rental start and end date
-           Row(
-            mainAxisAlignment: MainAxisAlignment.center, // Center the row
-            children: [
-              // select start date
-              GestureDetector(
-                onTap: () => _selectStartDate(context),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.blueGrey),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    selectedStartDate == null
-                        ? 'Select Start Date'
-                        : 'Start: ${DateFormat('yyyy-MM-dd').format(selectedStartDate!)}',
-                    style: const TextStyle(color: Colors.black, fontSize: 14),
-                  ),
-                ),
-              ),
-
-              const SizedBox(width: 20),
-
-              // select end date
-              GestureDetector(
-                onTap: () => _selectEndDate(context),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.blueGrey), 
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    selectedEndDate == null
-                        ? 'Select End Date'
-                        : 'End: ${DateFormat('yyyy-MM-dd').format(selectedEndDate!)}',
-                    style: const TextStyle(color: Colors.black, fontSize: 14),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center, // Center the row
+              children: [
+                // select start date
+                GestureDetector(
+                  onTap: () => _selectStartDate(context),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 10),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.blueGrey),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      selectedStartDate == null
+                          ? 'Select Start Date'
+                          : 'Start: ${DateFormat('yyyy-MM-dd').format(selectedStartDate!)}',
+                      style: const TextStyle(color: Colors.black, fontSize: 14),
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
+
+                const SizedBox(width: 20),
+
+                // select end date
+                GestureDetector(
+                  onTap: () => _selectEndDate(context),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 10),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.blueGrey),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      selectedEndDate == null
+                          ? 'Select End Date'
+                          : 'End: ${DateFormat('yyyy-MM-dd').format(selectedEndDate!)}',
+                      style: const TextStyle(color: Colors.black, fontSize: 14),
+                    ),
+                  ),
+                ),
+              ],
+            ),
 
             const SizedBox(height: 20),
 
@@ -222,11 +227,13 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blueGrey,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 30),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 30),
                   textStyle: const TextStyle(
-                    fontSize: 14,),
+                    fontSize: 14,
+                  ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8), 
+                    borderRadius: BorderRadius.circular(8),
                   ),
                 ),
                 child: const Text('Rent Motorcycle'),
