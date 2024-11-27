@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:revrentals/main_pages/auth_page.dart';
 import 'package:revrentals/user/marketplace/marketplace.dart';
+import 'package:revrentals/user/notifications/agreement_transaction.dart';
 import 'package:revrentals/user/profile_detail.dart';
 import 'package:intl/intl.dart';
 
@@ -115,8 +116,6 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        foregroundColor: Colors.white,
-        backgroundColor: Colors.blueGrey,
         actions: [
           IconButton(
             onPressed: () => signUserOut(context),
@@ -237,6 +236,116 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
                   ),
                 ),
                 child: const Text('Rent Motorcycle'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class RentedMotorcycleDetails extends StatefulWidget {
+  final String model;
+  final double totalRentalPrice;
+  final String imagePath;
+
+  const RentedMotorcycleDetails(
+      {super.key,
+      required this.model,
+      required this.totalRentalPrice,
+      required this.imagePath});
+
+  @override
+  State<RentedMotorcycleDetails> createState() =>
+      _RentedMotorcycleDetailsState();
+}
+
+// sign out function
+void signUserOut(BuildContext context) {
+  // FirebaseAuth.instance.signOut();
+  Navigator.pushReplacement(
+      context, MaterialPageRoute(builder: (context) => const AuthPage()));
+}
+
+class _RentedMotorcycleDetailsState extends State<RentedMotorcycleDetails> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            onPressed: () => signUserOut(context),
+            icon: const Icon(Icons.logout, color: Colors.white),
+          ),
+          IconButton(
+            icon: const Icon(Icons.person, color: Colors.white),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => DisplayProfileDetailsPage()),
+            ),
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // image
+            Center(
+              child: Image.asset(
+                widget.imagePath,
+                fit: BoxFit.contain,
+                height: 300,
+                width: 300,
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // motorcycle title
+            Center(
+              child: Text(
+                widget.model,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+
+            // motorcycle price
+            Center(
+              child: Text(
+                'Total Rental Price: \$${widget.totalRentalPrice.toStringAsFixed(2)} CAD',
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+                        Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  // Navigator.push(context, MaterialPageRoute(builder: (context) => AgreementTransactionPage(itemName: widget.model, renterName: 'renterName', rentalPeriod: 'rentalPeriod', rentalPrice: 'rentalPrice', totalPrice: widget.totalRentalPrice, onActionCompleted: 'onActionCompleted')))
+                },
+                style: ElevatedButton.styleFrom(
+                  // backgroundColor: Colors.blueGrey,
+                  // foregroundColor: Colors.white,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 30),
+                  textStyle: const TextStyle(
+                    fontSize: 14,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text('View Agreement & Transaction Details'),
               ),
             ),
           ],

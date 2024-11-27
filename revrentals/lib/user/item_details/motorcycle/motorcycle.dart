@@ -399,3 +399,84 @@ class _MotorcycleCardState extends State<MotorcycleCard> {
     );
   }
 }
+
+class RentedMotorcycleCard extends StatefulWidget {
+  final String model;
+  final String imagePath;
+  final double totalRentalPrice;
+
+  const RentedMotorcycleCard({
+    super.key,
+    required this.model,
+    required this.totalRentalPrice,
+    required this.imagePath,
+  });
+
+  @override
+  State<RentedMotorcycleCard> createState() => _RentedMotorcycleCardState();
+}
+
+class _RentedMotorcycleCardState extends State<RentedMotorcycleCard> {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RentedMotorcycleDetails(
+              model: widget.model,
+              totalRentalPrice: widget.totalRentalPrice,
+              imagePath: widget.imagePath,
+            ),
+          ),
+        );
+      },
+      child: SizedBox(
+        width: 200,
+        child: Card(
+          color: Colors.white,
+          elevation: 3,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Motorcycle image
+                Center(
+                  child: Image.asset(
+                    widget.imagePath,
+                    fit: BoxFit.cover,
+                    height: 150,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                // Model name
+                Text(
+                  widget.model,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                // Rental price per hour
+                Text(
+                  'Per Day: \$${widget.totalRentalPrice.toStringAsFixed(2)}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 10),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

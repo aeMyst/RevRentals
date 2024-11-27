@@ -1,19 +1,57 @@
 import 'package:flutter/material.dart';
-import 'package:revrentals/user/item_details/lot_details.dart';
+import 'package:revrentals/user/item_details/gear/gear_details.dart';
 
 // Widget to display motorcycles in each tab
-class LotTab extends StatelessWidget {
-  const LotTab({super.key});
+class GearTab extends StatelessWidget {
+  const GearTab({super.key});
 
   void _showFilterDialog(BuildContext context) {
+    String selectedGear = 'All';
     String selectedPriceRange = 'Any';
+    String selectedBrand = 'Any';
+    String selectedSize = 'Any';
+    String selectedMaterial = 'Any';
 
+    final List<String> gearType = [
+      'All',
+      'Helmet',
+      'Gloves',
+      'Jacket',
+      'Boots',
+      'Pants',
+    ];
     final List<String> priceRanges = [
       'Any',
       'Under \$100',
       'Above \$100',
       'Under \$200',
       'Above \$200'
+    ];
+
+    final List<String> brandOptions = [
+      'Any',
+      'Alpinestars',
+      'AGV',
+      'Shoei',
+      'HJC',
+      'Arai',
+    ];
+
+    final List<String> materialOptions = [
+      'Any',
+      'Leather',
+      'Plastic',
+      'Textile',
+      'Kevlar',
+    ];
+
+    final List<String> sizeOptions = [
+      'Any',
+      'X-Small',
+      'Small',
+      'Medium',
+      'Large',
+      'X-Large',
     ];
 
     showDialog(
@@ -26,6 +64,26 @@ class LotTab extends StatelessWidget {
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  // Dropdown for Category
+                  DropdownButtonFormField<String>(
+                    dropdownColor: Colors.white,
+                    value: selectedGear,
+                    decoration: const InputDecoration(
+                      labelText: 'Type',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: gearType.map((String category) {
+                      return DropdownMenuItem<String>(
+                        value: category,
+                        child: Text(category),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedGear = newValue!;
+                      });
+                    },
+                  ),
                   const SizedBox(height: 16),
                   // Dropdown for Price Range
                   DropdownButtonFormField<String>(
@@ -47,6 +105,69 @@ class LotTab extends StatelessWidget {
                       });
                     },
                   ),
+                  const SizedBox(height: 16),
+
+                  // Dropdown for Insurance
+                  DropdownButtonFormField<String>(
+                    dropdownColor: Colors.white,
+                    value: selectedBrand,
+                    decoration: const InputDecoration(
+                      labelText: 'Brand',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: brandOptions.map((String brand) {
+                      return DropdownMenuItem<String>(
+                        value: brand,
+                        child: Text(brand),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedBrand = newValue!;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    dropdownColor: Colors.white,
+                    value: selectedSize,
+                    decoration: const InputDecoration(
+                      labelText: 'Size',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: sizeOptions.map((String size) {
+                      return DropdownMenuItem<String>(
+                        value: size,
+                        child: Text(size),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedSize = newValue!;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  // Dropdown for Color
+                  DropdownButtonFormField<String>(
+                    dropdownColor: Colors.white,
+                    value: selectedMaterial,
+                    decoration: const InputDecoration(
+                      labelText: 'Material',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: materialOptions.map((String material) {
+                      return DropdownMenuItem<String>(
+                        value: material,
+                        child: Text(material),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedMaterial = newValue!;
+                      });
+                    },
+                  ),
                 ],
               ),
               actions: [
@@ -57,7 +178,8 @@ class LotTab extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () {
                     // Handle the filter logic here
-                    print('Price Range: $selectedPriceRange');
+                    print(
+                        'Category: $selectedGear, Price Range: $selectedPriceRange');
                     Navigator.pop(context);
                   },
                   child: const Text('Apply'),
@@ -165,31 +287,25 @@ class LotTab extends StatelessWidget {
           child: ListView(
             scrollDirection: Axis.vertical,
             children: const [
-              LotCard(
-                  lotAddress: 'Example Lot 1',
-                  rentalPrice: 25.0,
-                  imagePath: 'lib/images/lots/public_parking.png',
-                  description: ''),
-              LotCard(
-                  lotAddress: 'Example Lot 2',
-                  rentalPrice: 50.0,
-                  imagePath: 'lib/images/lots/outdoor_parking.png',
-                  description: ''),
-              LotCard(
-                  lotAddress: 'Example Lot 3',
-                  rentalPrice: 75.0,
-                  imagePath: 'lib/images/lots/big_parking.png',
-                  description: ''),
-              LotCard(
-                  lotAddress: 'Example Lot 4',
-                  rentalPrice: 100.0,
-                  imagePath: 'lib/images/lots/parking_garage.png',
-                  description: ''),
-              LotCard(
-                  lotAddress: 'Example Lot 5',
-                  rentalPrice: 150.0,
-                  imagePath: 'lib/images/lots/storage_units.png',
-                  description: ''),
+              GearItem(
+                imagePath: 'lib/images/gear/agv_pista.webp',
+                name: 'AGV Pista GP RR',
+                description: '',
+                rentalPrice: 100.0,
+              ),
+              GearItem(
+                imagePath: 'lib/images/gear/gloves.png',
+                name: 'Alpinestars Stella SMX-2 Air Carbon V2',
+                description:
+                    'High-quality leather gloves for comfort and protection.',
+                rentalPrice: 35.50,
+              ),
+              GearItem(
+                imagePath: 'lib/images/gear/jacket.jpg',
+                name: 'Alpinestars GPR Plus Jacket',
+                description: 'Leather jacket with armor protection.',
+                rentalPrice: 120.99,
+              ),
             ],
           ),
         ),
@@ -198,38 +314,38 @@ class LotTab extends StatelessWidget {
   }
 }
 
-class LotCard extends StatefulWidget {
-  final String lotAddress;
+class GearItem extends StatefulWidget {
+  final String imagePath;
+  final String name;
   final String description;
   final double rentalPrice;
-  final String imagePath;
 
-  const LotCard({
+  const GearItem({
     super.key,
-    required this.lotAddress,
+    required this.name,
     required this.rentalPrice,
     required this.imagePath,
     required this.description,
   });
 
   @override
-  State<LotCard> createState() => _LotCardState();
+  State<GearItem> createState() => _GearItemState();
 }
 
-class _LotCardState extends State<LotCard> {
+class _GearItemState extends State<GearItem> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Navigate to LotDetailsPage with the passed details
+        // Navigate to the GearDetailPage when the card is tapped
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => LotDetailsPage(
-              lotAddress: widget.lotAddress,
+            builder: (context) => GearDetailPage(
+              imagePath: widget.imagePath,
+              name: widget.name,
               description: widget.description,
               rentalPrice: widget.rentalPrice,
-              imagePath: widget.imagePath,
             ),
           ),
         );
@@ -247,6 +363,7 @@ class _LotCardState extends State<LotCard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Gear image
                 Center(
                   child: Image.asset(
                     widget.imagePath,
@@ -255,8 +372,9 @@ class _LotCardState extends State<LotCard> {
                   ),
                 ),
                 const SizedBox(height: 10),
+                // Gear name
                 Text(
-                  widget.lotAddress,
+                  widget.name,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
@@ -284,5 +402,19 @@ class _LotCardState extends State<LotCard> {
         ),
       ),
     );
+  }
+}
+
+class RentedItem extends StatefulWidget {
+  const RentedItem({super.key});
+
+  @override
+  State<RentedItem> createState() => _RentedItemState();
+}
+
+class _RentedItemState extends State<RentedItem> {
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
   }
 }

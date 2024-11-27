@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:revrentals/user/garage.dart';
+import 'package:revrentals/user/garage/garage.dart';
 import 'package:revrentals/user/marketplace/marketplace.dart';
 
 class UserHomePage extends StatefulWidget {
