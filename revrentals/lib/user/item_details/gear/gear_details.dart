@@ -1,20 +1,13 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:revrentals/main_pages/auth_page.dart';
 import 'package:intl/intl.dart';
+import 'package:revrentals/main_pages/auth_page.dart';
 
 class GearDetailPage extends StatefulWidget {
-  final String name;
-  final double rentalPrice;
-  final String imagePath;
-  final String description;
+  final Map<String, dynamic> gearData; // Accept the full gear data as a Map
 
   const GearDetailPage({
     super.key,
-    required this.name,
-    required this.rentalPrice,
-    required this.imagePath,
-    required this.description,
+    required this.gearData,
   });
 
   @override
@@ -27,62 +20,34 @@ class _GearDetailPageState extends State<GearDetailPage> {
 
   // Sign out function
   void signUserOut(BuildContext context) {
-    FirebaseAuth.instance.signOut();
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => const AuthPage()));
   }
 
-  // Function to select start rental date with white background
+  // Function to select start rental date
   Future<void> _selectStartDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(2024),
       lastDate: DateTime(2100),
-      builder: (BuildContext context, Widget? child) {
-        return Theme(
-          data: ThemeData.light().copyWith(
-            primaryColor: Colors.blueGrey, // Button color
-            dialogBackgroundColor: Colors.white, // White background
-            buttonTheme:
-                const ButtonThemeData(textTheme: ButtonTextTheme.primary),
-            colorScheme: const ColorScheme.light(
-                primary: Colors.blueGrey), // Adjust color scheme
-          ),
-          child: child!,
-        );
-      },
     );
-    if (picked != null && picked != selectedStartDate) {
+    if (picked != null) {
       setState(() {
         selectedStartDate = picked;
       });
     }
   }
 
-  // Function to select end rental date with white background
+  // Function to select end rental date
   Future<void> _selectEndDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(2024),
       lastDate: DateTime(2100),
-      builder: (BuildContext context, Widget? child) {
-        return Theme(
-          data: ThemeData.light().copyWith(
-            primaryColor: Colors.blueGrey, // Button color
-
-            dialogBackgroundColor: Colors.white, // White background
-            buttonTheme:
-                const ButtonThemeData(textTheme: ButtonTextTheme.primary),
-            colorScheme: const ColorScheme.light(
-                primary: Colors.blueGrey), // Adjust color scheme
-          ),
-          child: child!,
-        );
-      },
     );
-    if (picked != null && picked != selectedEndDate) {
+    if (picked != null) {
       setState(() {
         selectedEndDate = picked;
       });
@@ -92,19 +57,16 @@ class _GearDetailPageState extends State<GearDetailPage> {
   // Function to handle gear rental
   void _rentGear() {
     if (selectedStartDate != null && selectedEndDate != null) {
-      // If dates are selected, show success message
+      final rentalPeriod =
+          '${DateFormat('yyyy-MM-dd').format(selectedStartDate!)} to ${DateFormat('yyyy-MM-dd').format(selectedEndDate!)}';
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'Gear rented from ${DateFormat('yyyy-MM-dd').format(selectedStartDate!)} to ${DateFormat('yyyy-MM-dd').format(selectedEndDate!)}',
-          ),
+          content: Text('Gear rented for $rentalPeriod'),
           duration: const Duration(seconds: 3),
         ),
       );
-      print(
-          'Gear rented from ${DateFormat('yyyy-MM-dd').format(selectedStartDate!)} to ${DateFormat('yyyy-MM-dd').format(selectedEndDate!)}');
     } else {
-      // Show error message if dates aren't selected
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
             content: Text('Please select both start and end dates.')),
@@ -114,9 +76,11 @@ class _GearDetailPageState extends State<GearDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final gear = widget.gearData;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        title: const Text("Gear Details"),
         backgroundColor: Colors.blueGrey,
         foregroundColor: Colors.white,
       ),
@@ -125,10 +89,10 @@ class _GearDetailPageState extends State<GearDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Gear image
+            // Gear image (placeholder as there's no image in the data)
             Center(
               child: Image.asset(
-                widget.imagePath,
+                'lib/images/placeholder_gear.png', // Replace with actual image path if available
                 fit: BoxFit.contain,
                 height: 300,
                 width: 300,
@@ -139,7 +103,7 @@ class _GearDetailPageState extends State<GearDetailPage> {
             // Gear name
             Center(
               child: Text(
-                widget.name,
+                gear['Gear_Name'] ?? 'No Name Available',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 24,
@@ -148,10 +112,14 @@ class _GearDetailPageState extends State<GearDetailPage> {
             ),
             const SizedBox(height: 10),
 
-            // Gear description
+            // Gear details
             Center(
               child: Text(
-                widget.description,
+                "Brand: ${gear['Brand'] ?? 'N/A'}\n"
+                "Material: ${gear['Material'] ?? 'N/A'}\n"
+                "Type: ${gear['Type'] ?? 'N/A'}\n"
+                "Size: ${gear['Size'] ?? 'N/A'}",
+                textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey[700], fontSize: 16),
               ),
             ),
@@ -160,7 +128,7 @@ class _GearDetailPageState extends State<GearDetailPage> {
             // Gear price
             Center(
               child: Text(
-                'Per day: \$${widget.rentalPrice.toStringAsFixed(2)} CAD',
+                'Per day: \$${gear['GRentalPrice']?.toStringAsFixed(2) ?? '0.00'} CAD',
                 style: const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 16,
@@ -171,7 +139,7 @@ class _GearDetailPageState extends State<GearDetailPage> {
 
             // Select rental start and end date
             Row(
-              mainAxisAlignment: MainAxisAlignment.center, // Center the row
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Select start date
                 GestureDetector(

@@ -16,35 +16,30 @@ class _UserHomePageState extends State<UserHomePage> {
   int _currentIndex = 0;
 
   final ListingService _listingService = ListingService();
-  int? garageId;
+  int? profileId;
   bool isLoading = true; // State to track if data is loading
 
   @override
   void initState() {
     super.initState();
-    fetchGarageId(); // Fetch garage ID on init
+    fetchProfileId(); // Fetch profile ID on init
   }
 
-  Future<void> fetchGarageId() async {
-    if (widget.userData == null || widget.userData?['profile_id'] == null) {
-      // Handle the case where userData or profile_id is missing
-      print("Error: userData or profile_id is null");
-      setState(() {
-        isLoading = false; // Stop loading in this case
-      });
-      return;
-    }
-
+  Future<void> fetchProfileId() async {
     try {
-      final profileId = widget.userData!['profile_id'];
-      print("Fetching garage ID for profile ID: $profileId");
-      final id = await _listingService.fetchGarageId(profileId);
-      setState(() {
-        garageId = id;
-        isLoading = false; // Stop loading once garageId is fetched
-      });
+      final id = widget.userData?['profile_id'];
+      if (id != null) {
+        setState(() {
+          profileId = id;
+          isLoading = false; // Stop loading once profileId is fetched
+        });
+      } else {
+        setState(() {
+          isLoading = false; // Stop loading if profileId is null
+        });
+      }
     } catch (e) {
-      print("Error fetching garage ID: $e");
+      print("Error fetching profile ID: $e");
       setState(() {
         isLoading = false; // Stop loading in case of an error
       });
@@ -52,19 +47,17 @@ class _UserHomePageState extends State<UserHomePage> {
   }
 
   List<Widget> get _pages {
-    if (garageId == null) {
-      // Show placeholder widgets while garageId is being fetched
-      return const [
-        Center(
-            child: CircularProgressIndicator()), // Placeholder for Marketplace
-        Center(child: CircularProgressIndicator()), // Placeholder for Garage
-      ];
-    } else {
-      return [
-        MarketplacePage(garageId: garageId!), // Pass the fetched garageId
-        GaragePage(garageId: garageId!), // Pass the fetched garageId
-      ];
-    }
+    return [
+      if (profileId != null)
+        MarketplacePage(
+            garageId: profileId!) // Pass profileId to MarketplacePage
+      else
+        const Center(child: CircularProgressIndicator()), // Loading placeholder
+      if (profileId != null)
+        GaragePage(profileId: profileId!) // Pass profileId to GaragePage
+      else
+        const Center(child: CircularProgressIndicator()), // Loading placeholder
+    ];
   }
 
   @override

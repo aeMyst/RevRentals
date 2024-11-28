@@ -1,91 +1,104 @@
 import 'package:flutter/material.dart';
+import 'package:revrentals/services/listing_service.dart';
 
 class AddListingPage extends StatefulWidget {
-  const AddListingPage({super.key});
+  final int profileId;
+
+  const AddListingPage({super.key, required this.profileId});
 
   @override
   _AddListingPageState createState() => _AddListingPageState();
 }
 
 class _AddListingPageState extends State<AddListingPage> {
-  bool isMotorcycleSelected = true; // Initial selection for motorcycle
+  final ListingService _listingService = ListingService();
+  bool isMotorcycleSelected = true;
 
   // Controllers for text fields
   final TextEditingController modelController = TextEditingController();
-  final TextEditingController colorControler = TextEditingController();
+  final TextEditingController colorController = TextEditingController();
   final TextEditingController mileageController = TextEditingController();
   final TextEditingController insuranceController = TextEditingController();
   final TextEditingController vinController = TextEditingController();
   final TextEditingController registrationController = TextEditingController();
-  final TextEditingController vehicleAttributeController =
+  final TextEditingController rentalPriceController = TextEditingController();
+  final TextEditingController specificAttributeController =
       TextEditingController();
 
   final TextEditingController gearSizeController = TextEditingController();
   final TextEditingController brandController = TextEditingController();
   final TextEditingController materialController = TextEditingController();
+  final TextEditingController gearNameController = TextEditingController();
 
-  final TextEditingController rentalPriceController = TextEditingController();
-  final TextEditingController imagePathController = TextEditingController();
-
-  // Dropdown field
-  String? selectedMotorcycleType = 'Motorcycle'; // Default selected value
+  String? selectedMotorcycleType = 'Motorcycle';
   String? selectedGearType = 'Helmet';
-  String vehicleAttributeLabel = '';
+
+  String vehicleAttributeLabel = 'Engine Type';
+
+  Future<void> _addListing() async {
+    try {
+      // Fetch the garage ID based on the profile ID
+      int garageId = await _listingService.fetchGarageId(widget.profileId);
+
+      if (isMotorcycleSelected) {
+        // Prepare motorized vehicle data
+        Map<String, dynamic> listingData = {
+          "garage_id": garageId,
+          "vehicle_type": selectedMotorcycleType,
+          "vin": vinController.text,
+          "registration": registrationController.text,
+          "rental_price": double.parse(rentalPriceController.text),
+          "color": colorController.text,
+          "mileage": int.parse(mileageController.text),
+          "insurance": insuranceController.text,
+          "model": modelController.text,
+          "specific_attribute": specificAttributeController.text,
+        };
+
+        // Add motorized vehicle listing
+        await _listingService.addListing(listingData);
+      } else {
+        // Prepare gear data
+        Map<String, dynamic> listingData = {
+          "garage_id": garageId,
+          "gear_name": gearNameController.text,
+          "brand": brandController.text,
+          "material": materialController.text,
+          "type": selectedGearType,
+          "size": gearSizeController.text,
+          "rental_price": double.parse(rentalPriceController.text),
+        };
+
+        // Add gear listing
+        await _listingService.addListing(listingData);
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Listing added successfully!')),
+      );
+      Navigator.pop(context);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error adding listing: $e')),
+      );
+    }
+  }
 
   @override
   void dispose() {
     modelController.dispose();
+    colorController.dispose();
+    mileageController.dispose();
+    insuranceController.dispose();
+    vinController.dispose();
+    registrationController.dispose();
     rentalPriceController.dispose();
-    imagePathController.dispose();
+    specificAttributeController.dispose();
     gearSizeController.dispose();
-    vehicleAttributeController.dispose();
+    brandController.dispose();
+    materialController.dispose();
+    gearNameController.dispose();
     super.dispose();
-  }
-
-// Method to show an error dialog
-  void _showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          title: const Text("Error"),
-          content: Text(message),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showSavedListing(String model, String rentalPrice, String imagePath) {
-    // Display a dialog with the saved listing information
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Listing Saved"),
-          content: Text('Model: $model\n'
-              'Motorcycle Type: $selectedMotorcycleType\n'
-              'Rental Price: $rentalPrice\n'
-              'Image Path: $imagePath\n'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override
@@ -94,327 +107,138 @@ class _AddListingPageState extends State<AddListingPage> {
       appBar: AppBar(
         title: const Text("Add Listing"),
       ),
-      backgroundColor: Colors.white,
       body: SingleChildScrollView(
-        // Wrap everything in SingleChildScrollView
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Toggle buttons for selecting between Gear and Motorcycle
-            Center(
-              // Center the ToggleButtons widget within the available space
-              child: ToggleButtons(
-                isSelected: [isMotorcycleSelected, !isMotorcycleSelected],
-                onPressed: (int index) {
-                  setState(() {
-                    isMotorcycleSelected = index == 0;
-                  });
-                },
-                splashColor: Colors.blueGrey.withOpacity(0.5),
-                color: Colors.grey,
-                selectedColor: Colors.blueGrey,
-                fillColor: Colors.blueGrey.withOpacity(0.2),
-                borderColor: Colors.blueGrey,
-                borderRadius: BorderRadius.circular(10),
-                constraints: const BoxConstraints(minHeight: 50),
-                children: const [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text('Motorcycle', textAlign: TextAlign.center),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 32.0),
-                    child: Text('Gear', textAlign: TextAlign.center),
-                  ),
-                ],
-              ),
+            // Toggle between Motorized Vehicle and Gear
+            ToggleButtons(
+              isSelected: [isMotorcycleSelected, !isMotorcycleSelected],
+              onPressed: (index) {
+                setState(() {
+                  isMotorcycleSelected = index == 0;
+                });
+              },
+              constraints: const BoxConstraints(minHeight: 50, minWidth: 100),
+              children: const [
+                Text('Motorized Vehicle'),
+                Text('Gear'),
+              ],
             ),
             const SizedBox(height: 16),
 
-            // Conditional form based on selected toggle
+            // Conditional form fields
             if (isMotorcycleSelected) ...[
-              const SizedBox(height: 16),
-              // Dropdown for motorcycle type
               DropdownButtonFormField<String>(
-                dropdownColor: Colors.white,
                 value: selectedMotorcycleType,
-                decoration: const InputDecoration(
-                  labelText: 'Motorcycle Type',
-                ),
+                decoration: const InputDecoration(labelText: 'Vehicle Type'),
                 items: const [
-                  DropdownMenuItem<String>(
-                    value: 'Motorcycle',
-                    child: Text('Motorcycle'),
-                  ),
-                  DropdownMenuItem<String>(
-                    value: 'Moped',
-                    child: Text('Moped'),
-                  ),
-                  DropdownMenuItem<String>(
-                    value: 'Dirtbike',
-                    child: Text('Dirtbike'),
-                  ),
+                  DropdownMenuItem(
+                      value: 'Motorcycle', child: Text('Motorcycle')),
+                  DropdownMenuItem(value: 'Moped', child: Text('Moped')),
+                  DropdownMenuItem(value: 'Dirtbike', child: Text('Dirtbike')),
                 ],
-                onChanged: (String? newValue) {
+                onChanged: (value) {
                   setState(() {
-                    selectedMotorcycleType = newValue;
-
-                    // Update attribute based on type selected
-                    if (newValue == 'Motorcycle') {
-                      vehicleAttributeLabel = 'Engine Type';
-                      vehicleAttributeController.text = 'Enter the engine type';
-                    } else if (newValue == 'Moped') {
-                      vehicleAttributeLabel = 'Cargo Rack';
-                      vehicleAttributeController.text =
-                          'Enter the cargo rack type';
-                    } else if (newValue == 'Dirtbike') {
-                      vehicleAttributeLabel = 'Terrain Type';
-                      vehicleAttributeController.text =
-                          'Enter the terrain type';
-                    }
+                    selectedMotorcycleType = value;
+                    vehicleAttributeLabel = value == 'Motorcycle'
+                        ? 'Engine Type'
+                        : value == 'Moped'
+                            ? 'Cargo Rack'
+                            : 'Terrain Type';
                   });
                 },
               ),
               const SizedBox(height: 16),
-              // Extra attribute field
               TextField(
-                  controller: vehicleAttributeController,
-                  decoration: InputDecoration(
-                    labelText: vehicleAttributeController.text.isEmpty
-                        ? 'Select a motorcycle type to see details'
-                        : vehicleAttributeLabel,
-                    hintText: vehicleAttributeController.text.isEmpty
-                        ? 'Select a motorcycle type to see details'
-                        : vehicleAttributeController.text,
-                  )),
+                controller: specificAttributeController,
+                decoration: InputDecoration(labelText: vehicleAttributeLabel),
+              ),
               const SizedBox(height: 16),
-
-              // VIN form fields
               TextField(
                 controller: vinController,
-                decoration: const InputDecoration(
-                  labelText: 'VIN',
-                  hintText: 'Enter VIN',
-                  border: OutlineInputBorder(),
-                ),
+                decoration: const InputDecoration(labelText: 'VIN'),
               ),
               const SizedBox(height: 16),
-              // Motorcycle form fields
+              TextField(
+                controller: registrationController,
+                decoration: const InputDecoration(labelText: 'Registration'),
+              ),
+              const SizedBox(height: 16),
               TextField(
                 controller: modelController,
-                decoration: const InputDecoration(
-                  labelText: 'Model',
-                  hintText: 'Enter motorcycle model (Year, Brand, Name)',
-                  border: OutlineInputBorder(),
-                ),
+                decoration: const InputDecoration(labelText: 'Model'),
               ),
               const SizedBox(height: 16),
-              // Color form field
               TextField(
-                controller: colorControler,
-                decoration: const InputDecoration(
-                  labelText: 'Color',
-                  hintText: 'Enter color',
-                  border: OutlineInputBorder(),
-                ),
+                controller: colorController,
+                decoration: const InputDecoration(labelText: 'Color'),
               ),
               const SizedBox(height: 16),
-              // Rental price form field
               TextField(
-                controller: rentalPriceController,
-                decoration: const InputDecoration(
-                  labelText: 'Rental Price',
-                  hintText: 'Enter rental price per day',
-                  border: OutlineInputBorder(),
-                ),
+                controller: mileageController,
+                decoration: const InputDecoration(labelText: 'Mileage'),
                 keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 16),
-              // Mileage form field
-              TextField(
-                controller: mileageController,
-                decoration: const InputDecoration(
-                  labelText: 'Mileage',
-                  hintText: 'Enter mileage',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              // Insurance form field
               TextField(
                 controller: insuranceController,
-                decoration: const InputDecoration(
-                  labelText: 'Insurance',
-                  hintText: 'Enter insurance provider',
-                  border: OutlineInputBorder(),
-                ),
+                decoration: const InputDecoration(labelText: 'Insurance'),
               ),
               const SizedBox(height: 16),
-              // Insurance form field
               TextField(
-                controller: registrationController,
-                decoration: const InputDecoration(
-                  labelText: 'Registration',
-                  hintText: 'Enter registration number',
-                  border: OutlineInputBorder(),
-                ),
+                controller: rentalPriceController,
+                decoration: const InputDecoration(labelText: 'Rental Price'),
+                keyboardType: TextInputType.number,
               ),
-
-              // // Image path form field
-              // TextField(
-              //   controller: imagePathController,
-              //   decoration: const InputDecoration(
-              //     labelText: 'Image Path',
-              //     hintText: 'Enter image path or URL',
-              //     border: OutlineInputBorder(),
-              //   ),
-              // ),
             ] else ...[
-              const SizedBox(height: 16),
-              // Dropdown for gear type
               DropdownButtonFormField<String>(
-                dropdownColor: Colors.white,
                 value: selectedGearType,
-                decoration: const InputDecoration(
-                  labelText: 'Gear Type',
-                  border: OutlineInputBorder(),
-                ),
+                decoration: const InputDecoration(labelText: 'Gear Type'),
                 items: const [
-                  DropdownMenuItem<String>(
-                    value: 'Helmet',
-                    child: Text('Helmet'),
-                  ),
-                  DropdownMenuItem<String>(
-                    value: 'Gloves',
-                    child: Text('Gloves'),
-                  ),
-                  DropdownMenuItem<String>(
-                    value: 'Jacket',
-                    child: Text('Jacket'),
-                  ),
-                  DropdownMenuItem<String>(
-                    value: 'Boots',
-                    child: Text('Boots'),
-                  ),
-                  DropdownMenuItem<String>(
-                    value: 'Pants',
-                    child: Text('Pants'),
-                  ),
+                  DropdownMenuItem(value: 'Helmet', child: Text('Helmet')),
+                  DropdownMenuItem(value: 'Gloves', child: Text('Gloves')),
+                  DropdownMenuItem(value: 'Jacket', child: Text('Jacket')),
+                  DropdownMenuItem(value: 'Boots', child: Text('Boots')),
+                  DropdownMenuItem(value: 'Pants', child: Text('Pants')),
                 ],
-                onChanged: (String? newValue) {
+                onChanged: (value) {
                   setState(() {
-                    selectedGearType = newValue;
+                    selectedGearType = value;
                   });
                 },
               ),
               const SizedBox(height: 16),
-              // Gear size form field
+              TextField(
+                controller: gearNameController,
+                decoration: const InputDecoration(labelText: 'Gear Name'),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: brandController,
+                decoration: const InputDecoration(labelText: 'Brand'),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: materialController,
+                decoration: const InputDecoration(labelText: 'Material'),
+              ),
+              const SizedBox(height: 16),
               TextField(
                 controller: gearSizeController,
-                decoration: const InputDecoration(
-                  labelText: 'Gear Size',
-                  hintText: 'Enter gear size',
-                  border: OutlineInputBorder(),
-                ),
+                decoration: const InputDecoration(labelText: 'Size'),
               ),
               const SizedBox(height: 16),
-              // Gear size form field
-              TextField(
-                controller: brandController,
-                decoration: const InputDecoration(
-                  labelText: 'Brand',
-                  hintText: 'Enter brand',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              // Gear size form field
-              TextField(
-                controller: brandController,
-                decoration: const InputDecoration(
-                  labelText: 'Material',
-                  hintText: 'Enter material',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              // Rental price form field
               TextField(
                 controller: rentalPriceController,
-                decoration: const InputDecoration(
-                  labelText: 'Rental Price',
-                  hintText: 'Enter rental price per day',
-                  border: OutlineInputBorder(),
-                ),
+                decoration: const InputDecoration(labelText: 'Rental Price'),
                 keyboardType: TextInputType.number,
               ),
-              // const SizedBox(height: 16),
-              // // Image path form field
-              // TextField(
-              //   controller: imagePathController,
-              //   decoration: const InputDecoration(
-              //     labelText: 'Image Path',
-              //     hintText: 'Enter image path or URL',
-              //     border: OutlineInputBorder(),
-              //   ),
-              // ),
             ],
-
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                // Collect values from the text fields
-                String model = modelController.text;
-                String rentalPrice = rentalPriceController.text;
-                String imagePath = imagePathController.text;
-                String gearType = gearSizeController.text;
-
-                // Check if fields are filled out for either motorcycle or gear
-                if (isMotorcycleSelected) {
-                  // Validate motorcycle fields
-                  if (model.isEmpty ||
-                      rentalPrice.isEmpty ||
-                      imagePath.isEmpty ||
-                      colorControler.text.isEmpty ||
-                      vinController.text.isEmpty ||
-                      mileageController.text.isEmpty ||
-                      insuranceController.text.isEmpty ||
-                      registrationController.text.isEmpty) {
-                    // Show an error message if any required fields are empty
-                    _showErrorDialog(
-                        'Please fill out all fields for the motorcycle.');
-                    return;
-                  }
-                } else {
-                  // Validate gear fields
-                  if (gearType.isEmpty ||
-                      rentalPrice.isEmpty ||
-                      imagePath.isEmpty ||
-                      gearSizeController.text.isEmpty ||
-                      brandController.text.isEmpty ||
-                      materialController.text.isEmpty) {
-                    // Show an error message if any required fields are empty
-                    _showErrorDialog(
-                        'Please fill out all fields for the gear.');
-                    return;
-                  }
-                }
-
-                // If all fields are filled, save the listing
-                if (isMotorcycleSelected) {
-                  _showSavedListing(model, rentalPrice, imagePath);
-                } else {
-                  print('Gear type added: $selectedGearType');
-                }
-
-                print('Model: $model');
-                print('Rental Price: $rentalPrice');
-                print('Image Path: $imagePath');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 163, 196, 212),
-              ),
-              child: const Text('Save Listing'),
+              onPressed: _addListing,
+              child: const Text('Add Listing'),
             ),
           ],
         ),

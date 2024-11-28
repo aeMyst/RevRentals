@@ -1,20 +1,13 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:revrentals/main_pages/auth_page.dart';
 
 class LotDetailsPage extends StatefulWidget {
-  final String lotAddress;
-  final String description;
-  final double rentalPrice;
-  final String imagePath;
+  final Map<String, dynamic> lotData; // Accept the full lot data as a Map
 
   const LotDetailsPage({
     super.key,
-    required this.lotAddress,
-    required this.description,
-    required this.rentalPrice,
-    required this.imagePath,
+    required this.lotData,
   });
 
   @override
@@ -27,83 +20,53 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
 
   // Sign out function
   void signUserOut(BuildContext context) {
-    FirebaseAuth.instance.signOut();
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => const AuthPage()));
   }
 
-  // Function to select start rental date with white background
+  // Function to select start rental date
   Future<void> _selectStartDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(2024),
       lastDate: DateTime(2100),
-      builder: (BuildContext context, Widget? child) {
-        return Theme(
-          data: ThemeData.light().copyWith(
-            primaryColor: Colors.blueGrey, // Button color
-            dialogBackgroundColor: Colors.white, // White background
-            buttonTheme:
-                const ButtonThemeData(textTheme: ButtonTextTheme.primary),
-            colorScheme: const ColorScheme.light(
-                primary: Colors.blueGrey), // Adjust color scheme
-          ),
-          child: child!,
-        );
-      },
     );
-    if (picked != null && picked != selectedStartDate) {
+    if (picked != null) {
       setState(() {
         selectedStartDate = picked;
       });
     }
   }
 
-  // Function to select end rental date with white background
+  // Function to select end rental date
   Future<void> _selectEndDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(2024),
       lastDate: DateTime(2100),
-      builder: (BuildContext context, Widget? child) {
-        return Theme(
-          data: ThemeData.light().copyWith(
-            primaryColor: Colors.blueGrey, // Button color
-            dialogBackgroundColor: Colors.white, // White background
-            buttonTheme:
-                const ButtonThemeData(textTheme: ButtonTextTheme.primary),
-            colorScheme: const ColorScheme.light(
-                primary: Colors.blueGrey), // Adjust color scheme
-          ),
-          child: child!,
-        );
-      },
     );
-    if (picked != null && picked != selectedEndDate) {
+    if (picked != null) {
       setState(() {
         selectedEndDate = picked;
       });
     }
   }
 
-  // Function to handle gear rental
-  void _rentGear() {
+  // Function to handle renting the lot
+  void _rentLot() {
     if (selectedStartDate != null && selectedEndDate != null) {
-      // If dates are selected, show success message
+      final rentalPeriod =
+          '${DateFormat('yyyy-MM-dd').format(selectedStartDate!)} to ${DateFormat('yyyy-MM-dd').format(selectedEndDate!)}';
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'Gear rented from ${DateFormat('yyyy-MM-dd').format(selectedStartDate!)} to ${DateFormat('yyyy-MM-dd').format(selectedEndDate!)}',
-          ),
+          content: Text('Lot rented for $rentalPeriod'),
           duration: const Duration(seconds: 3),
         ),
       );
-      print(
-          'Gear rented from ${DateFormat('yyyy-MM-dd').format(selectedStartDate!)} to ${DateFormat('yyyy-MM-dd').format(selectedEndDate!)}');
     } else {
-      // Show error message if dates aren't selected
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
             content: Text('Please select both start and end dates.')),
@@ -113,9 +76,11 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final lot = widget.lotData;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        title: const Text("Lot Details"),
         foregroundColor: Colors.white,
         backgroundColor: Colors.blueGrey,
       ),
@@ -124,10 +89,10 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Lot image
+            // Lot image (placeholder as there's no image in the data)
             Center(
               child: Image.asset(
-                widget.imagePath,
+                'lib/images/placeholder_lot.png', // Replace with actual image path if available
                 fit: BoxFit.cover,
                 height: 300,
                 width: 300,
@@ -135,38 +100,27 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
             ),
             const SizedBox(height: 20),
             // Lot address
-            // Gear name
             Center(
               child: Text(
-                widget.lotAddress,
+                "Address: ${lot['LAddress']}",
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 24,
+                  fontSize: 20,
                 ),
               ),
             ),
+            const SizedBox(height: 10),
+            // Lot description
             Center(
               child: Text(
-                widget.description,
+                "Admin ID: ${lot['Admin_ID']}",
                 style: TextStyle(color: Colors.grey[700], fontSize: 16),
               ),
             ),
             const SizedBox(height: 20),
-            // Rental Price
-            Center(
-              child: Text(
-                'Per day: \$${widget.rentalPrice.toStringAsFixed(2)} CAD',
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-
             // Select rental start and end date
             Row(
-              mainAxisAlignment: MainAxisAlignment.center, // Center the row
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Select start date
                 GestureDetector(
@@ -187,7 +141,6 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
                   ),
                 ),
                 const SizedBox(width: 20),
-
                 // Select end date
                 GestureDetector(
                   onTap: () => _selectEndDate(context),
@@ -209,11 +162,10 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
               ],
             ),
             const SizedBox(height: 20),
-
             // Rent button
             Center(
               child: ElevatedButton(
-                onPressed: _rentGear,
+                onPressed: _rentLot,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blueGrey,
                   foregroundColor: Colors.white,
@@ -224,7 +176,7 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: const Text('Rent Gear'),
+                child: const Text('Rent Lot'),
               ),
             ),
           ],

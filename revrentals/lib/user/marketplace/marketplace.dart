@@ -19,27 +19,20 @@ class MarketplacePage extends StatefulWidget {
 class _MarketplacePageState extends State<MarketplacePage> {
   final ListingService _listingService =
       ListingService(); // Initialize ListingService
-  late Future<List<dynamic>>
-      _motorcyclesFuture; // Future for fetching motorcycles
+  late Future<List<dynamic>> _motorcyclesFuture;
+  late Future<List<dynamic>> _gearFuture;
+  late Future<List<dynamic>> _storageLotsFuture;
 
   @override
   void initState() {
     super.initState();
-    _motorcyclesFuture =
-        _fetchMotorcycles(); // Fetch motorcycles on initialization
-  }
-
-  Future<List<dynamic>> _fetchMotorcycles() async {
-    try {
-      return await _listingService.fetchMotorizedVehicles();
-    } catch (e) {
-      print("Error fetching motorcycles: $e");
-      return [];
-    }
+    _motorcyclesFuture = _listingService.fetchMotorizedVehicles();
+    _gearFuture = _listingService.fetchGearItems(); // Fetch gear items
+    _storageLotsFuture =
+        _listingService.fetchStorageLots(); // Fetch storage lots
   }
 
   void signUserOut(BuildContext context) {
-    // FirebaseAuth.instance.signOut();
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => const AuthPage()));
   }
@@ -93,8 +86,10 @@ class _MarketplacePageState extends State<MarketplacePage> {
                 child: TabBarView(
                   children: [
                     MotorcycleTab(motorcyclesFuture: _motorcyclesFuture),
-                    const GearTab(),
-                    const LotTab(),
+                    GearTab(gearFuture: _gearFuture), // Pass gearFuture
+                    LotTab(
+                        storageLotsFuture:
+                            _storageLotsFuture), // Pass storageLotsFuture
                   ],
                 ),
               ),
@@ -106,7 +101,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
   }
 }
 
-// MotorcycleTab updated to display fetched motorcycles
+// MotorcycleTab remains the same
 class MotorcycleTab extends StatelessWidget {
   final Future<List<dynamic>> motorcyclesFuture;
 
@@ -152,22 +147,94 @@ class MotorcycleTab extends StatelessWidget {
   }
 }
 
-// GearTab (unchanged)
+// GearTab updated to fetch and display gear items
 class GearTab extends StatelessWidget {
-  const GearTab({super.key});
+  final Future<List<dynamic>> gearFuture;
+
+  const GearTab({super.key, required this.gearFuture});
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text("Gear items will be displayed here."));
+    return FutureBuilder<List<dynamic>>(
+      future: gearFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text("Error: ${snapshot.error}"));
+        } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+          final gearItems = snapshot.data!;
+          return ListView.builder(
+            itemCount: gearItems.length,
+            itemBuilder: (context, index) {
+              final gear = gearItems[index];
+              return ListTile(
+                title: Text(gear['Gear_Name'] ?? "Unknown Gear"),
+                subtitle: Text("Rental Price: \$${gear['GRentalPrice']}"),
+                trailing: const Icon(Icons.settings),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => GearDetailPage(
+                        gearData: gear,
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          );
+        } else {
+          return const Center(child: Text("No gear items found."));
+        }
+      },
+    );
   }
 }
 
-// LotTab (unchanged)
+// LotTab updated to fetch and display storage lots
 class LotTab extends StatelessWidget {
-  const LotTab({super.key});
+  final Future<List<dynamic>> storageLotsFuture;
+
+  const LotTab({super.key, required this.storageLotsFuture});
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text("Storage lots will be displayed here."));
+    return FutureBuilder<List<dynamic>>(
+      future: storageLotsFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text("Error: ${snapshot.error}"));
+        } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+          final storageLots = snapshot.data!;
+          return ListView.builder(
+            itemCount: storageLots.length,
+            itemBuilder: (context, index) {
+              final lot = storageLots[index];
+              return ListTile(
+                title: Text("Lot No: ${lot['Lot_No']}"),
+                subtitle: Text("Address: ${lot['LAddress']}"),
+                trailing: const Icon(Icons.warehouse),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LotDetailsPage(
+                        lotData: lot,
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          );
+        } else {
+          return const Center(child: Text("No storage lots found."));
+        }
+      },
+    );
   }
 }

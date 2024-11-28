@@ -67,4 +67,38 @@ class ListingService {
       throw Exception("An error occurred: $e");
     }
   }
+
+  /// Fetch all storage lots.
+  Future<List<dynamic>> fetchStorageLots() async {
+    final url = Uri.parse("$_baseUrl/storage-lots/");
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['storage_lots'] as List<dynamic>;
+      } else {
+        throw Exception("Failed to fetch storage lots: ${response.body}");
+      }
+    } catch (e) {
+      throw Exception("An error occurred: $e");
+    }
+  }
+
+  /// Fetch all gear items.
+  Future<List<dynamic>> fetchGearItems() async {
+    final url = Uri.parse("$_baseUrl/gear-items/");
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['gear_items'] as List<dynamic>;
+      } else {
+        throw Exception("Failed to fetch gear items: ${response.body}");
+      }
+    } catch (e) {
+      throw Exception("An error occurred: $e");
+    }
+  }
 }
