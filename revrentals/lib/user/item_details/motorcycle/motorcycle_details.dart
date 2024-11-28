@@ -1,21 +1,14 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:revrentals/main_pages/auth_page.dart';
-import 'package:revrentals/user/marketplace/marketplace.dart';
-import 'package:revrentals/user/notifications/agreement_transaction.dart';
-import 'package:revrentals/user/profile_detail.dart';
 import 'package:intl/intl.dart';
+import 'package:revrentals/main_pages/auth_page.dart';
+import 'package:revrentals/user/profile_detail.dart';
 
 class MotorcycleDetailPage extends StatefulWidget {
-  final String model;
-  final double rentalPrice;
-  final String imagePath;
+  final Map<String, dynamic> motorcycleData; // Accept motorcycleData as a Map
 
   const MotorcycleDetailPage({
     super.key,
-    required this.model,
-    required this.rentalPrice,
-    required this.imagePath,
+    required this.motorcycleData,
   });
 
   @override
@@ -26,84 +19,51 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
   DateTime? selectedStartDate;
   DateTime? selectedEndDate;
 
-  // sign out function
   void signUserOut(BuildContext context) {
-    // FirebaseAuth.instance.signOut();
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => const AuthPage()));
   }
 
-  // function to select start rental date
   Future<void> _selectStartDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(2024),
       lastDate: DateTime(2100),
-      builder: (BuildContext context, Widget? child) {
-        return Theme(
-          data: ThemeData.light().copyWith(
-            primaryColor: Colors.blueGrey, // Button color
-            dialogBackgroundColor: Colors.white, // White background
-            buttonTheme:
-                const ButtonThemeData(textTheme: ButtonTextTheme.primary),
-            colorScheme: const ColorScheme.light(
-                primary: Colors.blueGrey), // Adjust color scheme
-          ),
-          child: child!,
-        );
-      },
     );
-    if (picked != null && picked != selectedStartDate) {
+    if (picked != null) {
       setState(() {
         selectedStartDate = picked;
       });
     }
   }
 
-  // function to select end date
   Future<void> _selectEndDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(2024),
       lastDate: DateTime(2100),
-      builder: (BuildContext context, Widget? child) {
-        return Theme(
-          data: ThemeData.light().copyWith(
-            primaryColor: Colors.blueGrey, // Button color
-            dialogBackgroundColor: Colors.white, // White background
-            buttonTheme:
-                const ButtonThemeData(textTheme: ButtonTextTheme.primary),
-            colorScheme: const ColorScheme.light(
-                primary: Colors.blueGrey), // Adjust color scheme
-          ),
-          child: child!,
-        );
-      },
     );
-    if (picked != null && picked != selectedEndDate) {
+    if (picked != null) {
       setState(() {
         selectedEndDate = picked;
       });
     }
   }
 
-  // function to HANDLE RENTAL (TO-DO) -----------------
   void _rentMotorcycle() {
     if (selectedStartDate != null && selectedEndDate != null) {
-      // if dates are selected, show success message
+      final String rentalPeriod =
+          '${DateFormat('yyyy-MM-dd').format(selectedStartDate!)} to ${DateFormat('yyyy-MM-dd').format(selectedEndDate!)}';
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-              'Motorcycle rented from ${DateFormat('yyyy-MM-dd').format(selectedStartDate!)} to ${DateFormat('yyyy-MM-dd').format(selectedEndDate!)}'),
+          content: Text('Motorcycle rented for $rentalPeriod'),
           duration: const Duration(seconds: 3),
         ),
       );
-      print(
-          'Motorcycle rented from ${DateFormat('yyyy-MM-dd').format(selectedStartDate!)} to ${DateFormat('yyyy-MM-dd').format(selectedEndDate!)}');
     } else {
-      // show error message if dates aren't selected
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
             content: Text('Please select both start and end dates.')),
@@ -113,21 +73,27 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final String model = widget.motorcycleData['Model'] ?? 'Unknown Model';
+    final double rentalPrice =
+        (widget.motorcycleData['Rental_Price'] as num?)?.toDouble() ?? 0.0;
+    final String imagePath =
+        widget.motorcycleData['Image_Path'] ?? 'assets/default_motorcycle.png';
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         actions: [
           IconButton(
             onPressed: () => signUserOut(context),
-            icon: const Icon(Icons.logout, color: Colors.white),
+            icon: const Icon(Icons.logout),
           ),
           IconButton(
-            icon: const Icon(Icons.person, color: Colors.white),
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (context) => const DisplayProfileDetailsPage()),
             ),
+            icon: const Icon(Icons.person),
           ),
         ],
       ),
@@ -136,216 +102,76 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // image
+            const SizedBox(height: 20),
+            // Display motorcycle image
             Center(
               child: Image.asset(
-                widget.imagePath,
-                fit: BoxFit.contain,
-                height: 300,
+                imagePath,
+                fit: BoxFit.cover,
+                height: 200,
                 width: 300,
               ),
             ),
             const SizedBox(height: 20),
-
-            // motorcycle title
+            // Display motorcycle model
             Center(
               child: Text(
-                widget.model,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24,
-                ),
+                model,
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
             ),
             const SizedBox(height: 10),
-
-            // motorcycle price
+            // Display rental price
             Center(
               child: Text(
-                'Per day: \$${widget.rentalPrice.toStringAsFixed(2)} CAD',
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                ),
+                'Per Day: \$${rentalPrice.toStringAsFixed(2)} CAD',
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
             ),
             const SizedBox(height: 20),
-
-            // select rental start and end date
             Row(
-              mainAxisAlignment: MainAxisAlignment.center, // Center the row
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // select start date
                 GestureDetector(
                   onTap: () => _selectStartDate(context),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 10),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.blueGrey),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       selectedStartDate == null
-                          ? 'Select Start Date'
-                          : 'Start: ${DateFormat('yyyy-MM-dd').format(selectedStartDate!)}',
-                      style: const TextStyle(color: Colors.black, fontSize: 14),
+                          ? 'Start Date'
+                          : DateFormat('yyyy-MM-dd').format(selectedStartDate!),
                     ),
                   ),
                 ),
-
                 const SizedBox(width: 20),
-
-                // select end date
                 GestureDetector(
                   onTap: () => _selectEndDate(context),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 10),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.blueGrey),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       selectedEndDate == null
-                          ? 'Select End Date'
-                          : 'End: ${DateFormat('yyyy-MM-dd').format(selectedEndDate!)}',
-                      style: const TextStyle(color: Colors.black, fontSize: 14),
+                          ? 'End Date'
+                          : DateFormat('yyyy-MM-dd').format(selectedEndDate!),
                     ),
                   ),
                 ),
               ],
             ),
-
             const SizedBox(height: 20),
-
-            //rent button
             Center(
               child: ElevatedButton(
                 onPressed: _rentMotorcycle,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueGrey,
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 12, horizontal: 30),
-                  textStyle: const TextStyle(
-                    fontSize: 14,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
                 child: const Text('Rent Motorcycle'),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class RentedMotorcycleDetails extends StatefulWidget {
-  final String model;
-  final double totalRentalPrice;
-  final String imagePath;
-
-  const RentedMotorcycleDetails(
-      {super.key,
-      required this.model,
-      required this.totalRentalPrice,
-      required this.imagePath});
-
-  @override
-  State<RentedMotorcycleDetails> createState() =>
-      _RentedMotorcycleDetailsState();
-}
-
-// sign out function
-void signUserOut(BuildContext context) {
-  // FirebaseAuth.instance.signOut();
-  Navigator.pushReplacement(
-      context, MaterialPageRoute(builder: (context) => const AuthPage()));
-}
-
-class _RentedMotorcycleDetailsState extends State<RentedMotorcycleDetails> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            onPressed: () => signUserOut(context),
-            icon: const Icon(Icons.logout, color: Colors.white),
-          ),
-          IconButton(
-            icon: const Icon(Icons.person, color: Colors.white),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => DisplayProfileDetailsPage()),
-            ),
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // image
-            Center(
-              child: Image.asset(
-                widget.imagePath,
-                fit: BoxFit.contain,
-                height: 300,
-                width: 300,
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // motorcycle title
-            Center(
-              child: Text(
-                widget.model,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24,
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-
-            // motorcycle price
-            Center(
-              child: Text(
-                'Total Rental Price: \$${widget.totalRentalPrice.toStringAsFixed(2)} CAD',
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-                        Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  // Navigator.push(context, MaterialPageRoute(builder: (context) => AgreementTransactionPage(itemName: widget.model, renterName: 'renterName', rentalPeriod: 'rentalPeriod', rentalPrice: 'rentalPrice', totalPrice: widget.totalRentalPrice, onActionCompleted: 'onActionCompleted')))
-                },
-                style: ElevatedButton.styleFrom(
-                  // backgroundColor: Colors.blueGrey,
-                  // foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 12, horizontal: 30),
-                  textStyle: const TextStyle(
-                    fontSize: 14,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: const Text('View Agreement & Transaction Details'),
               ),
             ),
           ],
