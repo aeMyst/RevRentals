@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:revrentals/services/admin_service.dart';
+import 'package:revrentals/services/listing_service.dart';
 import 'package:revrentals/user/item_details/lot/lot_details.dart';
 
 class AdminLotPage extends StatefulWidget {
@@ -14,6 +15,21 @@ class AdminLotPage extends StatefulWidget {
 }
 
 class _AdminLotPageState extends State<AdminLotPage> {
+  late Future<List<dynamic>> _storageLotsFuture;
+  @override
+  void initState() {
+    super.initState();
+    // Initialize the future with the provided future
+    _storageLotsFuture = widget.storageLotsFuture;
+  }
+
+  /// Method to fetch the latest lot data
+  Future<void> _refreshLots() async {
+    setState(() {
+      _storageLotsFuture = ListingService().fetchStorageLots();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,7 +42,7 @@ class _AdminLotPageState extends State<AdminLotPage> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: FutureBuilder<List<dynamic>>(
-          future: widget.storageLotsFuture,
+          future: _storageLotsFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -62,14 +78,15 @@ class _AdminLotPageState extends State<AdminLotPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
+        onPressed: () async {
           // Navigate to the add lot page
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => AddLotPage(adminId: widget.adminId),
+              builder: (context) => AddLotPage(adminId: widget.adminId, onLotAdded: _refreshLots,),
             ),
           );
+          await _refreshLots();
         },
         backgroundColor: Colors.blueGrey,
         child: const Icon(Icons.add, color: Colors.white),
@@ -80,7 +97,9 @@ class _AdminLotPageState extends State<AdminLotPage> {
 
 class AddLotPage extends StatefulWidget {
   final int adminId;
-  AddLotPage({super.key, required this.adminId});
+  final VoidCallback onLotAdded; // Callback to notify the parent of changes
+
+  AddLotPage({super.key, required this.adminId, required this.onLotAdded});
 
   @override
   State<AddLotPage> createState() => _AddLotPageState();
@@ -150,9 +169,13 @@ class _AddLotPageState extends State<AddLotPage> {
       };
       try {
         await _adminService.addLotListing(lotListingData);
-        
+        widget.onLotAdded();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Listing added successfully!')),
+        );
+        // Navigate back to the previous screen
+        Navigator.pop(context);
       } catch (e) {
-        
         _showErrorDialog(context, "Unable to insert lot data.");
       }
 
