@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:revrentals/admin/admin_auth.dart';
 import 'package:revrentals/admin/admin_login.dart';
 import 'package:revrentals/components/my_button.dart';
 import 'package:revrentals/components/my_textfield.dart';
 import 'package:revrentals/user/profile_detail.dart';
 import 'package:revrentals/user/user_home.dart';
+
 import '../services/auth_service.dart'; // Import AuthService
 
 class LoginPage extends StatefulWidget {
@@ -105,12 +105,13 @@ class _LoginPageState extends State<LoginPage> {
       });
 
       if (response['success']) {
-        Navigator.push(
+        final profileId = response['data']['profile_id'];
+        Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const ProfileDetailsPage()),
+          MaterialPageRoute(builder: (context) => ProfileDetailsPage(profileId: profileId)),
         );
       } else {
-        showError(context, response['error']);
+        showError(context, response['error'] ?? "Registration failed");
       }
     } catch (e) {
       showError(context, "An error occurred. Please try again.");

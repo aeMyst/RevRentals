@@ -50,15 +50,17 @@ class _UserHomePageState extends State<UserHomePage> {
     return [
       if (profileId != null)
         MarketplacePage(
-            garageId: profileId!) // Pass profileId to MarketplacePage
-      else
-        const Center(child: CircularProgressIndicator()), // Loading placeholder
+          garageId: profileId!,
+          userData: widget.userData, // Add this
+        ),
       if (profileId != null)
-        GaragePage(profileId: profileId!) // Pass profileId to GaragePage
-      else
-        const Center(child: CircularProgressIndicator()), // Loading placeholder
+        GaragePage(
+          profileId: profileId!,
+          userData: widget.userData, // Add this
+        ),
     ];
   }
+
 
   @override
   Widget build(BuildContext context) {

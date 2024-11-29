@@ -8,8 +8,9 @@ import 'package:revrentals/services/listing_service.dart';
 
 class GaragePage extends StatefulWidget {
   final int profileId; // Accept profileId as a parameter
+  final Map<String, dynamic>? userData;
 
-  const GaragePage({super.key, required this.profileId});
+  const GaragePage({super.key, required this.profileId, this.userData});
 
   @override
   State<GaragePage> createState() => _GaragePageState();
@@ -81,7 +82,9 @@ class _GaragePageState extends State<GaragePage> {
                     onPressed: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => DisplayProfileDetailsPage()),
+                          builder: (context) => DisplayProfileDetailsPage(
+                            userData: widget.userData,
+                          )),
                     ),
                   ),
                 ],

@@ -9,8 +9,9 @@ import 'package:revrentals/services/listing_service.dart'; // Import ListingServ
 
 class MarketplacePage extends StatefulWidget {
   final int garageId;
+  final Map<String, dynamic>? userData;
 
-  const MarketplacePage({super.key, required this.garageId});
+  const MarketplacePage({super.key, required this.garageId, this.userData});
 
   @override
   State<MarketplacePage> createState() => _MarketplacePageState();
@@ -62,7 +63,10 @@ class _MarketplacePageState extends State<MarketplacePage> {
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => const DisplayProfileDetailsPage()),
+                  builder: (context) => DisplayProfileDetailsPage(
+                    userData: widget.userData, // Pass from UserHomePage
+                  ),
+                ),
               ),
             ),
           ],

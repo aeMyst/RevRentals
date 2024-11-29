@@ -26,7 +26,6 @@ class AuthPage extends StatelessWidget {
           if (snapshot.hasData) {
             final user = snapshot.data!;
 
-            // Check if profile is complete and navigate accordingly
             return FutureBuilder<bool>(
               future: _isProfileComplete(user),
               builder: (context, snapshot) {
@@ -34,16 +33,15 @@ class AuthPage extends StatelessWidget {
                   return const Center(child: CircularProgressIndicator());
                 }
                 if (snapshot.hasData && snapshot.data == false) {
-                  // Profile is not complete; navigate to profile detail page
-                  return const ProfileDetailsPage();
+                  // Get profileId from user data
+                  final profileId = user.uid; // Adjust this based on where you store profileId
+                  return ProfileDetailsPage(profileId: int.parse(profileId));
                 } else {
-                  // Profile is complete or some error occurred; go to home page
                   return const UserHomePage();
                 }
               },
             );
           } else {
-            // User is not logged in
             return const LoginPage();
           }
         },
