@@ -34,10 +34,10 @@ class AdminService {
     }
   }
 
-  Future<Map<String, dynamic>> addLotListing(Map<String, dynamic> lotData) async {
-
+  Future<Map<String, dynamic>> addLotListing(
+      Map<String, dynamic> lotData) async {
     final url = Uri.parse("$_baseUrl/add-lot-listing/");
-    
+
     final response = await http.post(
       url,
       headers: {"Content-Type": "application/json"},
@@ -50,5 +50,25 @@ class AdminService {
       final error = jsonDecode(response.body);
       throw Exception(error["error"] ?? "Failed to add listing");
     }
+  }
+
+  Future<Map<String,dynamic>> updateLotListing(Map<String, dynamic> updatedLotData) async {
+    final url = Uri.parse("$_baseUrl/edit-lot-listing/");
+    final response = await http.put(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode(updatedLotData),
+    );
+
+    if (response.statusCode == 200) {
+      return {"success": true, "message": "Listing updated successfully"};
+    } else {
+      final error = jsonDecode(response.body);
+      throw Exception(error["error"] ?? "Failed to update listing");
+    }
+
+
   }
 }

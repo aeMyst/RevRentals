@@ -6,9 +6,14 @@ import 'package:revrentals/user/item_details/lot/lot_details.dart';
 class AdminLotPage extends StatefulWidget {
   final Future<List<dynamic>> storageLotsFuture;
   final int adminId;
+  final VoidCallback onLotUpdated; // Add a callback for refreshing
 
-  const AdminLotPage(
-      {super.key, required this.storageLotsFuture, required this.adminId});
+  const AdminLotPage({
+    super.key,
+    required this.storageLotsFuture,
+    required this.adminId,
+    required this.onLotUpdated, // Pass the callback here
+  });
 
   @override
   State<AdminLotPage> createState() => _AdminLotPageState();
@@ -16,6 +21,7 @@ class AdminLotPage extends StatefulWidget {
 
 class _AdminLotPageState extends State<AdminLotPage> {
   late Future<List<dynamic>> _storageLotsFuture;
+
   @override
   void initState() {
     super.initState();
@@ -64,6 +70,7 @@ class _AdminLotPageState extends State<AdminLotPage> {
                         MaterialPageRoute(
                           builder: (context) => EditLotPage(
                             lotData: lot,
+                            onLotUpdated: _refreshLots,
                           ),
                         ),
                       );
@@ -83,7 +90,10 @@ class _AdminLotPageState extends State<AdminLotPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => AddLotPage(adminId: widget.adminId, onLotAdded: _refreshLots,),
+              builder: (context) => AddLotPage(
+                adminId: widget.adminId,
+                onLotAdded: _refreshLots,
+              ),
             ),
           );
           await _refreshLots();
@@ -210,55 +220,127 @@ class _AddLotPageState extends State<AddLotPage> {
 
 class EditLotPage extends StatefulWidget {
   final Map<String, dynamic> lotData; // Accept the full lot data as a Map
+  final VoidCallback onLotUpdated; // Add callback
 
-  const EditLotPage({super.key, required this.lotData});
+  const EditLotPage({super.key, required this.lotData, required this.onLotUpdated});
 
   @override
   State<EditLotPage> createState() => _EditLotPageState();
 }
 
 class _EditLotPageState extends State<EditLotPage> {
+  final AdminService _adminService = AdminService();
+
+  late TextEditingController addressController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize the text controller with the current lot address
+    addressController = TextEditingController(text: widget.lotData['LAddress']);
+  }
+
+  @override
+  void dispose() {
+    addressController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _updateLot() async {
+    final updatedAddress = addressController.text.trim();
+
+    if (updatedAddress.isEmpty) {
+      _showErrorDialog("Address cannot be empty!");
+      return;
+    }
+
+    final updatedData = {
+      "Lot_No": widget.lotData['Lot_No'], // Include the Lot ID here
+      "LAddress": updatedAddress,
+    };
+
+    // Call the service to update the lot
+    final response = await _adminService.updateLotListing(updatedData);
+
+    if (response['success'] == true) {
+      // Show a success message and return to the previous screen
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response['message'])),
+      );
+      widget.onLotUpdated();
+      Navigator.of(context).pop(true); // Pass true to indicate success
+    } else {
+      _showErrorDialog(
+          response['error'] ?? "An error occurred while updating.");
+    }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Error"),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final lot = widget.lotData;
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: const Text("Edit Lot"),
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Lot image (placeholder as there's no image in the data)
-            Center(
-              child: Image.asset(
-                'lib/images/placeholder_lot.png', // Replace with actual image path if available
-                fit: BoxFit.cover,
-                height: 300,
-                width: 300,
-              ),
-            ),
-            const SizedBox(height: 20),
-            // Lot address
-            Center(
-              child: Text(
-                "Address: ${lot['LAddress']}",
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Display Lot Number
+              Text(
+                "Lot No: ${lot['Lot_No']}",
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 20,
+                  fontSize: 18,
                 ),
               ),
-            ),
-            const SizedBox(height: 10),
-            // Lot description
-            Center(
-              child: Text(
-                "Admin ID: ${lot['Admin_ID']}",
-                style: TextStyle(color: Colors.grey[700], fontSize: 16),
+              const SizedBox(height: 16),
+
+              // Editable Address Field
+              const Text(
+                "Address:",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
-            ),
-          ],
+              const SizedBox(height: 8),
+              TextField(
+                controller: addressController,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: "Enter new address",
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Save Button
+              Center(
+                child: ElevatedButton(
+                  onPressed: _updateLot,
+                  child: const Text("Save Changes"),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

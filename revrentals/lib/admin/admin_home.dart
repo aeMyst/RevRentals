@@ -41,6 +41,12 @@ class _AdminHomePageState extends State<AdminHomePage> {
       MaterialPageRoute(builder: (context) => const AuthPage()),
     );
   }
+  // Callback to refresh the lot list after editing
+  void _refreshStorageLots() {
+    setState(() {
+      _storageLotsFuture = _listingService.fetchStorageLots(); // Re-fetch storage lots
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +77,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => AdminLotPage(
-                                storageLotsFuture: _storageLotsFuture, adminId: widget.adminId,)));
+                                storageLotsFuture: _storageLotsFuture, adminId: widget.adminId, onLotUpdated: _refreshStorageLots,)));
                     // Navigate to Lots screen
                   }),
                   const SizedBox(width: 24),
