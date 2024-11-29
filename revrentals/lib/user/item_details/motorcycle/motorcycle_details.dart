@@ -20,6 +20,7 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
   DateTime? selectedEndDate;
 
   void signUserOut(BuildContext context) {
+    Navigator.pop(context);
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => const AuthPage()));
   }
