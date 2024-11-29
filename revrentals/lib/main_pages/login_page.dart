@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:revrentals/admin/admin_auth.dart';
+import 'package:revrentals/admin/admin_login.dart';
 import 'package:revrentals/components/my_button.dart';
 import 'package:revrentals/components/my_textfield.dart';
 import 'package:revrentals/user/profile_detail.dart';
@@ -146,7 +147,7 @@ class _LoginPageState extends State<LoginPage> {
   void getAdminPage(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const AdminAuthPage()),
+      MaterialPageRoute(builder: (context) => const AdminLoginPage()),
     );
   }
 
