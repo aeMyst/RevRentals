@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:revrentals/admin/admin_home.dart';
 import 'package:revrentals/components/my_textfield.dart';
 import 'package:revrentals/components/my_button.dart';
+import 'package:revrentals/services/admin_service.dart';
 
 class AdminLoginPage extends StatefulWidget {
   const AdminLoginPage({super.key});
@@ -13,10 +14,11 @@ class AdminLoginPage extends StatefulWidget {
 class _AdminLoginPageState extends State<AdminLoginPage> {
   final adminNameController = TextEditingController();
   final passwordController = TextEditingController();
+  final AdminService _adminService = AdminService();
 
-  // SIGN USER IN METHOD (Placeholder for Django API)
+
   void signUserIn(BuildContext context) async {
-    // Show loading indicator
+
     showDialog(
       context: context,
       builder: (context) => const Center(
@@ -24,27 +26,26 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
       ),
     );
 
-    // Placeholder for login logic
     String adminName = adminNameController.text.trim();
     String password = passwordController.text.trim();
 
     try {
-      // Simulate an API call to Django backend
-      // Replace this with actual API logic
-      // await Future.delayed(const Duration(seconds: 2));
 
-      if (adminName == 'revrentals_admin' && password == 'admin123') {
-        Navigator.pop(context); // Close the loading dialog
-
+      final response = await _adminService.adminLogin(adminName, password);
+      if (response['success']) {
         // Navigate to Admin Home Page after successful login
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const AdminHomePage()),
         );
+      } else {
+        errorMessage(response['error']);
       }
     } catch (e) {
       Navigator.pop(context); // Close the loading dialog
-      // errorMessage("Invalid username or password. Please try again.");
+      errorMessage("Invalid username or password. Please try again.");
+    } finally {
+
     }
   }
 
