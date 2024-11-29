@@ -24,7 +24,7 @@ class _AddListingPageState extends State<AddListingPage> {
   final TextEditingController rentalPriceController = TextEditingController();
   final TextEditingController specificAttributeController =
       TextEditingController();
-
+  
   final TextEditingController gearSizeController = TextEditingController();
   final TextEditingController brandController = TextEditingController();
   final TextEditingController materialController = TextEditingController();
@@ -32,7 +32,6 @@ class _AddListingPageState extends State<AddListingPage> {
 
   String? selectedMotorcycleType = 'Motorcycle';
   String? selectedGearType = 'Helmet';
-
   String vehicleAttributeLabel = 'Engine Type';
 
   Future<void> _addListing() async {
@@ -84,6 +83,28 @@ class _AddListingPageState extends State<AddListingPage> {
     }
   }
 
+// Method to show an error dialog
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: const Text("Error"),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   void dispose() {
     modelController.dispose();
@@ -104,6 +125,7 @@ class _AddListingPageState extends State<AddListingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text("Add Listing"),
       ),
@@ -119,10 +141,22 @@ class _AddListingPageState extends State<AddListingPage> {
                   isMotorcycleSelected = index == 0;
                 });
               },
+              splashColor: Colors.blueGrey.withOpacity(0.5),
+              color: Colors.grey,
+              selectedColor: Colors.blueGrey,
+              fillColor: Colors.blueGrey.withOpacity(0.2),
+              borderColor: Colors.blueGrey,
+              borderRadius: BorderRadius.circular(10),
               constraints: const BoxConstraints(minHeight: 50, minWidth: 100),
               children: const [
-                Text('Motorized Vehicle'),
-                Text('Gear'),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Text('Motorcycle', textAlign: TextAlign.center),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 32.0),
+                  child: Text('Gear', textAlign: TextAlign.center),
+                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -130,6 +164,7 @@ class _AddListingPageState extends State<AddListingPage> {
             // Conditional form fields
             if (isMotorcycleSelected) ...[
               DropdownButtonFormField<String>(
+                dropdownColor: Colors.white,
                 value: selectedMotorcycleType,
                 decoration: const InputDecoration(labelText: 'Vehicle Type'),
                 items: const [
@@ -193,6 +228,7 @@ class _AddListingPageState extends State<AddListingPage> {
               ),
             ] else ...[
               DropdownButtonFormField<String>(
+                dropdownColor: Colors.white,
                 value: selectedGearType,
                 decoration: const InputDecoration(labelText: 'Gear Type'),
                 items: const [
@@ -237,7 +273,47 @@ class _AddListingPageState extends State<AddListingPage> {
             ],
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _addListing,
+              onPressed: () {
+                // Collect values from the text fields
+                String model = modelController.text;
+                String rentalPrice = rentalPriceController.text;
+                // String imagePath = imagePathController.text;
+                String gearType = gearSizeController.text;
+                // Check if fields are filled out for either motorcycle or gear
+                if (isMotorcycleSelected) {
+                  // Validate motorcycle fields
+                  if (model.isEmpty ||
+                      rentalPrice.isEmpty ||
+                      // imagePath.isEmpty ||
+                      colorController.text.isEmpty ||
+                      vinController.text.isEmpty ||
+                      mileageController.text.isEmpty ||
+                      insuranceController.text.isEmpty ||
+                      registrationController.text.isEmpty) {
+                    // Show an error message if any required fields are empty
+                    _showErrorDialog(
+                        'Please fill out all fields for the motorcycle.');
+                    return;
+                  } else {
+                    _addListing();
+                  }
+                } else {
+                  // Validate gear fields
+                  if (gearType.isEmpty ||
+                      rentalPrice.isEmpty ||
+                      // imagePath.isEmpty ||
+                      gearSizeController.text.isEmpty ||
+                      brandController.text.isEmpty ||
+                      materialController.text.isEmpty) {
+                    // Show an error message if any required fields are empty
+                    _showErrorDialog(
+                        'Please fill out all fields for the gear.');
+                    return;
+                  } else {
+                    _addListing();
+                  }
+                }
+              },
               child: const Text('Add Listing'),
             ),
           ],
