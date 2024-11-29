@@ -28,8 +28,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
     super.initState();
     _motorcyclesFuture = _listingService.fetchMotorizedVehicles();
     _gearFuture = _listingService.fetchGearItems(); // Fetch gear items
-    _storageLotsFuture =
-        _listingService.fetchStorageLots(); // Fetch storage lots
+    _storageLotsFuture = _listingService.fetchStorageLots(); // Fetch storage lots
   }
 
   void signUserOut(BuildContext context) {

@@ -4,10 +4,13 @@ import 'package:revrentals/admin/admin_login.dart';
 import 'package:revrentals/admin/admin_agreement.dart';
 import 'package:revrentals/admin/admin_lot.dart';
 import 'package:revrentals/main_pages/auth_page.dart';
-import 'package:revrentals/services/listing_service.dart'; // Import ListingService
+import 'package:revrentals/services/admin_service.dart';
+import 'package:revrentals/services/listing_service.dart';
 
 class AdminHomePage extends StatefulWidget {
-  const AdminHomePage({super.key});
+  final int adminId;
+
+  const AdminHomePage({super.key, required this.adminId});
 
   @override
   State<AdminHomePage> createState() => _AdminHomePageState();
@@ -16,13 +19,18 @@ class AdminHomePage extends StatefulWidget {
 class _AdminHomePageState extends State<AdminHomePage> {
   final ListingService _listingService =
       ListingService(); // Initialize ListingService
+  final AdminService _adminService = AdminService(); // Initialize AdminService
   late Future<List<dynamic>> _storageLotsFuture;
+  late Future<List<dynamic>> _reservationsFuture;
+
 
   @override
   void initState() {
     super.initState();
     _storageLotsFuture =
         _listingService.fetchStorageLots(); // Fetch storage lots
+    _reservationsFuture =
+        _adminService.fetchReservations(); // Fetch reservations
   }
 
   // Sign user out method
@@ -62,7 +70,8 @@ class _AdminHomePageState extends State<AdminHomePage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => AdminLotPage(storageLotsFuture: _storageLotsFuture)));
+                            builder: (context) => AdminLotPage(
+                                storageLotsFuture: _storageLotsFuture, adminId: widget.adminId,)));
                     // Navigate to Lots screen
                   }),
                   const SizedBox(width: 24),
@@ -71,7 +80,8 @@ class _AdminHomePageState extends State<AdminHomePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const AdminAgreementPage()),
+                          builder: (context) => AdminAgreementPage(
+                              reservationLotsFuture: _reservationsFuture)),
                     );
                   }),
                 ],
@@ -80,20 +90,6 @@ class _AdminHomePageState extends State<AdminHomePage> {
           ),
         ),
       ),
-      // bottomNavigationBar: BottomAppBar(
-      //   color: Colors.grey[300],
-      //   child: Padding(
-      //     padding: const EdgeInsets.symmetric(vertical: 8.0),
-      //     child: Row(
-      //       mainAxisAlignment: MainAxisAlignment.center,
-      //       children: [
-      //         Icon(Icons.home, color: Colors.black),
-      //         SizedBox(width: 8),
-      //         Text("Home", style: TextStyle(color: Colors.black)),
-      //       ],
-      //     ),
-      //   ),
-      // ),
     );
   }
 

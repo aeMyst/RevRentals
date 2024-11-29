@@ -16,9 +16,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
   final passwordController = TextEditingController();
   final AdminService _adminService = AdminService();
 
-
   void signUserIn(BuildContext context) async {
-
     showDialog(
       context: context,
       builder: (context) => const Center(
@@ -30,13 +28,16 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
     String password = passwordController.text.trim();
 
     try {
-
       final response = await _adminService.adminLogin(adminName, password);
       if (response['success']) {
         // Navigate to Admin Home Page after successful login
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const AdminHomePage()),
+          MaterialPageRoute(
+            builder: (context) => AdminHomePage(
+              adminId: response['admin_id'],
+            ),
+          ),
         );
       } else {
         errorMessage(response['error']);
@@ -44,9 +45,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
     } catch (e) {
       Navigator.pop(context); // Close the loading dialog
       errorMessage("Invalid username or password. Please try again.");
-    } finally {
-
-    }
+    } finally {}
   }
 
   void errorMessage(String message) {

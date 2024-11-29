@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:revrentals/services/admin_service.dart';
 import 'package:revrentals/user/item_details/lot/lot_details.dart';
 
 class AdminLotPage extends StatefulWidget {
   final Future<List<dynamic>> storageLotsFuture;
+  final int adminId;
 
-  const AdminLotPage({super.key, required this.storageLotsFuture});
+  const AdminLotPage(
+      {super.key, required this.storageLotsFuture, required this.adminId});
 
   @override
   State<AdminLotPage> createState() => _AdminLotPageState();
@@ -36,17 +39,20 @@ class _AdminLotPageState extends State<AdminLotPage> {
                 itemBuilder: (context, index) {
                   final lot = storageLots[index];
                   return ListTile(
-                      title: Text("Lot No: ${lot['Lot_No']}"),
-                      subtitle: Text("Address: ${lot['LAddress']}"),
-                      trailing: const Icon(Icons.warehouse),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => EditLotPage(),
+                    title: Text("Lot No: ${lot['Lot_No']}"),
+                    subtitle: Text("Address: ${lot['LAddress']}"),
+                    trailing: const Icon(Icons.warehouse),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditLotPage(
+                            lotData: lot,
                           ),
-                        );
-                      });
+                        ),
+                      );
+                    },
+                  );
                 },
               );
             } else {
@@ -61,7 +67,7 @@ class _AdminLotPageState extends State<AdminLotPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => AddLotPage(),
+              builder: (context) => AddLotPage(adminId: widget.adminId),
             ),
           );
         },
@@ -72,10 +78,18 @@ class _AdminLotPageState extends State<AdminLotPage> {
   }
 }
 
-class AddLotPage extends StatelessWidget {
-  final TextEditingController addressController = TextEditingController();
+class AddLotPage extends StatefulWidget {
+  final int adminId;
+  AddLotPage({super.key, required this.adminId});
 
-  AddLotPage({super.key});
+  @override
+  State<AddLotPage> createState() => _AddLotPageState();
+}
+
+class _AddLotPageState extends State<AddLotPage> {
+  final AdminService _adminService = AdminService();
+
+  final TextEditingController addressController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -124,18 +138,25 @@ class AddLotPage extends StatelessWidget {
   }
 
   /// Method to validate the lot address and show an error dialog if empty
-  void _validateAndAddLot(BuildContext context) {
+  Future<void> _validateAndAddLot(BuildContext context) async {
     final lotAddress = addressController.text.trim();
 
     if (lotAddress.isEmpty) {
       _showErrorDialog(context, "Lot address cannot be empty!");
     } else {
-      // Add logic to handle a valid lot address
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Lot added successfully!")),
-      );
+      Map<String, dynamic> lotListingData = {
+        "admin_id": widget.adminId,
+        "laddress": lotAddress,
+      };
+      try {
+        await _adminService.addLotListing(lotListingData);
+        
+      } catch (e) {
+        
+        _showErrorDialog(context, "Unable to insert lot data.");
+      }
 
-      addressController.clear(); // Clear the input field after submission
+      // addressController.clear(); // Clear the input field after submission
     }
   }
 
@@ -165,7 +186,9 @@ class AddLotPage extends StatelessWidget {
 }
 
 class EditLotPage extends StatefulWidget {
-  const EditLotPage({super.key});
+  final Map<String, dynamic> lotData; // Accept the full lot data as a Map
+
+  const EditLotPage({super.key, required this.lotData});
 
   @override
   State<EditLotPage> createState() => _EditLotPageState();
@@ -174,10 +197,47 @@ class EditLotPage extends StatefulWidget {
 class _EditLotPageState extends State<EditLotPage> {
   @override
   Widget build(BuildContext context) {
+    final lot = widget.lotData;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(),
-
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Lot image (placeholder as there's no image in the data)
+            Center(
+              child: Image.asset(
+                'lib/images/placeholder_lot.png', // Replace with actual image path if available
+                fit: BoxFit.cover,
+                height: 300,
+                width: 300,
+              ),
+            ),
+            const SizedBox(height: 20),
+            // Lot address
+            Center(
+              child: Text(
+                "Address: ${lot['LAddress']}",
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            // Lot description
+            Center(
+              child: Text(
+                "Admin ID: ${lot['Admin_ID']}",
+                style: TextStyle(color: Colors.grey[700], fontSize: 16),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
