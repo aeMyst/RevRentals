@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:revrentals/admin/admin_login.dart';
 import 'package:revrentals/admin/admin_agreement.dart';
 import 'package:revrentals/admin/admin_lot.dart';
+import 'package:revrentals/main_pages/auth_page.dart';
+import 'package:revrentals/services/listing_service.dart'; // Import ListingService
 
 class AdminHomePage extends StatefulWidget {
   const AdminHomePage({super.key});
@@ -12,12 +14,23 @@ class AdminHomePage extends StatefulWidget {
 }
 
 class _AdminHomePageState extends State<AdminHomePage> {
+  final ListingService _listingService =
+      ListingService(); // Initialize ListingService
+  late Future<List<dynamic>> _storageLotsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _storageLotsFuture =
+        _listingService.fetchStorageLots(); // Fetch storage lots
+  }
+
   // Sign user out method
   void signUserOut(BuildContext context) {
-    FirebaseAuth.instance.signOut();
-    Navigator.pushReplacement(
+    Navigator.of(context).pop();
+    Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const AdminLoginPage()),
+      MaterialPageRoute(builder: (context) => const AuthPage()),
     );
   }
 
@@ -49,7 +62,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const AdminLotPage()));
+                            builder: (context) => AdminLotPage(storageLotsFuture: _storageLotsFuture)));
                     // Navigate to Lots screen
                   }),
                   const SizedBox(width: 24),

@@ -33,7 +33,8 @@ class _MarketplacePageState extends State<MarketplacePage> {
   }
 
   void signUserOut(BuildContext context) {
-    Navigator.pushReplacement(
+    Navigator.of(context).pop();
+    Navigator.push(
         context, MaterialPageRoute(builder: (context) => const AuthPage()));
   }
 

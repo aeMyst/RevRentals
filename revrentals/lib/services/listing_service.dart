@@ -73,7 +73,6 @@ class ListingService {
     final url = Uri.parse("$_baseUrl/storage-lots/");
     try {
       final response = await http.get(url);
-
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         return data['storage_lots'] as List<dynamic>;

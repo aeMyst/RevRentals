@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:revrentals/user/item_details/lot/lot_details.dart';
 
-class AdminLotPage extends StatelessWidget {
-  const AdminLotPage({super.key});
+class AdminLotPage extends StatefulWidget {
+  final Future<List<dynamic>> storageLotsFuture;
 
+  const AdminLotPage({super.key, required this.storageLotsFuture});
+
+  @override
+  State<AdminLotPage> createState() => _AdminLotPageState();
+}
+
+class _AdminLotPageState extends State<AdminLotPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -12,14 +20,39 @@ class AdminLotPage extends StatelessWidget {
           "Lots",
         ),
       ),
-      body: const Padding(
-        padding: EdgeInsets.all(16.0), // Added padding around the body
-        child: Center(
-          child: Text(
-            "List of lots will be displayed here.",
-            style: TextStyle(fontSize: 16, color: Colors.grey),
-            textAlign: TextAlign.center,
-          ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: FutureBuilder<List<dynamic>>(
+          future: widget.storageLotsFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text("Error: ${snapshot.error}"));
+            } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+              final storageLots = snapshot.data!;
+              return ListView.builder(
+                itemCount: storageLots.length,
+                itemBuilder: (context, index) {
+                  final lot = storageLots[index];
+                  return ListTile(
+                      title: Text("Lot No: ${lot['Lot_No']}"),
+                      subtitle: Text("Address: ${lot['LAddress']}"),
+                      trailing: const Icon(Icons.warehouse),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EditLotPage(),
+                          ),
+                        );
+                      });
+                },
+              );
+            } else {
+              return const Center(child: Text("No storage lots found."));
+            }
+          },
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -127,6 +160,24 @@ class AddLotPage extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+}
+
+class EditLotPage extends StatefulWidget {
+  const EditLotPage({super.key});
+
+  @override
+  State<EditLotPage> createState() => _EditLotPageState();
+}
+
+class _EditLotPageState extends State<EditLotPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(),
+
     );
   }
 }
