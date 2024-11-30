@@ -18,59 +18,61 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      // title: 'RevRentals',
-      // theme: ThemeData(
-      //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-      //   useMaterial3: true,
-      // ),
       theme: ThemeData(
-          // colorScheme: ColorScheme.fromSeed(
-          //   seedColor: Colors.pink,
+        datePickerTheme: const DatePickerThemeData(
+          backgroundColor: Colors.white,
+          headerBackgroundColor: Color.fromARGB(255, 163, 196, 212),
+          // dayForegroundColor: WidgetStatePropertyAll()
+        ),
+        cardTheme:
+            const CardTheme(color: Colors.white, surfaceTintColor: Colors.blue),
+        scaffoldBackgroundColor: Colors.white,
+        dialogBackgroundColor: Colors.white,
+        // TODO: Text theme
+        textTheme: const TextTheme(),
+        appBarTheme: const AppBarTheme(
+          centerTitle: true,
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.blueGrey,
+          iconTheme: IconThemeData(
+            color: Colors.white,
+          ),
+        ),
+        dropdownMenuTheme: const DropdownMenuThemeData(
+          inputDecorationTheme: InputDecorationTheme(fillColor: Colors.white),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+              backgroundColor: const Color.fromARGB(255, 163, 196, 212),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+              foregroundColor: Colors.white,
+              iconColor: Colors.white),
+        ),
+        // TODO: Button theme
+        buttonTheme: const ButtonThemeData(),
 
-          // ),
-          // primaryColor: Colors.pink,
-          // accentColor: Colors.red,
-          cardTheme: const CardTheme(
-              color: Colors.white, surfaceTintColor: Colors.blue),
-          scaffoldBackgroundColor: Colors.white,
-          dialogBackgroundColor: Colors.white,
-          textTheme: const TextTheme(),
-          appBarTheme: const AppBarTheme(
-            centerTitle: true,
-            foregroundColor: Colors.white,
-            backgroundColor: Colors.blueGrey,
-            iconTheme: IconThemeData(
-              color: Colors.white,
-            ),
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+          backgroundColor: Colors.blueGrey,
+          selectedItemColor: Colors.white,
+        ),
+
+        floatingActionButtonTheme: const FloatingActionButtonThemeData(
+          backgroundColor: Colors.blueGrey,
+          foregroundColor: Colors.white,
+        ),
+
+        inputDecorationTheme: const InputDecorationTheme(
+          enabledBorder: OutlineInputBorder(
+            borderSide:
+                BorderSide(width: 2, color: Color.fromARGB(255, 188, 205, 214)),
           ),
-          dropdownMenuTheme: const DropdownMenuThemeData(
-            inputDecorationTheme: InputDecorationTheme(fillColor: Colors.white),
-          ),
-          elevatedButtonTheme: ElevatedButtonThemeData(
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 163, 196, 212),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
-                  foregroundColor: Colors.white,
-                  iconColor: Colors.white)),
-          buttonTheme: const ButtonThemeData(),
-          bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-            backgroundColor: Colors.blueGrey,
-            selectedItemColor: Colors.white,
-          ),
-          floatingActionButtonTheme: const FloatingActionButtonThemeData(
-              backgroundColor: Colors.blueGrey,
-              foregroundColor: Colors.white
-              ),
-          inputDecorationTheme: const InputDecorationTheme(
-            enabledBorder: OutlineInputBorder(
+          focusedBorder: OutlineInputBorder(
               borderSide: BorderSide(
-                  width: 2, color: Color.fromARGB(255, 188, 205, 214)),
-            ),
-            focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(
-                    width: 2, color: Color.fromARGB(255, 135, 158, 170))),
-          )),
+                  width: 2, color: Color.fromARGB(255, 135, 158, 170))),
+        ),
+      ),
+
       home: const AuthPage(),
     );
   }

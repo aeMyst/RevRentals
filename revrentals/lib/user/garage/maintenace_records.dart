@@ -49,7 +49,8 @@
 //   }
 // }
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // For formatting dates
+import 'package:intl/intl.dart';
+import 'package:revrentals/services/listing_service.dart'; // For formatting dates
 
 class MaintenanceRecordsPage extends StatefulWidget {
   final String vin;
@@ -83,7 +84,8 @@ class _MaintenanceRecordsPageState extends State<MaintenanceRecordsPage> {
                   key: ValueKey(index),
                   record: record,
                   onDelete: () => _deleteRecord(index),
-                  onUpdate: (updatedRecord) => _updateRecord(index, updatedRecord),
+                  onUpdate: (updatedRecord) =>
+                      _updateRecord(index, updatedRecord),
                 );
               },
             ),
@@ -97,7 +99,9 @@ class _MaintenanceRecordsPageState extends State<MaintenanceRecordsPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _saveRecords,
+        onPressed: () {
+          _saveRecords(context);
+        },
         child: const Icon(Icons.save),
       ),
     );
@@ -105,7 +109,8 @@ class _MaintenanceRecordsPageState extends State<MaintenanceRecordsPage> {
 
   void _addNewRecord() {
     setState(() {
-      maintenanceRecords.add({"date": null, "servicedBy": "", "serviceDetails": ""});
+      maintenanceRecords
+          .add({"date": null, "servicedBy": "", "serviceDetails": ""});
     });
   }
 
@@ -121,12 +126,14 @@ class _MaintenanceRecordsPageState extends State<MaintenanceRecordsPage> {
     });
   }
 
-  void _saveRecords() {
+  Future<void> _saveRecords(BuildContext context) async {
     // Handle saving records (e.g., sending to backend or storing locally)
     print("Saving records: $maintenanceRecords");
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Maintenance records saved.")),
     );
+
+    Navigator.pop(context);
   }
 }
 
@@ -154,8 +161,10 @@ class _MaintenanceRecordRowState extends State<MaintenanceRecordRow> {
   @override
   void initState() {
     super.initState();
-    servicedByController = TextEditingController(text: widget.record["servicedBy"]);
-    serviceDetailsController = TextEditingController(text: widget.record["serviceDetails"]);
+    servicedByController =
+        TextEditingController(text: widget.record["servicedBy"]);
+    serviceDetailsController =
+        TextEditingController(text: widget.record["serviceDetails"]);
     selectedDate = widget.record["date"];
   }
 
@@ -232,11 +241,91 @@ class _MaintenanceRecordRowState extends State<MaintenanceRecordRow> {
               child: TextButton.icon(
                 onPressed: widget.onDelete,
                 icon: const Icon(Icons.delete, color: Colors.red),
-                label: const Text("Delete", style: TextStyle(color: Colors.red)),
+                label:
+                    const Text("Delete", style: TextStyle(color: Colors.red)),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class DisplayMaintenanceRecordsPage extends StatefulWidget {
+  final String vin;
+
+  DisplayMaintenanceRecordsPage({super.key, required this.vin});
+
+  @override
+  State<DisplayMaintenanceRecordsPage> createState() =>
+      _DisplayMaintenanceRecordsPageState();
+}
+
+class _DisplayMaintenanceRecordsPageState
+    extends State<DisplayMaintenanceRecordsPage> {
+  final ListingService _listingService =
+      ListingService(); // Initialize ListingService
+  late Future<List<dynamic>> _maintRecordsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch maintenance records
+    _maintRecordsFuture = _listingService.fetchMaintRecords(vin: widget.vin);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Maintenance Records")),
+      body: FutureBuilder<List<dynamic>>(
+        future: _maintRecordsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                "Error fetching records: ${snapshot.error}",
+                style: const TextStyle(color: Colors.red),
+              ),
+            );
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(
+              child: Text("No maintenance records found."),
+            );
+          } else {
+            // Build the list of records
+            final records = snapshot.data!;
+            return ListView.builder(
+              padding: const EdgeInsets.all(16.0),
+              itemCount: records.length,
+              itemBuilder: (context, index) {
+                final record = records[index];
+                return Card(
+                  margin: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Date: ${record['date'] != null ? DateFormat('yyyy-MM-dd').format(DateTime.parse(record['date'])) : 'Unknown'}",
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        Text("Serviced By: ${record['servicedBy'] ?? 'Unknown'}"),
+                        const SizedBox(height: 8),
+                        Text("Details: ${record['serviceDetails'] ?? 'N/A'}"),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          }
+        },
       ),
     );
   }
