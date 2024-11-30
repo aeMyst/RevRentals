@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:revrentals/services/listing_service.dart';
-import 'package:revrentals/user/garage/maintenace_records.dart';
+import 'package:revrentals/user/garage/maint_records.dart';
 
 class AddListingPage extends StatefulWidget {
   final int profileId;

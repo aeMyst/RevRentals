@@ -1,56 +1,9 @@
-// import 'package:flutter/material.dart';
-
-// class MaintenaceRecordsPage extends StatefulWidget {
-//   String vin;
-
-//   MaintenaceRecordsPage({super.key, required this.vin});
-
-//   @override
-//   State<MaintenaceRecordsPage> createState() => _MaintenaceRecordsPageState();
-// }
-
-// class _MaintenaceRecordsPageState extends State<MaintenaceRecordsPage> {
-//   final TextEditingController servicedByController = TextEditingController();
-//   final TextEditingController serviceDetailsController =
-//       TextEditingController();
-
-//   @override
-//   void dispose() {
-//     super.dispose();
-//     serviceDetailsController.dispose();
-//     servicedByController.dispose();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text("Maintenance Records"),
-//       ),
-//       body: SingleChildScrollView(
-//         padding: const EdgeInsets.all(16.0),
-//         child: Column(
-//           children: [
-//             TextField(
-//               controller: servicedByController,
-//               decoration: const InputDecoration(labelText: 'Serviced By'),
-//             ),
-//               const SizedBox(height: 16),
-//             TextField(
-//               controller: serviceDetailsController,
-//               decoration: const InputDecoration(labelText: 'Service Details'),
-//             ),
-//               const SizedBox(height: 16),
-
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:revrentals/services/listing_service.dart'; // For formatting dates
+import 'package:revrentals/services/auth_service.dart';
+import 'package:revrentals/services/listing_service.dart';
+import 'package:revrentals/user/garage/garage.dart';
+import 'package:revrentals/user/user_home.dart'; // For formatting dates
 
 class MaintenanceRecordsPage extends StatefulWidget {
   final String vin;
@@ -64,6 +17,7 @@ class MaintenanceRecordsPage extends StatefulWidget {
 class _MaintenanceRecordsPageState extends State<MaintenanceRecordsPage> {
   List<Map<String, dynamic>> maintenanceRecords = [];
   ListingService _listingService = ListingService();
+  AuthService _authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -103,6 +57,7 @@ class _MaintenanceRecordsPageState extends State<MaintenanceRecordsPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _saveRecords(context);
+          Navigator.push(context, MaterialPageRoute(builder: (context)=> GaragePage()));
         },
         child: const Icon(Icons.save),
       ),

@@ -4,7 +4,7 @@ import 'package:revrentals/main_pages/auth_page.dart';
 import 'package:revrentals/services/admin_service.dart';
 import 'package:revrentals/services/auth_service.dart';
 import 'package:revrentals/services/listing_service.dart';
-import 'package:revrentals/user/garage/maintenace_records.dart';
+import 'package:revrentals/user/garage/maint_records.dart';
 import 'package:revrentals/user/profile_detail.dart';
 
 class MotorcycleDetailPage extends StatefulWidget {
