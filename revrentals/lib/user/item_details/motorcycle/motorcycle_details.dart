@@ -75,7 +75,7 @@ Future<void> _rentMotorcycle() async {
         "end_date": formattedEndDate,
       };
 
-      await _listingService.addMotorcycleReservation(listingData);
+      await _listingService.addReservation(listingData);
 
       final String rentalPeriod =
           '$formattedStartDate to $formattedEndDate';

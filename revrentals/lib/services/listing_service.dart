@@ -119,9 +119,9 @@ class ListingService {
 
 
   /// Adds a motorized vehicle listing to the garage.
-  Future<Map<String, dynamic>> addMotorcycleReservation(
+  Future<Map<String, dynamic>> addReservation(
       Map<String, dynamic> listingData) async {
-    final url = Uri.parse("$_baseUrl/motorcycle-reservation/");
+    final url = Uri.parse("$_baseUrl/add-reservation/");
     final response = await http.post(
       url,
       headers: {"Content-Type": "application/json"},
