@@ -83,8 +83,8 @@ class _GaragePageState extends State<GaragePage> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => DisplayProfileDetailsPage(
-                            userData: widget.userData,
-                          )),
+                                userData: widget.userData,
+                              )),
                     ),
                   ),
                 ],
@@ -168,6 +168,13 @@ class _ListedTabState extends State<ListedTab> {
                         subtitle:
                             Text("Rental Price: \$${vehicle['Rental_Price']}"),
                         trailing: const Icon(Icons.motorcycle),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => GarageVehiclePage()),
+                          );
+                        },
                       )),
                   const SizedBox(height: 20),
                   const Text(
@@ -179,6 +186,13 @@ class _ListedTabState extends State<ListedTab> {
                         subtitle:
                             Text("Rental Price: \$${gear['Rental_Price']}"),
                         trailing: const Icon(Icons.checkroom),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => GarageGearPage()),
+                          );
+                        },
                       )),
                 ],
               );
@@ -208,6 +222,151 @@ class _ListedTabState extends State<ListedTab> {
     );
   }
 }
+
+class GarageVehiclePage extends StatefulWidget {
+  const GarageVehiclePage({super.key});
+
+  @override
+  State<GarageVehiclePage> createState() => _GarageVehiclePageState();
+}
+
+class _GarageVehiclePageState extends State<GarageVehiclePage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Vehicle Details"),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Vehicle Information",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
+            Center(
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     // builder: (context) => const UpdateMaintenancePage(),
+                  //   ),
+                  // );
+                },
+                icon: const Icon(Icons.build),
+                label: const Text("Update Maintenance Records"),
+           
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+class GarageGearPage extends StatefulWidget {
+  const GarageGearPage({super.key});
+
+  @override
+  State<GarageGearPage> createState() => _GarageGearPageState();
+}
+
+class _GarageGearPageState extends State<GarageGearPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Gear Details"),
+      ),
+    );
+  }
+}
+// class ListedTab extends StatefulWidget {
+//   final Future<Map<String, dynamic>> garageItemsFuture;
+//   final int profileId; // Accept profileId
+
+//   const ListedTab(
+//       {super.key, required this.garageItemsFuture, required this.profileId});
+
+//   @override
+//   _ListedTabState createState() => _ListedTabState();
+// }
+
+// class _ListedTabState extends State<ListedTab> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Stack(
+//       children: [
+//         FutureBuilder<Map<String, dynamic>>(
+//           future: widget.garageItemsFuture,
+//           builder: (context, snapshot) {
+//             if (snapshot.connectionState == ConnectionState.waiting) {
+//               return const Center(child: CircularProgressIndicator());
+//             } else if (snapshot.hasError) {
+//               return Center(child: Text("Error: ${snapshot.error}"));
+//             } else if (snapshot.hasData) {
+//               final data = snapshot.data!;
+//               final motorizedVehicles = data['motorized_vehicles'] as List;
+//               final gearItems = data['gear'] as List;
+
+//               return ListView(
+//                 padding: const EdgeInsets.all(16.0),
+//                 children: [
+//                   const Text(
+//                     "Motorized Vehicles",
+//                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+//                   ),
+//                   ...motorizedVehicles.map((vehicle) => ListTile(
+//                         title: Text(vehicle['Model']),
+//                         subtitle:
+//                             Text("Rental Price: \$${vehicle['Rental_Price']}"),
+//                         trailing: const Icon(Icons.motorcycle),
+//                       )),
+//                   const SizedBox(height: 20),
+//                   const Text(
+//                     "Gear Items",
+//                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+//                   ),
+//                   ...gearItems.map((gear) => ListTile(
+//                         title: Text(gear['Gear_Name']),
+//                         subtitle:
+//                             Text("Rental Price: \$${gear['Rental_Price']}"),
+//                         trailing: const Icon(Icons.checkroom),
+//                       )),
+//                 ],
+//               );
+//             } else {
+//               return const Center(child: Text("No items in your garage."));
+//             }
+//           },
+//         ),
+//         Positioned(
+//           bottom: 16,
+//           right: 16,
+//           child: FloatingActionButton(
+//             onPressed: () {
+//               Navigator.push(
+//                 context,
+//                 MaterialPageRoute(
+//                   builder: (context) =>
+//                       AddListingPage(profileId: widget.profileId),
+//                 ),
+//               );
+//             },
+//             backgroundColor: Colors.blueGrey,
+//             child: const Icon(Icons.add, color: Colors.white),
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+// }
 
 class RentedTab extends StatelessWidget {
   const RentedTab({super.key});

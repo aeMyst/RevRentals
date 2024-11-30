@@ -342,10 +342,10 @@ class _GearItemState extends State<GearItem> {
           context,
           MaterialPageRoute(
             builder: (context) => GearDetailPage(
-              imagePath: widget.imagePath,
-              name: widget.name,
-              description: widget.description,
-              rentalPrice: widget.rentalPrice,
+              // imagePath: widget.imagePath,
+              // name: widget.name,
+              // description: widget.description,
+              // rentalPrice: widget.rentalPrice,
             ),
           ),
         );
