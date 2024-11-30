@@ -72,20 +72,20 @@ class _GearDetailPageState extends State<GearDetailPage> {
 
         Map<String, dynamic> listingData = {
           "profile_id": widget.profileId,
-          "product_no": widget.gearData['Product_No'],
+          "product_no": widget.gearData['Product_no'],
           "start_date": formattedStartDate,
           "end_date": formattedEndDate,
         };
         await _listingService.addReservation(listingData);
-        
-        final String rentalPeriod = '$formattedStartDate to $formattedEndDate';
 
+        final String rentalPeriod = '$formattedStartDate to $formattedEndDate';
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Gear rented for $rentalPeriod'),
             duration: const Duration(seconds: 3),
           ),
         );
+        Navigator.pop(context);
       } catch (e) {
         print('Error occurred trying to rent gear: $e');
         ScaffoldMessenger.of(context).showSnackBar(
