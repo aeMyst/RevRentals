@@ -21,8 +21,7 @@ class AdminService {
 
   // Method to fetch profile ID using username
   Future<int> fetchAdminID() async {
-    final String admin_name = 'Admin1';
-    final url = Uri.parse("$_baseUrl/get-admin-id/$admin_name/");
+    final url = Uri.parse("$_baseUrl/get-admin-id/");
     final response = await http.get(url);
 
     if (response.statusCode == 200) {

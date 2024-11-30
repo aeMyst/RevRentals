@@ -5,6 +5,7 @@ import 'package:revrentals/services/admin_service.dart';
 import 'package:revrentals/services/auth_service.dart';
 import 'package:revrentals/services/listing_service.dart';
 import 'package:revrentals/user/profile_detail.dart';
+import 'package:intl/intl.dart';
 
 class MotorcycleDetailPage extends StatefulWidget {
   final int profileId;
@@ -21,7 +22,7 @@ class MotorcycleDetailPage extends StatefulWidget {
 }
 
 class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
-  final AdminService _adminService = AdminService();
+  final ListingService _listingService = ListingService();
   DateTime? selectedStartDate;
   DateTime? selectedEndDate;
 
@@ -59,36 +60,45 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
     }
   }
 
-  Future<void> _rentMotorcycle() async {
-    if (selectedStartDate != null && selectedEndDate != null) {
-      try {
-        final admin_id = await _adminService.fetchAdminID();
 
-        Map<String, dynamic> listingData = {
-          "profile_id": widget.profileId,
-          "admin_id": admin_id,
-          "vin": widget.motorcycleData['VIN'],
-          "start_date": selectedStartDate,
-          "end_date": selectedEndDate,
-        };
+Future<void> _rentMotorcycle() async {
+  if (selectedStartDate != null && selectedEndDate != null) {
+    try {
+      // Convert DateTime objects to strings in the format yyyy-MM-dd
+      String formattedStartDate = DateFormat('yyyy-MM-dd').format(selectedStartDate!);
+      String formattedEndDate = DateFormat('yyyy-MM-dd').format(selectedEndDate!);
 
-        final String rentalPeriod =
-            '${DateFormat('yyyy-MM-dd').format(selectedStartDate!)} to ${DateFormat('yyyy-MM-dd').format(selectedEndDate!)}';
+      Map<String, dynamic> listingData = {
+        "profile_id": widget.profileId,
+        "vin": widget.motorcycleData['VIN'],
+        "start_date": formattedStartDate,
+        "end_date": formattedEndDate,
+      };
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Motorcycle rented for $rentalPeriod'),
-            duration: const Duration(seconds: 3),
-          ),
-        );
-      } catch (e) {}
-    } else {
+      await _listingService.addMotorcycleReservation(listingData);
+
+      final String rentalPeriod =
+          '$formattedStartDate to $formattedEndDate';
+
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Please select both start and end dates.')),
+        SnackBar(
+          content: Text('Motorcycle rented for $rentalPeriod'),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    } catch (e) {
+      print('Error occurred: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('An error occurred. Please try again.')),
       );
     }
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Please select both start and end dates.')),
+    );
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
