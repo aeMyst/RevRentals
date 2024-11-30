@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:revrentals/main_pages/auth_page.dart';
+import 'package:revrentals/services/admin_service.dart';
+import 'package:revrentals/services/auth_service.dart';
+import 'package:revrentals/services/listing_service.dart';
 import 'package:revrentals/user/profile_detail.dart';
 
 class MotorcycleDetailPage extends StatefulWidget {
+  final int profileId;
   final Map<String, dynamic> motorcycleData; // Accept motorcycleData as a Map
 
   const MotorcycleDetailPage({
     super.key,
+    required this.profileId,
     required this.motorcycleData,
   });
 
@@ -16,6 +21,7 @@ class MotorcycleDetailPage extends StatefulWidget {
 }
 
 class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
+  final AdminService _adminService = AdminService();
   DateTime? selectedStartDate;
   DateTime? selectedEndDate;
 
@@ -53,17 +59,29 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
     }
   }
 
-  void _rentMotorcycle() {
+  Future<void> _rentMotorcycle() async {
     if (selectedStartDate != null && selectedEndDate != null) {
-      final String rentalPeriod =
-          '${DateFormat('yyyy-MM-dd').format(selectedStartDate!)} to ${DateFormat('yyyy-MM-dd').format(selectedEndDate!)}';
+      try {
+        final admin_id = await _adminService.fetchAdminID();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Motorcycle rented for $rentalPeriod'),
-          duration: const Duration(seconds: 3),
-        ),
-      );
+        Map<String, dynamic> listingData = {
+          "profile_id": widget.profileId,
+          "admin_id": admin_id,
+          "vin": widget.motorcycleData['VIN'],
+          "start_date": selectedStartDate,
+          "end_date": selectedEndDate,
+        };
+
+        final String rentalPeriod =
+            '${DateFormat('yyyy-MM-dd').format(selectedStartDate!)} to ${DateFormat('yyyy-MM-dd').format(selectedEndDate!)}';
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Motorcycle rented for $rentalPeriod'),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      } catch (e) {}
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

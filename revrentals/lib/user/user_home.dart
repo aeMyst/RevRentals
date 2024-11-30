@@ -50,7 +50,7 @@ class _UserHomePageState extends State<UserHomePage> {
     return [
       if (profileId != null)
         MarketplacePage(
-          garageId: profileId!,
+          profileId: profileId!,
           userData: widget.userData, // Add this
         ),
       if (profileId != null)
@@ -58,6 +58,7 @@ class _UserHomePageState extends State<UserHomePage> {
           profileId: profileId!,
           userData: widget.userData, // Add this
         ),
+        
     ];
   }
 

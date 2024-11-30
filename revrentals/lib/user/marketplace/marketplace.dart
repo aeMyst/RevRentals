@@ -8,10 +8,10 @@ import 'package:revrentals/user/profile_detail.dart';
 import 'package:revrentals/services/listing_service.dart'; // Import ListingService
 
 class MarketplacePage extends StatefulWidget {
-  final int garageId;
+  final int profileId;
   final Map<String, dynamic>? userData;
 
-  const MarketplacePage({super.key, required this.garageId, this.userData});
+  const MarketplacePage({super.key, required this.profileId, this.userData});
 
   @override
   State<MarketplacePage> createState() => _MarketplacePageState();
@@ -89,7 +89,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
               Expanded(
                 child: TabBarView(
                   children: [
-                    MotorcycleTab(motorcyclesFuture: _motorcyclesFuture),
+                    MotorcycleTab(profileId: widget.profileId, motorcyclesFuture: _motorcyclesFuture),
                     GearTab(gearFuture: _gearFuture), // Pass gearFuture
                     LotTab(
                         storageLotsFuture:
@@ -107,9 +107,10 @@ class _MarketplacePageState extends State<MarketplacePage> {
 
 // MotorcycleTab remains the same
 class MotorcycleTab extends StatelessWidget {
+  final int profileId;
   final Future<List<dynamic>> motorcyclesFuture;
 
-  const MotorcycleTab({super.key, required this.motorcyclesFuture});
+  const MotorcycleTab({super.key, required this.profileId, required this.motorcyclesFuture});
 
   @override
   Widget build(BuildContext context) {
@@ -134,7 +135,7 @@ class MotorcycleTab extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => MotorcycleDetailPage(
+                      builder: (context) => MotorcycleDetailPage(profileId: profileId,
                         motorcycleData: motorcycle,
                       ),
                     ),

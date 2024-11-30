@@ -22,7 +22,23 @@ class ListingService {
       throw Exception(error["error"] ?? "Failed to add listing");
     }
   }
+  /// Adds a motorized vehicle listing to the garage.
+  Future<Map<String, dynamic>> addGearListing(
+      Map<String, dynamic> listingData) async {
+    final url = Uri.parse("$_baseUrl/add-gear-listing/");
+    final response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(listingData),
+    );
 
+    if (response.statusCode == 201) {
+      return {"success": true, "message": "Gear listing added successfully"};
+    } else {
+      final error = jsonDecode(response.body);
+      throw Exception(error["error"] ?? "Failed to add gear listing");
+    }
+  }
   /// Fetches the garage ID for a specific profile ID.
   Future<int> fetchGarageId(int profileId) async {
     final url = Uri.parse("$_baseUrl/get-garage-id/$profileId/");
@@ -118,5 +134,6 @@ class ListingService {
       throw Exception(error["error"] ?? "Failed to add reservation");
     }
   }
+
 
 }
