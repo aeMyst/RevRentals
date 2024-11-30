@@ -117,10 +117,11 @@ class ListingService {
     }
   }
 
+
   /// Adds a motorized vehicle listing to the garage.
-  Future<Map<String, dynamic>> addMotorcycleReservation(
+  Future<Map<String, dynamic>> addReservation(
       Map<String, dynamic> listingData) async {
-    final url = Uri.parse("$_baseUrl/motorcycle-reservation/");
+    final url = Uri.parse("$_baseUrl/add-reservation/");
     final response = await http.post(
       url,
       headers: {"Content-Type": "application/json"},
@@ -128,7 +129,8 @@ class ListingService {
     );
 
     if (response.statusCode == 201) {
-      return {"success": true, "message": "Reservation added successfully"};
+      return json.decode(response.body); // Backend response
+
     } else {
       final error = jsonDecode(response.body);
       throw Exception(error["error"] ?? "Failed to add reservation");

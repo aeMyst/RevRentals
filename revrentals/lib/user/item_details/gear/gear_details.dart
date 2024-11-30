@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:revrentals/main_pages/auth_page.dart';
+import 'package:revrentals/services/listing_service.dart';
 
 class GearDetailPage extends StatefulWidget {
+  final int profileId;
   final Map<String, dynamic> gearData; // Accept the full gear data as a Map
 
   const GearDetailPage({
     super.key,
+    required this.profileId,
     required this.gearData,
   });
 
@@ -18,8 +21,11 @@ class _GearDetailPageState extends State<GearDetailPage> {
   DateTime? selectedStartDate;
   DateTime? selectedEndDate;
 
+  ListingService _listingService = ListingService();
+
   // Sign out function
   void signUserOut(BuildContext context) {
+    Navigator.pop(context);
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => const AuthPage()));
   }
@@ -55,17 +61,37 @@ class _GearDetailPageState extends State<GearDetailPage> {
   }
 
   // Function to handle gear rental
-  void _rentGear() {
+  Future<void> _rentGear() async {
     if (selectedStartDate != null && selectedEndDate != null) {
-      final rentalPeriod =
-          '${DateFormat('yyyy-MM-dd').format(selectedStartDate!)} to ${DateFormat('yyyy-MM-dd').format(selectedEndDate!)}';
+      try {
+        // Convert DateTime objects to strings in the format yyyy-MM-dd
+        String formattedStartDate =
+            DateFormat('yyyy-MM-dd').format(selectedStartDate!);
+        String formattedEndDate =
+            DateFormat('yyyy-MM-dd').format(selectedEndDate!);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Gear rented for $rentalPeriod'),
-          duration: const Duration(seconds: 3),
-        ),
-      );
+        Map<String, dynamic> listingData = {
+          "profile_id": widget.profileId,
+          "product_no": widget.gearData['Product_No'],
+          "start_date": formattedStartDate,
+          "end_date": formattedEndDate,
+        };
+        await _listingService.addReservation(listingData);
+        
+        final String rentalPeriod = '$formattedStartDate to $formattedEndDate';
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Gear rented for $rentalPeriod'),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      } catch (e) {
+        print('Error occurred trying to rent gear: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('An error occurred. Please try again.')),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
