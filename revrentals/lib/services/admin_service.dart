@@ -19,6 +19,22 @@ class AdminService {
     }
   }
 
+  // Method to fetch profile ID using username
+  Future<int> fetchAdminID() async {
+    final String admin_name = 'Admin1';
+    final url = Uri.parse("$_baseUrl/get-admin-id/$admin_name/");
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data["admin_id"];
+    } else {
+      final error = jsonDecode(response.body);
+      throw Exception(error["error"] ?? "Failed to fetch Admin ID");
+    }
+  }
+
+
   Future<List<dynamic>> fetchReservations() async {
     final url = Uri.parse("$_baseUrl/reservations/");
     try {

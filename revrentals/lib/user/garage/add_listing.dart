@@ -70,7 +70,7 @@ class _AddListingPageState extends State<AddListingPage> {
         };
 
         // Add gear listing
-        await _listingService.addListing(listingData);
+        await _listingService.addGearListing(listingData);
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
