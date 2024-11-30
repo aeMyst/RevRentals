@@ -73,7 +73,7 @@ flutter:
     # - lib/images/jacket.jpg
     # - lib/images/moped.jpg
     - lib/images/rr_logo.png
-    - lib/images/motorcycle/ninja400.png
+    - lib/images/motorcycle/default_motorcycle.png
     - lib/images/motorcycle/ninja_zx4r.png
     - lib/images/motorcycle/scooter.png
     - lib/images/motorcycle/dirtbike.png  

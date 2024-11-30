@@ -136,6 +136,23 @@ class ListingService {
     }
   }
 
+    /// Fetch all gear items.
+  Future<List<dynamic>> fetchMaintRecords({required String vin}) async {
+    final url = Uri.parse("$_baseUrl/motorized-vehicles/$vin/");
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['maintenance_records'] as List<dynamic>;
+      } else {
+        throw Exception("Failed to fetch maintenance records: ${response.body}");
+      }
+    } catch (e) {
+      throw Exception("An error occurred: $e");
+    }
+  }
+
   // Future<Map<String,dynamic>> fetchTransaction(int reservation_no) async {
   //   final url = Uri.parse("$_baseUrl/view-transaction/$reservation_no/");
 
@@ -143,6 +160,7 @@ class ListingService {
 
   // Future<Map<String,dynamic>> fetchAgreement(int reservation_no) async {
   //   final url = Uri.parse("$_baseUrl/view-agreement/$reservation_no/");
-
   // }
+
+
 }
