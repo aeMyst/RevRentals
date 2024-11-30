@@ -255,7 +255,7 @@ class _MaintenanceRecordRowState extends State<MaintenanceRecordRow> {
 class DisplayMaintenanceRecordsPage extends StatefulWidget {
   final String vin;
 
-  DisplayMaintenanceRecordsPage({super.key, required this.vin});
+  const DisplayMaintenanceRecordsPage({super.key, required this.vin});
 
   @override
   State<DisplayMaintenanceRecordsPage> createState() =>
@@ -311,13 +311,15 @@ class _DisplayMaintenanceRecordsPageState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Date: ${record['date'] != null ? DateFormat('yyyy-MM-dd').format(DateTime.parse(record['date'])) : 'Unknown'}",
+                          "Date: ${record['date'] != null 
+                          
+                          ? DateFormat('yyyy-MM-dd').format(DateTime.parse(record['date'])) : 'Unknown'}",
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 8),
-                        Text("Serviced By: ${record['servicedBy'] ?? 'Unknown'}"),
+                        Text("Serviced By: ${record['serviced_by'] ?? 'Unknown'}"),
                         const SizedBox(height: 8),
-                        Text("Details: ${record['serviceDetails'] ?? 'N/A'}"),
+                        Text("Details: ${record['service_details'] ?? 'N/A'}"),
                       ],
                     ),
                   ),
