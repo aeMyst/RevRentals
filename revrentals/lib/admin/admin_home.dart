@@ -86,7 +86,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => AdminAgreementPage(
+                          builder: (context) => AdminReservationsPage(
                               reservationLotsFuture: _reservationsFuture)),
                     );
                   }),

@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-class AdminAgreementPage extends StatefulWidget {
+class AdminReservationsPage extends StatefulWidget {
   final Future<List<dynamic>> reservationLotsFuture;
 
-  const AdminAgreementPage({super.key, required this.reservationLotsFuture});
+  const AdminReservationsPage({super.key, required this.reservationLotsFuture});
 
   @override
-  State<AdminAgreementPage> createState() => _AdminAgreementPageState();
+  State<AdminReservationsPage> createState() => _AdminReservationsPageState();
 }
 
-class _AdminAgreementPageState extends State<AdminAgreementPage> {
+class _AdminReservationsPageState extends State<AdminReservationsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,6 +67,11 @@ class TransactionAgreementsPage extends StatefulWidget {
 class _TransactionAgreementsPageState extends State<TransactionAgreementsPage> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        
+      ),
+    );
   }
 }
