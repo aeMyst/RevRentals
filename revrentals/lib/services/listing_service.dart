@@ -136,13 +136,13 @@ class ListingService {
     }
   }
 
-  Future<Map<String,dynamic>> fetchTransaction(int reservation_no) async {
-    final url = Uri.parse("$_baseUrl/view-transaction/$reservation_no/");
+  // Future<Map<String,dynamic>> fetchTransaction(int reservation_no) async {
+  //   final url = Uri.parse("$_baseUrl/view-transaction/$reservation_no/");
 
-  }
+  // }
 
-  Future<Map<String,dynamic>> fetchAgreement(int reservation_no) async {
-    final url = Uri.parse("$_baseUrl/view-agreement/$reservation_no/");
+  // Future<Map<String,dynamic>> fetchAgreement(int reservation_no) async {
+  //   final url = Uri.parse("$_baseUrl/view-agreement/$reservation_no/");
 
-  }
+  // }
 }

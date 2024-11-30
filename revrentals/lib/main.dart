@@ -30,6 +30,9 @@ class MyApp extends StatelessWidget {
           // ),
           // primaryColor: Colors.pink,
           // accentColor: Colors.red,
+          cardTheme: const CardTheme(
+              color: Colors.white, surfaceTintColor: Colors.blue),
+          scaffoldBackgroundColor: Colors.white,
           dialogBackgroundColor: Colors.white,
           textTheme: const TextTheme(),
           appBarTheme: const AppBarTheme(
@@ -51,21 +54,14 @@ class MyApp extends StatelessWidget {
                   foregroundColor: Colors.white,
                   iconColor: Colors.white)),
           buttonTheme: const ButtonThemeData(),
-
-          // textButtonTheme: TextButtonThemeData(
-          //     style: ButtonStyle(
-          //       foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
-          //     ),
-          //     onPressed: () {},
-          //     child: const Text(
-          //       'Text Button',
-          //       style: TextStyle(
-          //         color: Colors.blue,
-          //         fontWeight: FontWeight.bold,
-          //       ),
-          //     ),
-          //     ),
-
+          bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+            backgroundColor: Colors.blueGrey,
+            selectedItemColor: Colors.white,
+          ),
+          floatingActionButtonTheme: const FloatingActionButtonThemeData(
+              backgroundColor: Colors.blueGrey,
+              foregroundColor: Colors.white
+              ),
           inputDecorationTheme: const InputDecorationTheme(
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(
