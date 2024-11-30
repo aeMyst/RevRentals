@@ -87,7 +87,7 @@ Future<void> _rentMotorcycle() async {
         ),
       );
     } catch (e) {
-      print('Error occurred: $e');
+      print('Error occurred trying to rent motorcycle: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('An error occurred. Please try again.')),
       );

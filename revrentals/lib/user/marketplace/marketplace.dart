@@ -90,7 +90,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
                 child: TabBarView(
                   children: [
                     MotorcycleTab(profileId: widget.profileId, motorcyclesFuture: _motorcyclesFuture),
-                    GearTab(gearFuture: _gearFuture), // Pass gearFuture
+                    GearTab(profileId: widget.profileId, gearFuture: _gearFuture), // Pass gearFuture
                     LotTab(
                         storageLotsFuture:
                             _storageLotsFuture), // Pass storageLotsFuture
@@ -155,8 +155,9 @@ class MotorcycleTab extends StatelessWidget {
 // GearTab updated to fetch and display gear items
 class GearTab extends StatelessWidget {
   final Future<List<dynamic>> gearFuture;
+  final int profileId;
 
-  const GearTab({super.key, required this.gearFuture});
+  const GearTab({super.key, required this.profileId, required this.gearFuture});
 
   @override
   Widget build(BuildContext context) {
@@ -182,6 +183,7 @@ class GearTab extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => GearDetailPage(
+                        profileId: profileId,
                         gearData: gear,
                       ),
                     ),
