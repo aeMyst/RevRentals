@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:revrentals/services/listing_service.dart';
+import 'package:revrentals/user/garage/maintenace_records.dart';
 
 class AddListingPage extends StatefulWidget {
   final int profileId;
@@ -104,6 +105,7 @@ class _AddListingPageState extends State<AddListingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text("Add Listing"),
       ),
@@ -191,6 +193,19 @@ class _AddListingPageState extends State<AddListingPage> {
                 decoration: const InputDecoration(labelText: 'Rental Price'),
                 keyboardType: TextInputType.number,
               ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          MaintenanceRecordsPage(vin: vinController.text),
+                    ),
+                  );
+                },
+                child: const Text('Add Maintenance Records'),
+              )
             ] else ...[
               DropdownButtonFormField<String>(
                 value: selectedGearType,
