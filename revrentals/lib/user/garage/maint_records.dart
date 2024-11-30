@@ -1,61 +1,14 @@
-// import 'package:flutter/material.dart';
-
-// class MaintenaceRecordsPage extends StatefulWidget {
-//   String vin;
-
-//   MaintenaceRecordsPage({super.key, required this.vin});
-
-//   @override
-//   State<MaintenaceRecordsPage> createState() => _MaintenaceRecordsPageState();
-// }
-
-// class _MaintenaceRecordsPageState extends State<MaintenaceRecordsPage> {
-//   final TextEditingController servicedByController = TextEditingController();
-//   final TextEditingController serviceDetailsController =
-//       TextEditingController();
-
-//   @override
-//   void dispose() {
-//     super.dispose();
-//     serviceDetailsController.dispose();
-//     servicedByController.dispose();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text("Maintenance Records"),
-//       ),
-//       body: SingleChildScrollView(
-//         padding: const EdgeInsets.all(16.0),
-//         child: Column(
-//           children: [
-//             TextField(
-//               controller: servicedByController,
-//               decoration: const InputDecoration(labelText: 'Serviced By'),
-//             ),
-//               const SizedBox(height: 16),
-//             TextField(
-//               controller: serviceDetailsController,
-//               decoration: const InputDecoration(labelText: 'Service Details'),
-//             ),
-//               const SizedBox(height: 16),
-
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:revrentals/services/listing_service.dart'; // For formatting dates
+import 'package:revrentals/services/auth_service.dart';
+import 'package:revrentals/services/listing_service.dart';
+import 'package:revrentals/user/garage/garage.dart';
+import 'package:revrentals/user/user_home.dart'; // For formatting dates
 
 class MaintenanceRecordsPage extends StatefulWidget {
   final String vin;
-
-  MaintenanceRecordsPage({super.key, required this.vin});
+  final int profileId;
+  MaintenanceRecordsPage({super.key, required this.vin, required this.profileId});
 
   @override
   State<MaintenanceRecordsPage> createState() => _MaintenanceRecordsPageState();
@@ -63,6 +16,8 @@ class MaintenanceRecordsPage extends StatefulWidget {
 
 class _MaintenanceRecordsPageState extends State<MaintenanceRecordsPage> {
   List<Map<String, dynamic>> maintenanceRecords = [];
+  ListingService _listingService = ListingService();
+  AuthService _authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -81,6 +36,7 @@ class _MaintenanceRecordsPageState extends State<MaintenanceRecordsPage> {
               itemBuilder: (context, index) {
                 final record = maintenanceRecords[index];
                 return MaintenanceRecordRow(
+                  vin: widget.vin,
                   key: ValueKey(index),
                   record: record,
                   onDelete: () => _deleteRecord(index),
@@ -101,6 +57,7 @@ class _MaintenanceRecordsPageState extends State<MaintenanceRecordsPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _saveRecords(context);
+          Navigator.push(context, MaterialPageRoute(builder: (context)=> UserHomePage()));
         },
         child: const Icon(Icons.save),
       ),
@@ -109,9 +66,34 @@ class _MaintenanceRecordsPageState extends State<MaintenanceRecordsPage> {
 
   void _addNewRecord() {
     setState(() {
-      maintenanceRecords
-          .add({"date": null, "servicedBy": "", "serviceDetails": ""});
+      print(widget.vin);
+      maintenanceRecords.add(
+        {"vin":widget.vin, "date": null, "servicedBy": "", "serviceDetails": ""},
+      );
     });
+  }
+
+  void errorMessage(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: const Text(
+            "Error",
+          ),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _updateRecord(int index, Map<String, dynamic> updatedRecord) {
@@ -126,24 +108,57 @@ class _MaintenanceRecordsPageState extends State<MaintenanceRecordsPage> {
     });
   }
 
+  // Validate records before saving
+  bool _validateRecords() {
+    if (maintenanceRecords.isEmpty) {
+      return false;
+    }
+    for (var record in maintenanceRecords) {
+      if (record['date'] == null) {
+        return false; // Invalid if date is null or empty
+      }
+      if (record['serviced_by'] == null || record['serviced_by'].isEmpty) {
+        return false; // Invalid if servicedBy is null or empty
+      }
+      if (record['service_details'] == null ||
+          record['service_details'].isEmpty) {
+        return false; // Invalid if serviceDetails is null or empty
+      }
+    }
+    return true; // All records are valid
+  }
+
   Future<void> _saveRecords(BuildContext context) async {
     // Handle saving records (e.g., sending to backend or storing locally)
-    print("Saving records: $maintenanceRecords");
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Maintenance records saved.")),
-    );
+         print("Saving records: $maintenanceRecords");
+   
+    if (!_validateRecords()) {
+      errorMessage(context, "All fields must be filled.");
+      return;
+    } else {
+      try {
 
-    Navigator.pop(context);
+        await _listingService.addMaintRecords(maintenanceRecords);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Maintenance records saved.")),
+        );
+        return;
+      } catch (e) {
+        errorMessage(context, e.toString());
+      }
+    }
   }
 }
 
 class MaintenanceRecordRow extends StatefulWidget {
+  final String vin;
   final Map<String, dynamic> record;
   final VoidCallback onDelete;
   final Function(Map<String, dynamic>) onUpdate;
 
   const MaintenanceRecordRow({
     Key? key,
+    required this.vin,
     required this.record,
     required this.onDelete,
     required this.onUpdate,
@@ -162,9 +177,9 @@ class _MaintenanceRecordRowState extends State<MaintenanceRecordRow> {
   void initState() {
     super.initState();
     servicedByController =
-        TextEditingController(text: widget.record["servicedBy"]);
+        TextEditingController(text: widget.record["serviced_by"]);
     serviceDetailsController =
-        TextEditingController(text: widget.record["serviceDetails"]);
+        TextEditingController(text: widget.record["service_details"]);
     selectedDate = widget.record["date"];
   }
 
@@ -191,10 +206,16 @@ class _MaintenanceRecordRowState extends State<MaintenanceRecordRow> {
   }
 
   void _notifyUpdate() {
+    // Format the date in yyyy-MM-dd format before updating the record
+    String formattedDate = selectedDate != null
+        ? DateFormat('yyyy-MM-dd').format(selectedDate!)
+        : ''; // You can use an empty string or null if you want to handle it differently
+
     widget.onUpdate({
-      "date": selectedDate,
-      "servicedBy": servicedByController.text,
-      "serviceDetails": serviceDetailsController.text,
+      "vin":widget.vin,
+      "date": formattedDate,
+      "serviced_by": servicedByController.text,
+      "service_details": serviceDetailsController.text,
     });
   }
 
@@ -311,13 +332,12 @@ class _DisplayMaintenanceRecordsPageState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Date: ${record['date'] != null 
-                          
-                          ? DateFormat('yyyy-MM-dd').format(DateTime.parse(record['date'])) : 'Unknown'}",
+                          "Date: ${record['date'] != null ? DateFormat('yyyy-MM-dd').format(DateTime.parse(record['date'])) : 'Unknown'}",
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 8),
-                        Text("Serviced By: ${record['serviced_by'] ?? 'Unknown'}"),
+                        Text(
+                            "Serviced By: ${record['serviced_by'] ?? 'Unknown'}"),
                         const SizedBox(height: 8),
                         Text("Details: ${record['service_details'] ?? 'N/A'}"),
                       ],
@@ -332,4 +352,3 @@ class _DisplayMaintenanceRecordsPageState
     );
   }
 }
-

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:revrentals/services/listing_service.dart';
-import 'package:revrentals/user/garage/maintenace_records.dart';
+import 'package:revrentals/user/garage/maint_records.dart';
 
 class AddListingPage extends StatefulWidget {
   final int profileId;
@@ -33,13 +33,25 @@ class _AddListingPageState extends State<AddListingPage> {
 
   String? selectedMotorcycleType = 'Motorcycle';
   String? selectedGearType = 'Helmet';
-
+  String? selectedInsuranceType = 'Basic';
   String vehicleAttributeLabel = 'Engine Type';
 
   Future<void> _addListing() async {
     try {
       // Fetch the garage ID based on the profile ID
       int garageId = await _listingService.fetchGarageId(widget.profileId);
+
+      // Show loading dialog
+      showDialog(
+        context: context,
+        barrierDismissible:
+            false, // Prevent the user from dismissing the dialog
+        builder: (context) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      );
 
       if (isMotorcycleSelected) {
         // Prepare motorized vehicle data
@@ -51,13 +63,28 @@ class _AddListingPageState extends State<AddListingPage> {
           "rental_price": double.parse(rentalPriceController.text),
           "color": colorController.text,
           "mileage": int.parse(mileageController.text),
-          "insurance": insuranceController.text,
+          "insurance": selectedInsuranceType,
           "model": modelController.text,
           "specific_attribute": specificAttributeController.text,
         };
 
         // Add motorized vehicle listing
         await _listingService.addListing(listingData);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Listing added successfully!')),
+        );
+
+        // Now that the VIN is valid, pass it to the MaintenanceRecordsPage
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MaintenanceRecordsPage(
+              vin: vinController.text,
+              profileId: widget.profileId,
+            ),
+          ),
+        );
       } else {
         // Prepare gear data
         Map<String, dynamic> listingData = {
@@ -72,16 +99,17 @@ class _AddListingPageState extends State<AddListingPage> {
 
         // Add gear listing
         await _listingService.addGearListing(listingData);
-      }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Listing added successfully!')),
-      );
-      Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Listing added successfully!')),
+        );
+        Navigator.pop(context);
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error adding listing: $e')),
       );
+      Navigator.pop(context);
     }
   }
 
@@ -182,30 +210,46 @@ class _AddListingPageState extends State<AddListingPage> {
                 decoration: const InputDecoration(labelText: 'Mileage'),
                 keyboardType: TextInputType.number,
               ),
+
               const SizedBox(height: 16),
-              TextField(
-                controller: insuranceController,
-                decoration: const InputDecoration(labelText: 'Insurance'),
+              DropdownButtonFormField<String>(
+                value: selectedInsuranceType,
+                decoration: const InputDecoration(labelText: 'Insurance Type'),
+                items: const [
+                  DropdownMenuItem(value: 'Basic', child: Text('Basic')),
+                  DropdownMenuItem(value: 'Premium', child: Text('Premium')),
+                  DropdownMenuItem(
+                      value: 'Comprehensive', child: Text('Comprehensive')),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    
+                    selectedInsuranceType =
+                        value; // Update variable on selection
+                        print(selectedInsuranceType);
+                  });
+                },
               ),
+
               const SizedBox(height: 16),
               TextField(
                 controller: rentalPriceController,
                 decoration: const InputDecoration(labelText: 'Rental Price'),
                 keyboardType: TextInputType.number,
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          MaintenanceRecordsPage(vin: vinController.text),
-                    ),
-                  );
-                },
-                child: const Text('Add Maintenance Records'),
-              )
+              // const SizedBox(height: 20),
+              // ElevatedButton(
+              //   onPressed: () {
+              //     Navigator.push(
+              //       context,
+              //       MaterialPageRoute(
+              //         builder: (context) =>
+              //             MaintenanceRecordsPage(vin: vinController.text),
+              //       ),
+              //     );
+              //   },
+              //   child: const Text('Add Maintenance Records'),
+              // )
             ] else ...[
               DropdownButtonFormField<String>(
                 value: selectedGearType,
