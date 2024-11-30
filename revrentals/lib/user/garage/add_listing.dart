@@ -33,7 +33,7 @@ class _AddListingPageState extends State<AddListingPage> {
 
   String? selectedMotorcycleType = 'Motorcycle';
   String? selectedGearType = 'Helmet';
-
+  String? selectedInsuranceType = 'Basic';
   String vehicleAttributeLabel = 'Engine Type';
 
   Future<void> _addListing() async {
@@ -63,7 +63,7 @@ class _AddListingPageState extends State<AddListingPage> {
           "rental_price": double.parse(rentalPriceController.text),
           "color": colorController.text,
           "mileage": int.parse(mileageController.text),
-          "insurance": insuranceController.text,
+          "insurance": selectedInsuranceType,
           "model": modelController.text,
           "specific_attribute": specificAttributeController.text,
         };
@@ -79,8 +79,10 @@ class _AddListingPageState extends State<AddListingPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                MaintenanceRecordsPage(vin: vinController.text),
+            builder: (context) => MaintenanceRecordsPage(
+              vin: vinController.text,
+              profileId: widget.profileId,
+            ),
           ),
         );
       } else {
@@ -208,11 +210,27 @@ class _AddListingPageState extends State<AddListingPage> {
                 decoration: const InputDecoration(labelText: 'Mileage'),
                 keyboardType: TextInputType.number,
               ),
+
               const SizedBox(height: 16),
-              TextField(
-                controller: insuranceController,
-                decoration: const InputDecoration(labelText: 'Insurance'),
+              DropdownButtonFormField<String>(
+                value: selectedInsuranceType,
+                decoration: const InputDecoration(labelText: 'Insurance Type'),
+                items: const [
+                  DropdownMenuItem(value: 'Basic', child: Text('Basic')),
+                  DropdownMenuItem(value: 'Premium', child: Text('Premium')),
+                  DropdownMenuItem(
+                      value: 'Comprehensive', child: Text('Comprehensive')),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    
+                    selectedInsuranceType =
+                        value; // Update variable on selection
+                        print(selectedInsuranceType);
+                  });
+                },
               ),
+
               const SizedBox(height: 16),
               TextField(
                 controller: rentalPriceController,
