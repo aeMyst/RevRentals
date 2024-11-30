@@ -136,7 +136,7 @@ class ListingService {
     }
   }
 
-    /// Fetch all gear items.
+    // Fetch all maint records for a vehicle.
   Future<List<dynamic>> fetchMaintRecords({required String vin}) async {
     final url = Uri.parse("$_baseUrl/motorized-vehicles/$vin/");
     try {
@@ -152,6 +152,26 @@ class ListingService {
       throw Exception("An error occurred: $e");
     }
   }
+
+  // Adds maintenance records for a vin
+Future<Map<String, dynamic>> addMaintRecords(
+  List<Map<String, dynamic>> recordsData) async {
+
+  final url = Uri.parse("$_baseUrl/add-maintenance-records/");
+  final response = await http.post(
+    url,
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode(recordsData),
+  );
+
+  if (response.statusCode == 201) {
+    return json.decode(response.body); // Backend response
+  } else {
+    final error = jsonDecode(response.body);
+    throw Exception(error["error"] ?? "Failed to add maintenance records");
+  }
+}
+
 
   // Future<Map<String,dynamic>> fetchTransaction(int reservation_no) async {
   //   final url = Uri.parse("$_baseUrl/view-transaction/$reservation_no/");

@@ -41,6 +41,18 @@ class _AddListingPageState extends State<AddListingPage> {
       // Fetch the garage ID based on the profile ID
       int garageId = await _listingService.fetchGarageId(widget.profileId);
 
+      // Show loading dialog
+      showDialog(
+        context: context,
+        barrierDismissible:
+            false, // Prevent the user from dismissing the dialog
+        builder: (context) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      );
+
       if (isMotorcycleSelected) {
         // Prepare motorized vehicle data
         Map<String, dynamic> listingData = {
@@ -58,6 +70,19 @@ class _AddListingPageState extends State<AddListingPage> {
 
         // Add motorized vehicle listing
         await _listingService.addListing(listingData);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Listing added successfully!')),
+        );
+
+        // Now that the VIN is valid, pass it to the MaintenanceRecordsPage
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                MaintenanceRecordsPage(vin: vinController.text),
+          ),
+        );
       } else {
         // Prepare gear data
         Map<String, dynamic> listingData = {
@@ -72,16 +97,17 @@ class _AddListingPageState extends State<AddListingPage> {
 
         // Add gear listing
         await _listingService.addGearListing(listingData);
-      }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Listing added successfully!')),
-      );
-      Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Listing added successfully!')),
+        );
+        Navigator.pop(context);
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error adding listing: $e')),
       );
+      Navigator.pop(context);
     }
   }
 
@@ -193,19 +219,19 @@ class _AddListingPageState extends State<AddListingPage> {
                 decoration: const InputDecoration(labelText: 'Rental Price'),
                 keyboardType: TextInputType.number,
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          MaintenanceRecordsPage(vin: vinController.text),
-                    ),
-                  );
-                },
-                child: const Text('Add Maintenance Records'),
-              )
+              // const SizedBox(height: 20),
+              // ElevatedButton(
+              //   onPressed: () {
+              //     Navigator.push(
+              //       context,
+              //       MaterialPageRoute(
+              //         builder: (context) =>
+              //             MaintenanceRecordsPage(vin: vinController.text),
+              //       ),
+              //     );
+              //   },
+              //   child: const Text('Add Maintenance Records'),
+              // )
             ] else ...[
               DropdownButtonFormField<String>(
                 value: selectedGearType,
