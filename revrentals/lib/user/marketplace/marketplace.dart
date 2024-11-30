@@ -29,7 +29,8 @@ class _MarketplacePageState extends State<MarketplacePage> {
     super.initState();
     _motorcyclesFuture = _listingService.fetchMotorizedVehicles();
     _gearFuture = _listingService.fetchGearItems(); // Fetch gear items
-    _storageLotsFuture = _listingService.fetchStorageLots(); // Fetch storage lots
+    _storageLotsFuture =
+        _listingService.fetchStorageLots(); // Fetch storage lots
   }
 
   void signUserOut(BuildContext context) {
@@ -89,9 +90,14 @@ class _MarketplacePageState extends State<MarketplacePage> {
               Expanded(
                 child: TabBarView(
                   children: [
-                    MotorcycleTab(profileId: widget.profileId, motorcyclesFuture: _motorcyclesFuture),
-                    GearTab(profileId: widget.profileId, gearFuture: _gearFuture), // Pass gearFuture
+                    MotorcycleTab(
+                        profileId: widget.profileId,
+                        motorcyclesFuture: _motorcyclesFuture),
+                    GearTab(
+                        profileId: widget.profileId,
+                        gearFuture: _gearFuture), // Pass gearFuture
                     LotTab(
+                      profileId: widget.profileId,
                         storageLotsFuture:
                             _storageLotsFuture), // Pass storageLotsFuture
                   ],
@@ -110,7 +116,8 @@ class MotorcycleTab extends StatelessWidget {
   final int profileId;
   final Future<List<dynamic>> motorcyclesFuture;
 
-  const MotorcycleTab({super.key, required this.profileId, required this.motorcyclesFuture});
+  const MotorcycleTab(
+      {super.key, required this.profileId, required this.motorcyclesFuture});
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +142,8 @@ class MotorcycleTab extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => MotorcycleDetailPage(profileId: profileId,
+                      builder: (context) => MotorcycleDetailPage(
+                        profileId: profileId,
                         motorcycleData: motorcycle,
                       ),
                     ),
@@ -203,8 +211,10 @@ class GearTab extends StatelessWidget {
 // LotTab updated to fetch and display storage lots
 class LotTab extends StatelessWidget {
   final Future<List<dynamic>> storageLotsFuture;
+  final int profileId;
 
-  const LotTab({super.key, required this.storageLotsFuture});
+  const LotTab(
+      {super.key, required this.profileId, required this.storageLotsFuture});
 
   @override
   Widget build(BuildContext context) {
@@ -229,7 +239,7 @@ class LotTab extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => LotDetailsPage(
+                      builder: (context) => LotDetailsPage(profileId: profileId,
                         lotData: lot,
                       ),
                     ),

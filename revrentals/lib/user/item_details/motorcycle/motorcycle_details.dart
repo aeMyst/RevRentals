@@ -76,16 +76,17 @@ Future<void> _rentMotorcycle() async {
       };
 
       await _listingService.addReservation(listingData);
-
+      
       final String rentalPeriod =
           '$formattedStartDate to $formattedEndDate';
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Motorcycle rented for $rentalPeriod'),
+          content: Text('Motorcycle successfully rented for $rentalPeriod'),
           duration: const Duration(seconds: 3),
         ),
       );
+      Navigator.pop(context);
     } catch (e) {
       print('Error occurred trying to rent motorcycle: $e');
       ScaffoldMessenger.of(context).showSnackBar(

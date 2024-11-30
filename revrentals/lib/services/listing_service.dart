@@ -130,7 +130,6 @@ class ListingService {
 
     if (response.statusCode == 201) {
       return json.decode(response.body); // Backend response
-
     } else {
       final error = jsonDecode(response.body);
       throw Exception(error["error"] ?? "Failed to add reservation");

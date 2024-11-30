@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:revrentals/main_pages/auth_page.dart';
+import 'package:revrentals/services/listing_service.dart';
 
 class LotDetailsPage extends StatefulWidget {
+  final int profileId;
   final Map<String, dynamic> lotData; // Accept the full lot data as a Map
 
   const LotDetailsPage({
     super.key,
+    required this.profileId,
     required this.lotData,
   });
 
@@ -17,6 +20,7 @@ class LotDetailsPage extends StatefulWidget {
 class _LotDetailsPageState extends State<LotDetailsPage> {
   DateTime? selectedStartDate;
   DateTime? selectedEndDate;
+  final ListingService _listingService = ListingService();
 
   // Sign out function
   void signUserOut(BuildContext context) {
@@ -55,17 +59,39 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
   }
 
   // Function to handle renting the lot
-  void _rentLot() {
+  Future<void> _rentLot() async {
     if (selectedStartDate != null && selectedEndDate != null) {
-      final rentalPeriod =
-          '${DateFormat('yyyy-MM-dd').format(selectedStartDate!)} to ${DateFormat('yyyy-MM-dd').format(selectedEndDate!)}';
+      try {
+        // Convert DateTime objects to strings in the format yyyy-MM-dd
+        String formattedStartDate =
+            DateFormat('yyyy-MM-dd').format(selectedStartDate!);
+        String formattedEndDate =
+            DateFormat('yyyy-MM-dd').format(selectedEndDate!);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Lot rented for $rentalPeriod'),
-          duration: const Duration(seconds: 3),
-        ),
-      );
+        Map<String, dynamic> listingData = {
+          "profile_id": widget.profileId,
+          "lot_no": widget.lotData['Lot_No'],
+          "start_date": formattedStartDate,
+          "end_date": formattedEndDate,
+        };
+
+        await _listingService.addReservation(listingData);
+
+        final String rentalPeriod = '$formattedStartDate to $formattedEndDate';
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Storage lot rented for $rentalPeriod'),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+        Navigator.pop(context);
+      } catch (e) {
+        print('Error occurred trying to rent storage lot: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('An error occurred. Please try again.')),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
