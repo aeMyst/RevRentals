@@ -121,44 +121,252 @@ class MotorcycleTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<dynamic>>(
-      future: motorcyclesFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text("Error: ${snapshot.error}"));
-        } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-          final motorcycles = snapshot.data!;
-          return ListView.builder(
-            itemCount: motorcycles.length,
-            itemBuilder: (context, index) {
-              final motorcycle = motorcycles[index];
-              return ListTile(
-                title: Text(motorcycle['Model']),
-                subtitle: Text("Rental Price: \$${motorcycle['Rental_Price']}"),
-                trailing: const Icon(Icons.motorcycle),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MotorcycleDetailPage(
-                        profileId: profileId,
-                        motorcycleData: motorcycle,
-                      ),
-                    ),
-                  );
-                },
-              );
+    return Column(
+      children: [
+        // Filter button or icon above the ListView
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: () => _showFilterDialog(context), // Assuming you have the _showFilterDialog method
+              child: const Text("Filter Motorcycles"),
+            ),
+          ),
+        
+        //return FutureBuilder<List<dynamic>>(
+          Expanded (
+            child: FutureBuilder<List<dynamic>>(
+            future: motorcyclesFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text("Error: ${snapshot.error}"));
+              } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                final motorcycles = snapshot.data!;
+                
+                return ListView.builder(
+                  itemCount: motorcycles.length,
+                  itemBuilder: (context, index) {
+                    final motorcycle = motorcycles[index];
+
+                    return ListTile(
+                      title: Text(motorcycle['Model']),
+                      subtitle: Text("Rental Price: \$${motorcycle['Rental_Price']}"),
+                      trailing: const Icon(Icons.motorcycle),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MotorcycleDetailPage(
+                              profileId: profileId,
+                              motorcycleData: motorcycle,
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                );
+              } else {
+                return const Center(child: Text("No motorcycles found."));
+              }
             },
-          );
-        } else {
-          return const Center(child: Text("No motorcycles found."));
-        }
-      },
+          ),
+        )
+      ]
     );
   }
 }
+
+void _showFilterDialog(BuildContext context) {
+  String selectedVehicle = 'All';
+  String selectedPriceRange = 'Any';
+  String selectedInsurance = 'Any';
+  String selectedMileage = 'Any';
+  String selectedColor = 'Any';
+
+  final List<String> vehicleType = [
+    'All',
+    'Motorcycles',
+    'Dirtbike',
+    'Moped'
+  ];
+  final List<String> priceRanges = [
+    'Any',
+    'Under \$100',
+    'Above \$100',
+    'Under \$200',
+    'Above \$200'
+  ];
+  final List<String> insuranceOptions = [
+    'Any',
+    'Basic',
+    'Premium',
+    'Comprehensive'
+  ];
+  final List<String> colorOptions = [
+    'Any',
+    'Red',
+    'Orange',
+    'Yellow',
+    'Green',
+    'Blue',
+    'Purple',
+    'Pink',
+    'Black',
+    'White',
+    'Other',
+  ];
+  final List<String> mileageOptions = [
+    'Any',
+    'Under 10,000 km',
+    '10,000 - 50,000 km',
+    'Above 50,000 km'
+  ];
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return AlertDialog(
+            title: const Text('Filter Options'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Dropdown for Vehicle Type
+                DropdownButtonFormField<String>(
+                  value: selectedVehicle,
+                  decoration: const InputDecoration(
+                    labelText: 'Vehicle Type',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: vehicleType.map((String type) {
+                    return DropdownMenuItem<String>(
+                      value: type,
+                      child: Text(type),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedVehicle = newValue!;
+                    });
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Dropdown for Price Range
+                DropdownButtonFormField<String>(
+                  value: selectedPriceRange,
+                  decoration: const InputDecoration(
+                    labelText: 'Price Range',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: priceRanges.map((String range) {
+                    return DropdownMenuItem<String>(
+                      value: range,
+                      child: Text(range),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedPriceRange = newValue!;
+                    });
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Dropdown for Color
+                DropdownButtonFormField<String>(
+                  value: selectedColor,
+                  decoration: const InputDecoration(
+                    labelText: 'Color',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: colorOptions.map((String color) {
+                    return DropdownMenuItem<String>(
+                      value: color,
+                      child: Text(color),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedColor = newValue!;
+                    });
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Dropdown for Mileage
+                DropdownButtonFormField<String>(
+                  value: selectedMileage,
+                  decoration: const InputDecoration(
+                    labelText: 'Mileage',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: mileageOptions.map((String mileage) {
+                    return DropdownMenuItem<String>(
+                      value: mileage,
+                      child: Text(mileage),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedMileage = newValue!;
+                    });
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Dropdown for Insurance
+                DropdownButtonFormField<String>(
+                  value: selectedInsurance,
+                  decoration: const InputDecoration(
+                    labelText: 'Insurance',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: insuranceOptions.map((String insurance) {
+                    return DropdownMenuItem<String>(
+                      value: insurance,
+                      child: Text(insurance),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedInsurance = newValue!;
+                    });
+                  },
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  // Handle filter application logic here
+                  print('Applied Filters:');
+                  print('Vehicle Type: $selectedVehicle');
+                  print('Price Range: $selectedPriceRange');
+                  print('Color: $selectedColor');
+                  print('Mileage: $selectedMileage');
+                  print('Insurance: $selectedInsurance');
+                  
+                  // Close the dialog after applying filters
+                  Navigator.pop(context);
+                },
+                child: const Text('Apply Filters'),
+              ),
+            ],
+          );
+        },
+      );
+    },
+  );
+}
+
 
 // GearTab updated to fetch and display gear items
 class GearTab extends StatelessWidget {
