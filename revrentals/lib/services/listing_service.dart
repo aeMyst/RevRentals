@@ -119,20 +119,28 @@ class ListingService {
 
 
   /// Adds a motorized vehicle listing to the garage.
-  Future<Map<String, dynamic>> addReservation(
-      Map<String, dynamic> listingData) async {
+  Future<Map<String, dynamic>> addReservation(Map<String, dynamic> listingData) async {
     final url = Uri.parse("$_baseUrl/add-reservation/");
-    final response = await http.post(
-      url,
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode(listingData),
-    );
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(listingData),
+      );
 
-    if (response.statusCode == 201) {
-      return json.decode(response.body); // Backend response
-    } else {
-      final error = jsonDecode(response.body);
-      throw Exception(error["error"] ?? "Failed to add reservation");
+      if (response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        // The success response will include the reservation number
+        return {
+          "success": true,
+          "message": "Reservation added successfully",
+          "reservation_no": data['reservation_no']
+        };
+      } else {
+        throw Exception(jsonDecode(response.body)['error']);
+      }
+    } catch (e) {
+      throw Exception("Failed to add reservation: $e");
     }
   }
 
@@ -153,25 +161,113 @@ class ListingService {
     }
   }
 
-  // Adds maintenance records for a vin
-Future<Map<String, dynamic>> addMaintRecords(
-  List<Map<String, dynamic>> recordsData) async {
+    // Adds maintenance records for a vin
+  Future<Map<String, dynamic>> addMaintRecords(
+    List<Map<String, dynamic>> recordsData) async {
 
-  final url = Uri.parse("$_baseUrl/add-maintenance-records/");
-  final response = await http.post(
-    url,
-    headers: {"Content-Type": "application/json"},
-    body: jsonEncode(recordsData),
-  );
+    final url = Uri.parse("$_baseUrl/add-maintenance-records/");
+    final response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(recordsData),
+    );
 
-  if (response.statusCode == 201) {
-    return json.decode(response.body); // Backend response
-  } else {
-    final error = jsonDecode(response.body);
-    throw Exception(error["error"] ?? "Failed to add maintenance records");
+    if (response.statusCode == 201) {
+      return json.decode(response.body); // Backend response
+    } else {
+      final error = jsonDecode(response.body);
+      throw Exception(error["error"] ?? "Failed to add maintenance records");
+    }
   }
-}
 
+  // Creates a new agreement for a reservation and returns agreement details
+  Future<Map<String, dynamic>> addAgreement(Map<String, dynamic> agreementData) async {
+    final url = Uri.parse("$_baseUrl/add-agreement/");
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(agreementData),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        // Return the complete agreement details for the transaction page
+        return {
+          "success": true,
+          "message": data['message'],
+          "item_name": data['item_name'],
+          "item_type": data['item_type'],
+          "rental_overview": data['rental_overview'],
+          "agreement_fee": data['agreement_fee'],
+          "damage_compensation": data['damage_compensation']
+        };
+      } else {
+        throw Exception(jsonDecode(response.body)['error']);
+      }
+    } catch (e) {
+      throw Exception("Failed to create agreement: $e");
+    }
+  }
+
+
+  // Creates a new transaction for a reservation and returns transaction details
+  Future<Map<String, dynamic>> addTransaction(Map<String, dynamic> transactionData) async {
+    final url = Uri.parse("$_baseUrl/add-transaction/");
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(transactionData),
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception(jsonDecode(response.body)['error']);
+      }
+    } catch (e) {
+      throw Exception("Failed to process transaction: $e");
+    }
+  }
+
+  Future<Map<String, dynamic>> fetchAgreement(int reservationNo) async {
+    final url = Uri.parse("$_baseUrl/view-agreement/$reservationNo/");
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception(jsonDecode(response.body)['error']);
+    }
+  }
+
+  Future<Map<String, dynamic>> fetchTransaction(int reservationNo) async {
+    final url = Uri.parse("$_baseUrl/view-transaction/$reservationNo/");
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception(jsonDecode(response.body)['error']);
+    }
+  }
+
+    /// Fetches complete reservation details including renter information
+  Future<Map<String, dynamic>> fetchReservationDetails(int reservationNo) async {
+    final url = Uri.parse("$_baseUrl/view-reservation-details/$reservationNo/");
+    try {
+      final response = await http.get(url);
+      
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception(jsonDecode(response.body)['error']);
+      }
+    } catch (e) {
+      throw Exception("Failed to fetch reservation details: $e");
+    }
+  }
 
   // Future<Map<String,dynamic>> fetchTransaction(int reservation_no) async {
   //   final url = Uri.parse("$_baseUrl/view-transaction/$reservation_no/");
