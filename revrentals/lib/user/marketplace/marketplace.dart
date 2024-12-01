@@ -112,12 +112,29 @@ class _MarketplacePageState extends State<MarketplacePage> {
 }
 
 // MotorcycleTab remains the same
-class MotorcycleTab extends StatelessWidget {
+class MotorcycleTab extends StatefulWidget {
   final int profileId;
   final Future<List<dynamic>> motorcyclesFuture;
 
   const MotorcycleTab(
       {super.key, required this.profileId, required this.motorcyclesFuture});
+
+  @override
+  _MotorcycleTabState createState() => _MotorcycleTabState();
+  
+}
+
+class _MotorcycleTabState extends State<MotorcycleTab> {
+  late Future<List<dynamic>> motorcyclesFuture;
+  //late Future<List<dynamic>> filteredMotorcyclesFuture;
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    motorcyclesFuture = widget.motorcyclesFuture;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -146,12 +163,11 @@ class MotorcycleTab extends StatelessWidget {
               borderSide: const BorderSide(color: Colors.grey), 
             ),
           ),
-         /* onChanged: (query) {
-            // Implement search logic here
+          onChanged: (query) {
             setState(() {
               _searchQuery = query;
             });
-          }, */
+          }, 
         ),
       ),
       const SizedBox(height: 16),
@@ -195,11 +211,18 @@ class MotorcycleTab extends StatelessWidget {
                 return Center(child: Text("Error: ${snapshot.error}"));
               } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                 final motorcycles = snapshot.data!;
+
+                // filtering
+                final filteredMotorcycles = motorcycles
+                  .where((motorcycle) => motorcycle['Model']
+                    .toLowerCase()
+                    .contains(_searchQuery.toLowerCase()))
+                  .toList();
                 
                 return ListView.builder(
-                  itemCount: motorcycles.length,
+                  itemCount: filteredMotorcycles.length,
                   itemBuilder: (context, index) {
-                    final motorcycle = motorcycles[index];
+                    final motorcycle = filteredMotorcycles[index];
 
                     return ListTile(
                       title: Text(motorcycle['Model']),
@@ -210,7 +233,7 @@ class MotorcycleTab extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) => MotorcycleDetailPage(
-                              profileId: profileId,
+                              profileId: widget.profileId,
                               motorcycleData: motorcycle,
                             ),
                           ),
