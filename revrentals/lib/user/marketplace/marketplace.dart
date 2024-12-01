@@ -123,14 +123,34 @@ class MotorcycleTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Filter button or icon above the ListView
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: () => _showFilterDialog(context), // Assuming you have the _showFilterDialog method
-              child: const Text("Filter Motorcycles"),
+        const SizedBox(height: 16),
+        // Filter and Sort Buttons Row
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            ElevatedButton.icon(
+              icon: const Icon(Icons.filter_list),
+              label: const Text(
+                'Filter',
+              ),
+              onPressed: () {
+                _showFilterDialog(context);
+              },
             ),
-          ),
+            const SizedBox(width: 16),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.sort),
+              label: const Text(
+                'Sort',
+              ),
+              onPressed: () {
+                // TODO: Add sort functionality
+                _showSortDialog(context);
+              },
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
         
         //return FutureBuilder<List<dynamic>>(
           Expanded (
@@ -367,6 +387,61 @@ void _showFilterDialog(BuildContext context) {
   );
 }
 
+void _showSortDialog(BuildContext context) {
+    String selectedSortOption = 'None';
+    final List<String> sortOptions = [
+      'None',
+      'Price: Low to High',
+      'Price: High to Low',
+      'Newest First'
+    ];
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: const Text('Sort Options'),
+              content: DropdownButtonFormField<String>(
+                dropdownColor: Colors.white,
+                value: selectedSortOption,
+                decoration: const InputDecoration(
+                  labelText: 'Sort By',
+                  border: OutlineInputBorder(),
+                ),
+                items: sortOptions.map((String option) {
+                  return DropdownMenuItem<String>(
+                    value: option,
+                    child: Text(option),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedSortOption = newValue!;
+                  });
+                },
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    // Handle the sort logic here
+                    print('Sort Option: $selectedSortOption');
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Apply'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
 
 // GearTab updated to fetch and display gear items
 class GearTab extends StatelessWidget {
