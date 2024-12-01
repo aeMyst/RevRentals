@@ -124,9 +124,41 @@ class MotorcycleTab extends StatelessWidget {
     return Column(
       children: [
         const SizedBox(height: 16),
+
+        // Search bar
+        Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: TextField(
+          decoration: InputDecoration(
+            hintText: 'Search Motorcycles...',
+            prefixIcon: const Icon(Icons.search),
+
+            // need to keep all three of these so it stays rounded 
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20.0),  
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20.0),  
+              borderSide: const BorderSide(color: Colors.grey), 
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20.0),  
+              borderSide: const BorderSide(color: Colors.grey), 
+            ),
+          ),
+         /* onChanged: (query) {
+            // Implement search logic here
+            setState(() {
+              _searchQuery = query;
+            });
+          }, */
+        ),
+      ),
+      const SizedBox(height: 16),
+
         // Filter and Sort Buttons Row
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton.icon(
               icon: const Icon(Icons.filter_list),
@@ -144,8 +176,8 @@ class MotorcycleTab extends StatelessWidget {
                 'Sort',
               ),
               onPressed: () {
-                // TODO: Add sort functionality
-                _showSortDialog(context);
+                  // TODO: Add sort functionality
+                  _showSortDialog(context);
               },
             ),
           ],
