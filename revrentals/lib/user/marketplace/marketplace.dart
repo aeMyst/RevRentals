@@ -7,6 +7,9 @@ import 'package:revrentals/user/notifications/notifications.dart';
 import 'package:revrentals/user/profile_detail.dart';
 import 'package:revrentals/services/listing_service.dart'; // Import ListingService
 
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 class MarketplacePage extends StatefulWidget {
   final int profileId;
   final Map<String, dynamic>? userData;
@@ -126,7 +129,7 @@ class MotorcycleTab extends StatefulWidget {
 
 class _MotorcycleTabState extends State<MotorcycleTab> {
   late Future<List<dynamic>> motorcyclesFuture;
-  //late Future<List<dynamic>> filteredMotorcyclesFuture;
+  late List<dynamic> _filteredMotorcycles = [];  // local storage of filtered vehicles
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
@@ -134,30 +137,37 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   void initState() {
     super.initState();
     motorcyclesFuture = widget.motorcyclesFuture;
-  }
-
-   void _applySort(String selectedSortOption) {
-    motorcyclesFuture.then((motorcycles) {
-      switch (selectedSortOption) {
-        case 'Price: Low to High':
-          motorcycles.sort((a, b) => a['Rental_Price'].compareTo(b['Rental_Price']));
-          break;
-        case 'Price: High to Low':
-          motorcycles.sort((a, b) => b['Rental_Price'].compareTo(a['Rental_Price']));
-          break;
-        case 'Newest First':
-          motorcycles.sort((a, b) => b['dateAdded'].compareTo(a['dateAdded'])); // TO FIX
-          break;
-        default:
-          break;
-      }
-
-      // Update the motorcycles list
+    /*motorcyclesFuture.then((motorcycles) {
       setState(() {
-        motorcyclesFuture = Future.value(motorcycles);
+        _motorcyclesList = motorcycles;
       });
-    });
+    }); */
+    _filteredMotorcycles = [];
   }
+
+
+  void _applySort(String selectedSortOption) {
+  motorcyclesFuture.then((motorcycles) {
+    switch (selectedSortOption) {
+      case 'Price: Low to High':
+        motorcycles.sort((a, b) => a['Rental_Price'].compareTo(b['Rental_Price']));
+        break;
+      case 'Price: High to Low':
+        motorcycles.sort((a, b) => b['Rental_Price'].compareTo(a['Rental_Price']));
+        break;
+      case 'Newest First':
+        motorcycles.sort((a, b) => b['dateAdded'].compareTo(a['dateAdded'])); // TO FIX
+        break;
+      default:
+        break;
+    }
+
+    // Update the motorcycles list
+    setState(() {
+      motorcyclesFuture = Future.value(motorcycles);
+    });
+  });
+}
 
   void _showSortDialog(BuildContext context) {
     String selectedSortOption = 'None';
@@ -218,124 +228,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     );
   }
 
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const SizedBox(height: 16),
-
-        // Search bar
-        Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: TextField(
-          decoration: InputDecoration(
-            hintText: 'Search Motorcycles...',
-            prefixIcon: const Icon(Icons.search),
-
-            // need to keep all three of these so it stays rounded 
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0),  
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0),  
-              borderSide: const BorderSide(color: Colors.grey), 
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0),  
-              borderSide: const BorderSide(color: Colors.grey), 
-            ),
-          ),
-          onChanged: (query) {
-            setState(() {
-              _searchQuery = query;
-            });
-          }, 
-        ),
-      ),
-      const SizedBox(height: 16),
-
-        // Filter and Sort Buttons Row
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton.icon(
-              icon: const Icon(Icons.filter_list),
-              label: const Text(
-                'Filter',
-              ),
-              onPressed: () {
-                _showFilterDialog(context);
-              },
-            ),
-            const SizedBox(width: 16),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.sort),
-              label: const Text(
-                'Sort',
-              ),
-              onPressed: () {
-                  // TODO: Add sort functionality
-                  _showSortDialog(context);
-              },
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-
-          Expanded (
-            child: FutureBuilder<List<dynamic>>(
-            future: motorcyclesFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text("Error: ${snapshot.error}"));
-              } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                final motorcycles = snapshot.data!;
-
-                // filtering
-                final filteredMotorcycles = motorcycles
-                  .where((motorcycle) => motorcycle['Model']
-                    .toLowerCase()
-                    .contains(_searchQuery.toLowerCase()))
-                  .toList();
-                
-                return ListView.builder(
-                  itemCount: filteredMotorcycles.length,
-                  itemBuilder: (context, index) {
-                    final motorcycle = filteredMotorcycles[index];
-
-                    return ListTile(
-                      title: Text(motorcycle['Model']),
-                      subtitle: Text("Rental Price: \$${motorcycle['Rental_Price']}"),
-                      trailing: const Icon(Icons.motorcycle),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MotorcycleDetailPage(
-                              profileId: widget.profileId,
-                              motorcycleData: motorcycle,
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                );
-              } else {
-                return const Center(child: Text("No motorcycles found."));
-              }
-            },
-          ),
-        )
-      ]
-    );
-  }
-}
-
-void _showFilterDialog(BuildContext context) {
+  void _showFilterDialog(BuildContext context) {
   String selectedVehicle = 'All';
   String selectedPriceRange = 'Any';
   String selectedInsurance = 'Any';
@@ -503,15 +396,7 @@ void _showFilterDialog(BuildContext context) {
               ),
               ElevatedButton(
                 onPressed: () {
-                  // Handle filter application logic here
-                  print('Applied Filters:');
-                  print('Vehicle Type: $selectedVehicle');
-                  print('Price Range: $selectedPriceRange');
-                  print('Color: $selectedColor');
-                  print('Mileage: $selectedMileage');
-                  print('Insurance: $selectedInsurance');
-                  
-                  // Close the dialog after applying filters
+                  _applyColorFilter(context, selectedColor);
                   Navigator.pop(context);
                 },
                 child: const Text('Apply Filters'),
@@ -524,13 +409,149 @@ void _showFilterDialog(BuildContext context) {
   );
 }
 
-
-  
-  
-
-  
+  void _applyColorFilter(BuildContext context, String selectedColor) async {
+    final url = Uri.parse('http://10.0.2.2:8000/filter-by-color/');
     
-  
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'color': selectedColor,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      // Handle successful response
+      final responseData = json.decode(response.body);
+      final filteredMotorcycles = responseData['vins'];
+
+      setState(() {
+        _filteredMotorcycles = filteredMotorcycles;
+      });
+      
+      print('Filtered Vehicles: ${responseData['vins']}');
+    } else {
+      // Handle error response
+      print('Error: ${response.body}');
+    }
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const SizedBox(height: 16),
+
+        // Search bar
+        Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: TextField(
+          decoration: InputDecoration(
+            hintText: 'Search Motorcycles...',
+            prefixIcon: const Icon(Icons.search),
+
+            // need to keep all three of these so it stays rounded 
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20.0),  
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20.0),  
+              borderSide: const BorderSide(color: Colors.grey), 
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20.0),  
+              borderSide: const BorderSide(color: Colors.grey), 
+            ),
+          ),
+          onChanged: (query) {
+            setState(() {
+              _searchQuery = query;
+            });
+          }, 
+        ),
+      ),
+        const SizedBox(height: 16),
+
+        // Filter and Sort Buttons Row
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton.icon(
+              icon: const Icon(Icons.filter_list),
+              label: const Text(
+                'Filter',
+              ),
+              onPressed: () {
+                _showFilterDialog(context);
+              },
+            ),
+            const SizedBox(width: 16),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.sort),
+              label: const Text(
+                'Sort',
+              ),
+              onPressed: () {
+                  // TODO: Add sort functionality
+                  _showSortDialog(context);
+              },
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+
+        Expanded (
+          child: FutureBuilder<List<dynamic>>(
+          future: motorcyclesFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text("Error: ${snapshot.error}"));
+            } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+              final motorcycles = snapshot.data!;
+
+              // filtering
+              final filteredMotorcycles = motorcycles
+                .where((motorcycle) => motorcycle['Model']
+                  .toLowerCase()
+                  .contains(_searchQuery.toLowerCase()))
+                .toList();
+              
+              return ListView.builder(
+                itemCount: filteredMotorcycles.length,
+                itemBuilder: (context, index) {
+                  final motorcycle = filteredMotorcycles[index];
+
+                  return ListTile(
+                    title: Text(motorcycle['Model']),
+                    subtitle: Text("Rental Price: \$${motorcycle['Rental_Price']}"),
+                    trailing: const Icon(Icons.motorcycle),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MotorcycleDetailPage(
+                            profileId: widget.profileId,
+                            motorcycleData: motorcycle,
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              );
+            } else {
+              return const Center(child: Text("No motorcycles found."));
+            }
+          },
+        ),
+      )
+    ]
+  );}
+}
+
 
 // GearTab updated to fetch and display gear items
 class GearTab extends StatelessWidget {
