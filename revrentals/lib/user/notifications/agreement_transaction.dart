@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:revrentals/services/listing_service.dart';
 
 class AgreementTransactionPage extends StatefulWidget {
   final String itemName;
@@ -7,6 +8,7 @@ class AgreementTransactionPage extends StatefulWidget {
   final double rentalPrice;
   final double totalPrice;
   final VoidCallback onActionCompleted;
+  final int agreementId;
 
   const AgreementTransactionPage({
     super.key,
@@ -16,20 +18,20 @@ class AgreementTransactionPage extends StatefulWidget {
     required this.rentalPrice,
     required this.totalPrice,
     required this.onActionCompleted,
+    required this.agreementId
   });
 
   @override
-  _AgreementTransactionPageState createState() =>
-      _AgreementTransactionPageState();
+  _AgreementTransactionPageState createState() => _AgreementTransactionPageState();
 }
 
 class _AgreementTransactionPageState extends State<AgreementTransactionPage> {
-  // Dropdown list of payment methods
+  final ListingService _listingService = ListingService();
   final List<String> paymentMethods = ['Credit Card', 'Debit Card', 'PayPal', 'E-Transfer'];
   String? selectedPaymentMethod;
+  bool isProcessing = false;
 
-  // Method to handle payment
-  void _processPayment() {
+  Future<void> _processPayment() async {
     if (selectedPaymentMethod == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please select a payment method")),
@@ -37,13 +39,32 @@ class _AgreementTransactionPageState extends State<AgreementTransactionPage> {
       return;
     }
 
-    widget.onActionCompleted();
-    // Simulate a payment process
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Payment successful via $selectedPaymentMethod")),
-    );
-    // Navigate back to notifications after successful payment
-    Navigator.pop(context); // You could replace this with a more specific navigation action
+    setState(() {
+      isProcessing = true;
+    });
+
+    try {
+      await _listingService.addTransaction({
+        "agreement_id": widget.agreementId,     // agreementID is the same as reservationID
+        "payment_method": selectedPaymentMethod,
+      });
+      print(widget.agreementId);    // testing purposes
+      widget.onActionCompleted();
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Payment successful via $selectedPaymentMethod")),
+      );
+      
+      Navigator.pop(context);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Payment failed: $e")),
+      );
+    } finally {
+      setState(() {
+        isProcessing = false;
+      });
+    }
   }
 
   @override
@@ -89,14 +110,12 @@ class _AgreementTransactionPageState extends State<AgreementTransactionPage> {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-            // Dropdown menu for selecting payment method
+            
             DropdownButtonFormField<String>(
-              
               dropdownColor: Colors.white,
               decoration: const InputDecoration(
                 labelText: "Select a Payment Method",
               ),
-              
               value: selectedPaymentMethod,
               onChanged: (String? newValue) {
                 setState(() {
@@ -113,9 +132,12 @@ class _AgreementTransactionPageState extends State<AgreementTransactionPage> {
             const SizedBox(height: 20),
             Center(
               child: ElevatedButton(
-                onPressed: _processPayment,
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                child: const Text("Confirm Payment"),
+                onPressed: isProcessing ? null : _processPayment,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  disabledBackgroundColor: Colors.grey,
+                ),
+                child: Text(isProcessing ? 'Processing...' : 'Confirm Payment'),
               ),
             ),
           ],
