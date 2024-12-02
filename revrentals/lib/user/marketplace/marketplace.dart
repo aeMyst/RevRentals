@@ -118,6 +118,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
 class MotorcycleTab extends StatefulWidget {
   final int profileId;
   final Future<List<dynamic>> motorcyclesFuture;
+  
 
   const MotorcycleTab(
       {super.key, required this.profileId, required this.motorcyclesFuture});
@@ -132,6 +133,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   late List<dynamic> _filteredMotorcycles = [];  // local storage of filtered vehicles
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  String selectedColor = 'Any';
 
   @override
   void initState() {
@@ -410,32 +412,47 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
 }
 
   void _applyColorFilter(BuildContext context, String selectedColor) async {
-    final url = Uri.parse('http://10.0.2.2:8000/filter-by-color/');
-    
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'color': selectedColor,
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      // Handle successful response
-      final responseData = json.decode(response.body);
-      final filteredMotorcycles = responseData['vins'];
-
-      setState(() {
-        _filteredMotorcycles = filteredMotorcycles;
-      });
-      
-      print('Filtered Vehicles: ${responseData['vins']}');
+    if (selectedColor == "Any") {
+    // If the selected color is "Any", use the motorcyclesFuture list
+    setState(() {
+      _filteredMotorcycles = motorcyclesFuture as List;  // Assuming motorcyclesFuture is the list you want to use
+    });
     } else {
-      // Handle error response
-      print('Error: ${response.body}');
+      final url = Uri.parse('http://10.0.2.2:8000/filter-by-color/');
+      
+      final body = {'color': selectedColor};  // No need for empty body if "Any"
+      
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(body),
+      );
+
+      if (response.statusCode == 200) {
+        print('Received successful response');
+        final responseData = json.decode(response.body);
+        print('Response Data: $responseData');
+
+        // Access the 'vehicles' key and ensure it's a list
+        if (responseData.containsKey('vehicles') && responseData['vehicles'] is List) {
+          final vehicles = responseData['vehicles'];
+          print('Filtered Vehicles: $vehicles');
+
+          // Update _filteredMotorcycles with the filtered list
+          setState(() {
+            _filteredMotorcycles = vehicles;
+          });
+        } else {
+          print('No valid vehicles found in response');
+          setState(() {
+            _filteredMotorcycles = [];
+          });
+        }
+      } else {
+        print('Error: ${response.body}');
+      }
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -503,30 +520,35 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
 
         Expanded (
           child: FutureBuilder<List<dynamic>>(
-          future: motorcyclesFuture,
+          future: motorcyclesFuture, // The original list is fetched here.
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
               return Center(child: Text("Error: ${snapshot.error}"));
             } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-              final motorcycles = snapshot.data!;
+              final vehicles = snapshot.data!;
 
-              // filtering
-              final filteredMotorcycles = motorcycles
-                .where((motorcycle) => motorcycle['Model']
-                  .toLowerCase()
-                  .contains(_searchQuery.toLowerCase()))
-                .toList();
-              
+              // If there are no filtered motorcycles, show the original list
+              final displayMotorcycles = _filteredMotorcycles.isNotEmpty
+                  ? _filteredMotorcycles
+                  : vehicles; // Use the filtered list if available, otherwise the original list
+
+              // Apply search filtering if there is a search query
+              final filteredBySearch = displayMotorcycles.where((motorcycle) {
+                return motorcycle['Model']
+                    .toLowerCase()
+                    .contains(_searchQuery.toLowerCase());
+              }).toList();
+
               return ListView.builder(
-                itemCount: filteredMotorcycles.length,
+                itemCount: filteredBySearch.length,
                 itemBuilder: (context, index) {
-                  final motorcycle = filteredMotorcycles[index];
+                  final vehicle = filteredBySearch[index];
 
                   return ListTile(
-                    title: Text(motorcycle['Model']),
-                    subtitle: Text("Rental Price: \$${motorcycle['Rental_Price']}"),
+                    title: Text(vehicle['Model'] ?? 'Unknown Model'),
+                    subtitle: Text("Rental Price: \$${vehicle['Rental_Price']}"),
                     trailing: const Icon(Icons.motorcycle),
                     onTap: () {
                       Navigator.push(
@@ -534,7 +556,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                         MaterialPageRoute(
                           builder: (context) => MotorcycleDetailPage(
                             profileId: widget.profileId,
-                            motorcycleData: motorcycle,
+                            motorcycleData: vehicle,
                           ),
                         ),
                       );
@@ -547,10 +569,66 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
             }
           },
         ),
+      ),
+    ],
+  );}
+}
+
+//this code lists everything - but filtering doesnt work aksdfkdj
+         /* child: FutureBuilder<List<dynamic>>(
+          //future: motorcyclesFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text("Error: ${snapshot.error}"));
+            } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+              final vehicles = snapshot.data!;
+
+              // filtering
+             // final filteredMotorcycles = _filteredMotorcycles.isNotEmpty ? _filteredMotorcycles
+               //     : motorcycles;
+              
+              /* filtering based on search query if keeping search functionality
+              final finalMotorcycles = filteredMotorcycles
+                  .where((motorcycle) =>
+                      motorcycle['Model']
+                          .toLowerCase()
+                          .contains(_searchQuery.toLowerCase()))
+                  .toList(); */
+
+              return ListView.builder(
+                itemCount: vehicles.length,
+                itemBuilder: (context, index) {
+                  final vehicle = vehicles[index];
+
+                  return ListTile(
+                    title: Text(vehicle['Model'] ?? 'Unknown Model'),
+                    subtitle: Text("Rental Price: \$${vehicle['Rental_Price']}"),
+                    trailing: const Icon(Icons.motorcycle),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MotorcycleDetailPage(
+                            profileId: widget.profileId,
+                            motorcycleData: vehicle,
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              );
+            } else {
+              return const Center(child: Text("No motorcycles found."));
+            }
+          },
+        ), 
       )
     ]
   );}
-}
+} */
 
 
 // GearTab updated to fetch and display gear items
