@@ -405,7 +405,8 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                     context: context,
                     selectedColor: selectedColor,
                     selectedPriceRange: selectedPriceRange,
-                    selectedMileage: selectedMileage
+                    selectedMileage: selectedMileage,
+                    selectedInsurance: selectedInsurance,
                     );
                   Navigator.pop(context);
                 },
@@ -424,13 +425,22 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     String? selectedColor,
     String? selectedPriceRange,
     String? selectedMileage,
+    String? selectedInsurance,
   }) async {
     // If no filters are selected, reset to the original list (motorcyclesFuture)
-    if (selectedColor == "Any" && selectedPriceRange == "Any" && selectedMileage == "Any") {
+    if (selectedColor == "Any" &&
+    selectedPriceRange == "Any" &&
+    selectedMileage == "Any" &&
+    selectedInsurance == "Any") {
+    try {
+      final motorcycles = await motorcyclesFuture;
       setState(() {
-        _filteredMotorcycles = motorcyclesFuture as List; 
+        _filteredMotorcycles = motorcycles;
       });
-    } else {
+    } catch (error) {
+      print("Error resolving motorcyclesFuture: $error");
+    }
+  } else{
       // Initialize an empty list to collect filtered motorcycles
       List<dynamic> filteredList = [];
 
@@ -451,6 +461,12 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
       if (selectedMileage != null && selectedMileage != "Any") {
         final mileageFilteredList = await _applyMileageFilter(selectedMileage);
         filteredList.addAll(mileageFilteredList);
+      }
+
+      // Apply insurance filter
+      if (selectedInsurance != null && selectedInsurance != "Any") {
+        final insuranceFilteredList = await _applyInsuranceFilter(selectedInsurance);
+        filteredList.addAll(insuranceFilteredList);
       }
 
       // Update state with the filtered list or reset if no results
@@ -525,6 +541,34 @@ Future<List<dynamic>> _applyPriceFilter(String selectedPriceRange) async {
 Future<List<dynamic>> _applyMileageFilter(String selectedMileage) async {
   final url = Uri.parse('http://10.0.2.2:8000/filter-by-mileage/');
   final body = {'mileage': selectedMileage};
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(body),
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      if (responseData.containsKey('vehicles') && responseData['vehicles'] is List) {
+        return responseData['vehicles'];
+      } else {
+        return [];
+      }
+    } else {
+      print('Error: ${response.body}');
+      return [];
+    }
+  } catch (error) {
+    print('Error: $error');
+    return [];
+  }
+}
+
+Future<List<dynamic>> _applyInsuranceFilter(String selectedInsurance) async {
+  final url = Uri.parse('http://10.0.2.2:8000/filter-by-insurance/');
+  final body = {'insurance': selectedInsurance};
 
   try {
     final response = await http.post(
