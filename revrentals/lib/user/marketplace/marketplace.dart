@@ -136,6 +136,89 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     motorcyclesFuture = widget.motorcyclesFuture;
   }
 
+   void _applySort(String selectedSortOption) {
+    motorcyclesFuture.then((motorcycles) {
+      switch (selectedSortOption) {
+        case 'Price: Low to High':
+          motorcycles.sort((a, b) => a['Rental_Price'].compareTo(b['Rental_Price']));
+          break;
+        case 'Price: High to Low':
+          motorcycles.sort((a, b) => b['Rental_Price'].compareTo(a['Rental_Price']));
+          break;
+        case 'Newest First':
+          motorcycles.sort((a, b) => b['dateAdded'].compareTo(a['dateAdded'])); // TO FIX
+          break;
+        default:
+          break;
+      }
+
+      // Update the motorcycles list
+      setState(() {
+        motorcyclesFuture = Future.value(motorcycles);
+      });
+    });
+  }
+
+  void _showSortDialog(BuildContext context) {
+    String selectedSortOption = 'None';
+    final List<String> sortOptions = [
+      'None',
+      'Price: Low to High',
+      'Price: High to Low',
+      'Newest First'
+    ];
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: const Text('Sort Options'),
+              content: DropdownButtonFormField<String>(
+                dropdownColor: Colors.white,
+                value: selectedSortOption,
+                decoration: const InputDecoration(
+                  labelText: 'Sort By',
+                  border: OutlineInputBorder(),
+                ),
+                items: sortOptions.map((String option) {
+                  return DropdownMenuItem<String>(
+                    value: option,
+                    child: Text(option),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedSortOption = newValue!;
+                  });
+                },
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    // Handle the sort logic here
+                    print('Sort Option: $selectedSortOption');
+
+                    _applySort(selectedSortOption);
+
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Apply'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -199,8 +282,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
           ],
         ),
         const SizedBox(height: 16),
-        
-        //return FutureBuilder<List<dynamic>>(
+
           Expanded (
             child: FutureBuilder<List<dynamic>>(
             future: motorcyclesFuture,
@@ -442,61 +524,13 @@ void _showFilterDialog(BuildContext context) {
   );
 }
 
-void _showSortDialog(BuildContext context) {
-    String selectedSortOption = 'None';
-    final List<String> sortOptions = [
-      'None',
-      'Price: Low to High',
-      'Price: High to Low',
-      'Newest First'
-    ];
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            return AlertDialog(
-              title: const Text('Sort Options'),
-              content: DropdownButtonFormField<String>(
-                dropdownColor: Colors.white,
-                value: selectedSortOption,
-                decoration: const InputDecoration(
-                  labelText: 'Sort By',
-                  border: OutlineInputBorder(),
-                ),
-                items: sortOptions.map((String option) {
-                  return DropdownMenuItem<String>(
-                    value: option,
-                    child: Text(option),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedSortOption = newValue!;
-                  });
-                },
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    // Handle the sort logic here
-                    print('Sort Option: $selectedSortOption');
-                    Navigator.pop(context);
-                  },
-                  child: const Text('Apply'),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
+  
+  
+
+  
+    
+  
 
 // GearTab updated to fetch and display gear items
 class GearTab extends StatelessWidget {
