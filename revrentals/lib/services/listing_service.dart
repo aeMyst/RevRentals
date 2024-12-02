@@ -22,6 +22,7 @@ class ListingService {
       throw Exception(error["error"] ?? "Failed to add listing");
     }
   }
+
   /// Adds a motorized vehicle listing to the garage.
   Future<Map<String, dynamic>> addGearListing(
       Map<String, dynamic> listingData) async {
@@ -39,6 +40,7 @@ class ListingService {
       throw Exception(error["error"] ?? "Failed to add gear listing");
     }
   }
+
   /// Fetches the garage ID for a specific profile ID.
   Future<int> fetchGarageId(int profileId) async {
     final url = Uri.parse("$_baseUrl/get-garage-id/$profileId/");
@@ -117,9 +119,9 @@ class ListingService {
     }
   }
 
-
   /// Adds a motorized vehicle listing to the garage.
-  Future<Map<String, dynamic>> addReservation(Map<String, dynamic> listingData) async {
+  Future<Map<String, dynamic>> addReservation(
+      Map<String, dynamic> listingData) async {
     final url = Uri.parse("$_baseUrl/add-reservation/");
     try {
       final response = await http.post(
@@ -144,7 +146,7 @@ class ListingService {
     }
   }
 
-    // Fetch all maint records for a vehicle.
+  // Fetch all maint records for a vehicle.
   Future<List<dynamic>> fetchMaintRecords({required String vin}) async {
     final url = Uri.parse("$_baseUrl/motorized-vehicles/$vin/");
     try {
@@ -154,17 +156,17 @@ class ListingService {
         final data = jsonDecode(response.body);
         return data['maintenance_records'] as List<dynamic>;
       } else {
-        throw Exception("Failed to fetch maintenance records: ${response.body}");
+        throw Exception(
+            "Failed to fetch maintenance records: ${response.body}");
       }
     } catch (e) {
       throw Exception("An error occurred: $e");
     }
   }
 
-    // Adds maintenance records for a vin
+  // Adds maintenance records for a vin
   Future<Map<String, dynamic>> addMaintRecords(
-    List<Map<String, dynamic>> recordsData) async {
-
+      List<Map<String, dynamic>> recordsData) async {
     final url = Uri.parse("$_baseUrl/add-maintenance-records/");
     final response = await http.post(
       url,
@@ -181,7 +183,8 @@ class ListingService {
   }
 
   // Creates a new agreement for a reservation and returns agreement details
-  Future<Map<String, dynamic>> addAgreement(Map<String, dynamic> agreementData) async {
+  Future<Map<String, dynamic>> addAgreement(
+      Map<String, dynamic> agreementData) async {
     final url = Uri.parse("$_baseUrl/add-agreement/");
     try {
       final response = await http.post(
@@ -210,9 +213,9 @@ class ListingService {
     }
   }
 
-
   // Creates a new transaction for a reservation and returns transaction details
-  Future<Map<String, dynamic>> addTransaction(Map<String, dynamic> transactionData) async {
+  Future<Map<String, dynamic>> addTransaction(
+      Map<String, dynamic> transactionData) async {
     final url = Uri.parse("$_baseUrl/add-transaction/");
     try {
       final response = await http.post(
@@ -253,12 +256,13 @@ class ListingService {
     }
   }
 
-    /// Fetches complete reservation details including renter information
-  Future<Map<String, dynamic>> fetchReservationDetails(int reservationNo) async {
+  /// Fetches complete reservation details including renter information
+  Future<Map<String, dynamic>> fetchReservationDetails(
+      int reservationNo) async {
     final url = Uri.parse("$_baseUrl/view-reservation-details/$reservationNo/");
     try {
       final response = await http.get(url);
-      
+
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       } else {
@@ -266,6 +270,44 @@ class ListingService {
       }
     } catch (e) {
       throw Exception("Failed to fetch reservation details: $e");
+    }
+  }
+
+  // Fetch notifications for the seller
+  Future<List<dynamic>> fetchSellerNotifications(int profileId) async {
+    final url = Uri.parse("$_baseUrl/notifications/seller/$profileId/");
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        if (jsonResponse['success'] == true &&
+            jsonResponse['notifications'] is List) {
+          return jsonResponse['notifications'] as List<dynamic>;
+        } else {
+          return []; // Return an empty list if notifications are not found
+        }
+      } else {
+        throw Exception(
+            "Failed to fetch notifications. Status code: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error in fetchSellerNotifications: $e");
+      return [];
+    }
+  }
+
+  // Approve or reject a reservation
+  Future<void> updateReservationStatus(int reservationNo, String action) async {
+    final url = Uri.parse("$_baseUrl/reservations/$reservationNo/");
+    final response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"action": action}),
+    );
+
+    if (response.statusCode != 200) {
+      final error = jsonDecode(response.body);
+      throw Exception(error["error"] ?? "Failed to update reservation");
     }
   }
 
@@ -277,6 +319,4 @@ class ListingService {
   // Future<Map<String,dynamic>> fetchAgreement(int reservation_no) async {
   //   final url = Uri.parse("$_baseUrl/view-agreement/$reservation_no/");
   // }
-
-
 }
