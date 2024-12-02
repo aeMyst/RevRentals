@@ -134,6 +134,9 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   String selectedColor = 'Any';
+  String selectedMileage = 'Any';
+  String selectedPriceRange = 'Any';
+  String selectedVehicle = 'All';
 
   @override
   void initState() {
@@ -398,7 +401,12 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  _applyColorFilter(context, selectedColor);
+                  _applyFilter(
+                    context: context,
+                    selectedColor: selectedColor,
+                    selectedPriceRange: selectedPriceRange,
+                    selectedMileage: selectedMileage
+                    );
                   Navigator.pop(context);
                 },
                 child: const Text('Apply Filters'),
@@ -411,17 +419,58 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   );
 }
 
-  void _applyColorFilter(BuildContext context, String selectedColor) async {
-    if (selectedColor == "Any") {
-    // If the selected color is "Any", use the motorcyclesFuture list
-    setState(() {
-      _filteredMotorcycles = motorcyclesFuture as List;  // Assuming motorcyclesFuture is the list you want to use
-    });
+  void _applyFilter({
+    required BuildContext context,
+    String? selectedColor,
+    String? selectedPriceRange,
+    String? selectedMileage,
+  }) async {
+    // If no filters are selected, reset to the original list (motorcyclesFuture)
+    if (selectedColor == "Any" && selectedPriceRange == "Any" && selectedMileage == "Any") {
+      setState(() {
+        _filteredMotorcycles = motorcyclesFuture as List; 
+      });
     } else {
-      final url = Uri.parse('http://10.0.2.2:8000/filter-by-color/');
-      
-      final body = {'color': selectedColor};  // No need for empty body if "Any"
-      
+      // Initialize an empty list to collect filtered motorcycles
+      List<dynamic> filteredList = [];
+
+      // Apply color filter
+      if (selectedColor != null && selectedColor != "Any") {
+        final colorFilteredList = await _applyColorFilter(selectedColor);
+        filteredList.addAll(colorFilteredList);
+      }
+
+      // Apply price range filter
+      // THIS DOESNT WORKRKRKRKRKRRKKRKRK
+      if (selectedPriceRange != null && selectedPriceRange != "Any") {
+        final priceFilteredList = await _applyPriceFilter(selectedPriceRange);
+        filteredList.addAll(priceFilteredList);
+      }
+
+      // Apply mileage filter
+      if (selectedMileage != null && selectedMileage != "Any") {
+        final mileageFilteredList = await _applyMileageFilter(selectedMileage);
+        filteredList.addAll(mileageFilteredList);
+      }
+
+      // Update state with the filtered list or reset if no results
+      if (filteredList.isNotEmpty) {
+        setState(() {
+          _filteredMotorcycles = filteredList;
+        });
+      } else {
+        setState(() {
+          _filteredMotorcycles = [];
+        });
+      }
+    }
+  }
+
+  Future<List<dynamic>> _applyColorFilter(String selectedColor) async {
+    final url = Uri.parse('http://10.0.2.2:8000/filter-by-color/');
+    final body = {'color': selectedColor};
+
+    try {
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
@@ -429,30 +478,77 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
       );
 
       if (response.statusCode == 200) {
-        print('Received successful response');
         final responseData = json.decode(response.body);
-        print('Response Data: $responseData');
-
-        // Access the 'vehicles' key and ensure it's a list
         if (responseData.containsKey('vehicles') && responseData['vehicles'] is List) {
-          final vehicles = responseData['vehicles'];
-          print('Filtered Vehicles: $vehicles');
-
-          // Update _filteredMotorcycles with the filtered list
-          setState(() {
-            _filteredMotorcycles = vehicles;
-          });
+          return responseData['vehicles'];
         } else {
-          print('No valid vehicles found in response');
-          setState(() {
-            _filteredMotorcycles = [];
-          });
+          return [];
         }
       } else {
         print('Error: ${response.body}');
+        return [];
       }
+    } catch (error) {
+      print('Error: $error');
+      return [];
     }
   }
+
+Future<List<dynamic>> _applyPriceFilter(String selectedPriceRange) async {
+  final url = Uri.parse('http://10.0.2.2:8000/filter-by-price/');
+  final body = {'price_range': selectedPriceRange};
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(body),
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      if (responseData.containsKey('vehicles') && responseData['vehicles'] is List) {
+        return responseData['vehicles'];
+      } else {
+        return [];
+      }
+    } else {
+      print('Error: ${response.body}');
+      return [];
+    }
+  } catch (error) {
+    print('Error: $error');
+    return [];
+  }
+}
+
+Future<List<dynamic>> _applyMileageFilter(String selectedMileage) async {
+  final url = Uri.parse('http://10.0.2.2:8000/filter-by-mileage/');
+  final body = {'mileage': selectedMileage};
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(body),
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      if (responseData.containsKey('vehicles') && responseData['vehicles'] is List) {
+        return responseData['vehicles'];
+      } else {
+        return [];
+      }
+    } else {
+      print('Error: ${response.body}');
+      return [];
+    }
+  } catch (error) {
+    print('Error: $error');
+    return [];
+  }
+}
 
   @override
   Widget build(BuildContext context) {
