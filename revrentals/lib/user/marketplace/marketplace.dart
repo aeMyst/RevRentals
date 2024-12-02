@@ -249,9 +249,11 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   final List<String> priceRanges = [
     'Any',
     'Under \$100',
-    'Above \$100',
+    'Under \$150',
+    //'Above \$100',
     'Under \$200',
-    'Above \$200'
+    'Under \$250',
+    //'Above \$200'
   ];
   final List<String> insuranceOptions = [
     'Any',
@@ -453,9 +455,20 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
       // Apply price range filter
       // THIS DOESNT WORKRKRKRKRKRRKKRKRK
       if (selectedPriceRange != null && selectedPriceRange != "Any") {
-        final priceFilteredList = await _applyPriceFilter(selectedPriceRange);
+        // Extract the numeric value from the selected price range
+        final numericPrice = int.parse(
+          selectedPriceRange.replaceAll(RegExp(r'[^0-9]'), '')
+        );
+
+        // Call the filter function with the numeric price
+        final priceFilteredList = await _applyPriceFilter(numericPrice);
         filteredList.addAll(priceFilteredList);
       }
+      
+      /* if (selectedPriceRange != null && selectedPriceRange != "Any") {
+        final priceFilteredList = await _applyPriceFilter(selectedPriceRange);
+        filteredList.addAll(priceFilteredList);
+      } */
 
       // Apply mileage filter
       if (selectedMileage != null && selectedMileage != "Any") {
@@ -510,33 +523,24 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     }
   }
 
-Future<List<dynamic>> _applyPriceFilter(String selectedPriceRange) async {
+Future<List<dynamic>> _applyPriceFilter(int maxPrice) async {
   final url = Uri.parse('http://10.0.2.2:8000/filter-by-price/');
-  final body = {'price_range': selectedPriceRange};
+  final body = {'rental_price': maxPrice};
 
-  try {
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode(body),
-    );
+  final response = await http.post(
+    url,
+    headers: {'Content-Type': 'application/json'},
+    body: json.encode(body),
+  );
 
-    if (response.statusCode == 200) {
-      final responseData = json.decode(response.body);
-      if (responseData.containsKey('vehicles') && responseData['vehicles'] is List) {
-        return responseData['vehicles'];
-      } else {
-        return [];
-      }
-    } else {
-      print('Error: ${response.body}');
-      return [];
-    }
-  } catch (error) {
-    print('Error: $error');
-    return [];
+  if (response.statusCode == 200) {
+    final responseData = json.decode(response.body);
+    return responseData['vehicles'] ?? [];
+  } else {
+    throw Exception('Failed to filter by price: ${response.body}');
   }
 }
+
 
 Future<List<dynamic>> _applyMileageFilter(String selectedMileage) async {
   final url = Uri.parse('http://10.0.2.2:8000/filter-by-mileage/');
