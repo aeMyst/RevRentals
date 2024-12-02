@@ -31,8 +31,8 @@ class _RentalApprovalPageState extends State<RentalApprovalPage> {
 
   Future<void> _loadReservationDetails() async {
     try {
-      final details = await _listingService.fetchReservationDetails(widget.reservationNo);
-      print(widget.reservationNo); // testing purposes
+      final details =
+          await _listingService.fetchReservationDetails(widget.reservationNo);
       setState(() {
         reservationDetails = details;
         isLoading = false;
@@ -47,7 +47,7 @@ class _RentalApprovalPageState extends State<RentalApprovalPage> {
 
   Future<void> _approveRental() async {
     setState(() => isLoading = true);
-    
+
     try {
       final response = await _listingService.addAgreement({
         "reservation_no": widget.reservationNo,
@@ -59,19 +59,21 @@ class _RentalApprovalPageState extends State<RentalApprovalPage> {
           const SnackBar(content: Text('Rental request approved')),
         );
 
-        // **TEMPORARY DELETE WHEN NOTIFICATIONS ARE FUNCTIONAL**
-        // navigate to transaction page with agreement data
+        // Navigate to the agreement transaction page
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => AgreementTransactionPage(
               itemName: response['item_name'],
-              renterName: "${reservationDetails?['renter_first_name'] ?? ''} ${reservationDetails?['renter_last_name'] ?? ''}",
+              renterName:
+                  "${reservationDetails?['renter_first_name'] ?? ''} ${reservationDetails?['renter_last_name'] ?? ''}",
               rentalPeriod: response['rental_overview'],
               rentalPrice: response['agreement_fee'].toDouble(),
-              totalPrice: (response['agreement_fee'] + response['damage_compensation']).toDouble(),
+              totalPrice:
+                  (response['agreement_fee'] + response['damage_compensation'])
+                      .toDouble(),
               onActionCompleted: widget.onActionCompleted,
-              agreementId: widget.reservationNo,    // NEED TO PASS AGREEMENT ID TO TRANSACTION PAGE (agreementID = reservationID)
+              agreementId: widget.reservationNo,
             ),
           ),
         );
@@ -81,6 +83,30 @@ class _RentalApprovalPageState extends State<RentalApprovalPage> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error approving rental: $e')),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+  Future<void> _rejectRental() async {
+    setState(() => isLoading = true);
+
+    try {
+      await _listingService.updateReservationStatus(
+          widget.reservationNo, "reject");
+
+      // Show rejection confirmation
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Rental request rejected')),
+      );
+
+      widget
+          .onActionCompleted(); // Notify parent widget to refresh notifications
+      Navigator.pop(context); // Close the rental approval page
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error rejecting rental: $e')),
       );
     } finally {
       setState(() => isLoading = false);
@@ -114,12 +140,10 @@ class _RentalApprovalPageState extends State<RentalApprovalPage> {
     }
 
     // Format dates for display
-    final startDate = DateFormat('MMM dd, yyyy').format(
-      DateTime.parse(reservationDetails?['start_date'] ?? '')
-    );
-    final endDate = DateFormat('MMM dd, yyyy').format(
-      DateTime.parse(reservationDetails?['end_date'] ?? '')
-    );
+    final startDate = DateFormat('MMM dd, yyyy')
+        .format(DateTime.parse(reservationDetails?['start_date'] ?? ''));
+    final endDate = DateFormat('MMM dd, yyyy')
+        .format(DateTime.parse(reservationDetails?['end_date'] ?? ''));
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -141,7 +165,8 @@ class _RentalApprovalPageState extends State<RentalApprovalPage> {
               style: TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 8),
-            Text("Requested by: ${reservationDetails?['renter_first_name']} ${reservationDetails?['renter_last_name']}"),
+            Text(
+                "Requested by: ${reservationDetails?['renter_first_name']} ${reservationDetails?['renter_last_name']}"),
             Text("Item: ${reservationDetails?['item_name']}"),
             const SizedBox(height: 20),
             Text("Rental Period: $startDate to $endDate"),
@@ -150,28 +175,23 @@ class _RentalApprovalPageState extends State<RentalApprovalPage> {
             const SizedBox(height: 20),
             Text("Total Payment: \$${reservationDetails?['total_price']}"),
             const SizedBox(height: 40),
-            
+
             // Centered buttons
             Center(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton(
-                    onPressed: () {
-                      // Reject the rental request
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Rental request rejected')),
-                      );
-                      widget.onActionCompleted();
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                    onPressed: _rejectRental,
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: Colors.red),
                     child: const Text("Reject"),
                   ),
                   const SizedBox(width: 16),
                   ElevatedButton(
                     onPressed: _approveRental,
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: Colors.green),
                     child: const Text("Approve"),
                   ),
                 ],

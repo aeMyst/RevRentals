@@ -296,6 +296,16 @@ class ListingService {
     }
   }
 
+  Future<List<dynamic>> fetchBuyerNotifications(int buyerId) async {
+    final response =
+        await http.get(Uri.parse("$_baseUrl/notifications/buyer/$buyerId/"));
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body)['notifications'];
+    } else {
+      throw Exception("Failed to fetch buyer notifications");
+    }
+  }
+
   // Approve or reject a reservation
   Future<void> updateReservationStatus(int reservationNo, String action) async {
     final url = Uri.parse("$_baseUrl/reservations/$reservationNo/");
@@ -311,6 +321,15 @@ class ListingService {
     }
   }
 
+  Future<void> deleteReservation(int reservationNo) async {
+    final response = await http
+        .delete(Uri.parse("$_baseUrl/notifications/delete/$reservationNo/"));
+    if (response.statusCode != 200) {
+      throw Exception("Failed to delete reservation");
+    }
+  }
+}
+
   // Future<Map<String,dynamic>> fetchTransaction(int reservation_no) async {
   //   final url = Uri.parse("$_baseUrl/view-transaction/$reservation_no/");
 
@@ -319,4 +338,3 @@ class ListingService {
   // Future<Map<String,dynamic>> fetchAgreement(int reservation_no) async {
   //   final url = Uri.parse("$_baseUrl/view-agreement/$reservation_no/");
   // }
-}

@@ -4,7 +4,8 @@ import 'package:revrentals/user/notifications/rental_approval.dart';
 import 'package:revrentals/services/listing_service.dart';
 
 class NotificationsPage extends StatefulWidget {
-  final int profileId; // Seller's profile ID
+  final int profileId; // Buyer's or Seller's profile ID
+
   const NotificationsPage({super.key, required this.profileId});
 
   @override
@@ -12,8 +13,7 @@ class NotificationsPage extends StatefulWidget {
 }
 
 class _NotificationsPageState extends State<NotificationsPage> {
-  final ListingService _listingService =
-      ListingService(); // Initialize ListingService
+  final ListingService _listingService = ListingService();
   late Future<List<dynamic>> _notificationsFuture;
 
   @override
@@ -22,24 +22,21 @@ class _NotificationsPageState extends State<NotificationsPage> {
     _notificationsFuture = _fetchNotifications();
   }
 
-  // Fetch notifications from the backend
   Future<List<dynamic>> _fetchNotifications() async {
     try {
-      final response =
+      // Fetch both buyer and seller notifications dynamically
+      final sellerNotifications =
           await _listingService.fetchSellerNotifications(widget.profileId);
-      if (response.isNotEmpty) {
-        return response;
-      } else {
-        return []; // Return an empty list if no notifications
-      }
+      final buyerNotifications =
+          await _listingService.fetchBuyerNotifications(widget.profileId);
+      return [...sellerNotifications, ...buyerNotifications];
     } catch (e) {
       print("Error fetching notifications: $e");
       return [];
     }
   }
 
-  // Refresh notifications locally
-  void _refreshNotifications() {
+  Future<void> _refreshNotifications() async {
     setState(() {
       _notificationsFuture = _fetchNotifications();
     });
@@ -48,10 +45,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text('Notifications'),
-      ),
+      appBar: AppBar(title: const Text('Notifications')),
       body: FutureBuilder<List<dynamic>>(
         future: _notificationsFuture,
         builder: (context, snapshot) {
@@ -59,29 +53,46 @@ class _NotificationsPageState extends State<NotificationsPage> {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text("Error: ${snapshot.error}"));
-          } else if (snapshot.hasData && (snapshot.data?.isNotEmpty ?? false)) {
+          } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
             final notifications = snapshot.data!;
             return ListView.builder(
               itemCount: notifications.length,
               itemBuilder: (context, index) {
                 final notification = notifications[index];
-                final int reservationNo = notification['reservation_no'] ?? 0;
+                final int reservationNo = notification['reservation_no'];
                 final String itemName =
                     notification['item_name'] ?? "Unknown Item";
-                final String renterName =
-                    "${notification['renter_first_name'] ?? 'Unknown'} ${notification['renter_last_name'] ?? ''}";
                 final String rentalPeriod =
-                    "${notification['start_date'] ?? 'N/A'} to ${notification['end_date'] ?? 'N/A'}";
-                final String status = notification['status'] ?? "N/A";
-                final String message = (status == "Pending Approval")
-                    ? "You have a new rental request for $itemName."
-                    : "Rental request for $itemName has been $status.";
+                    "${notification['start_date']} to ${notification['end_date']}";
+                final String status = notification['status'] ?? "Unknown";
+                final String renterName = notification
+                            .containsKey('renter_first_name') &&
+                        notification.containsKey('renter_last_name')
+                    ? "${notification['renter_first_name']} ${notification['renter_last_name']}"
+                    : "N/A";
 
                 return ListTile(
-                  leading: const Icon(Icons.notifications, color: Colors.blue),
-                  title: Text(message),
-                  subtitle: Text("Renter: $renterName\nPeriod: $rentalPeriod"),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                  leading: Icon(
+                    status == "Pending Approval"
+                        ? Icons.pending
+                        : status == "Approved"
+                            ? Icons.check_circle
+                            : Icons.cancel,
+                    color: status == "Pending Approval"
+                        ? Colors.orange
+                        : status == "Approved"
+                            ? Colors.green
+                            : Colors.red,
+                  ),
+                  title: Text(
+                    status == "Rejected"
+                        ? "Request for $itemName was rejected"
+                        : "Rental request for $itemName",
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Text(
+                      "Renter: $renterName\nPeriod: $rentalPeriod\nStatus: $status"),
+                  trailing: const Icon(Icons.arrow_forward_ios),
                   onTap: () {
                     if (status == "Pending Approval") {
                       Navigator.push(
@@ -93,7 +104,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                           ),
                         ),
                       );
-                    } else {
+                    } else if (status == "Approved") {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -108,13 +119,29 @@ class _NotificationsPageState extends State<NotificationsPage> {
                           ),
                         ),
                       );
+                    } else if (status == "Rejected") {
+                      // Show a SnackBar and allow dismissal
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                              "The request for $itemName was rejected. Tap to dismiss."),
+                          action: SnackBarAction(
+                            label: "Dismiss",
+                            onPressed: () {
+                              _listingService
+                                  .deleteReservation(reservationNo)
+                                  .then((_) => _refreshNotifications());
+                            },
+                          ),
+                        ),
+                      );
                     }
                   },
                 );
               },
             );
           } else {
-            return const Center(child: Text("No notifications"));
+            return const Center(child: Text("No notifications."));
           }
         },
       ),
