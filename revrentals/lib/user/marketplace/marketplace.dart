@@ -718,62 +718,6 @@ Future<List<dynamic>> _applyInsuranceFilter(String selectedInsurance) async {
   );}
 }
 
-//this code lists everything - but filtering doesnt work aksdfkdj
-         /* child: FutureBuilder<List<dynamic>>(
-          //future: motorcyclesFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(child: Text("Error: ${snapshot.error}"));
-            } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-              final vehicles = snapshot.data!;
-
-              // filtering
-             // final filteredMotorcycles = _filteredMotorcycles.isNotEmpty ? _filteredMotorcycles
-               //     : motorcycles;
-              
-              /* filtering based on search query if keeping search functionality
-              final finalMotorcycles = filteredMotorcycles
-                  .where((motorcycle) =>
-                      motorcycle['Model']
-                          .toLowerCase()
-                          .contains(_searchQuery.toLowerCase()))
-                  .toList(); */
-
-              return ListView.builder(
-                itemCount: vehicles.length,
-                itemBuilder: (context, index) {
-                  final vehicle = vehicles[index];
-
-                  return ListTile(
-                    title: Text(vehicle['Model'] ?? 'Unknown Model'),
-                    subtitle: Text("Rental Price: \$${vehicle['Rental_Price']}"),
-                    trailing: const Icon(Icons.motorcycle),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => MotorcycleDetailPage(
-                            profileId: widget.profileId,
-                            motorcycleData: vehicle,
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
-              );
-            } else {
-              return const Center(child: Text("No motorcycles found."));
-            }
-          },
-        ), 
-      )
-    ]
-  );}
-} */
-
 
 // GearTab updated to fetch and display gear items
 class GearTab extends StatelessWidget {
