@@ -405,6 +405,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                 onPressed: () {
                   _applyFilter(
                     context: context,
+                    selectedVehicle: selectedVehicle,
                     selectedColor: selectedColor,
                     selectedPriceRange: selectedPriceRange,
                     selectedMileage: selectedMileage,
@@ -424,13 +425,14 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
 
   void _applyFilter({
     required BuildContext context,
+    String? selectedVehicle,
     String? selectedColor,
     String? selectedPriceRange,
     String? selectedMileage,
     String? selectedInsurance,
   }) async {
     // If no filters are selected, reset to the original list (motorcyclesFuture)
-    if (selectedColor == "Any" &&
+    if (selectedVehicle == "All" && selectedColor == "Any" &&
     selectedPriceRange == "Any" &&
     selectedMileage == "Any" &&
     selectedInsurance == "Any") {
@@ -446,6 +448,12 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
       // Initialize an empty list to collect filtered motorcycles
       List<dynamic> filteredList = [];
 
+      // Apply vehicle filter
+      if (selectedVehicle != null && selectedVehicle != "Any") {
+        final vehicleFilteredList = await _applyVehicleFilter(selectedVehicle);
+        filteredList.addAll(vehicleFilteredList);
+      }
+
       // Apply color filter
       if (selectedColor != null && selectedColor != "Any") {
         final colorFilteredList = await _applyColorFilter(selectedColor);
@@ -453,7 +461,6 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
       }
 
       // Apply price range filter
-      // THIS DOESNT WORKRKRKRKRKRRKKRKRK
       if (selectedPriceRange != null && selectedPriceRange != "Any") {
         // Extract the numeric value from the selected price range
         final numericPrice = int.parse(
@@ -495,6 +502,35 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     }
   }
 
+  Future<List<dynamic>> _applyVehicleFilter(String selectedVehicle) async {
+    final url = Uri.parse('http://10.0.2.2:8000/filter-by-vehicle/');
+    final body = {'vehicle': selectedVehicle};
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(body),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData.containsKey('vehicles') && responseData['vehicles'] is List) {
+          return responseData['vehicles'];
+        } else {
+          return [];
+        }
+      } else {
+        print('Error: ${response.body}');
+        return [];
+      }
+    } catch (error) {
+      print('Error: $error');
+      return [];
+    }
+  }
+
+
   Future<List<dynamic>> _applyColorFilter(String selectedColor) async {
     final url = Uri.parse('http://10.0.2.2:8000/filter-by-color/');
     final body = {'color': selectedColor};
@@ -523,7 +559,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     }
   }
 
-Future<List<dynamic>> _applyPriceFilter(int maxPrice) async {
+  Future<List<dynamic>> _applyPriceFilter(int maxPrice) async {
   final url = Uri.parse('http://10.0.2.2:8000/filter-by-price/');
   final body = {'rental_price': maxPrice};
 
@@ -541,8 +577,7 @@ Future<List<dynamic>> _applyPriceFilter(int maxPrice) async {
   }
 }
 
-
-Future<List<dynamic>> _applyMileageFilter(String selectedMileage) async {
+  Future<List<dynamic>> _applyMileageFilter(String selectedMileage) async {
   final url = Uri.parse('http://10.0.2.2:8000/filter-by-mileage/');
   final body = {'mileage': selectedMileage};
 
@@ -570,7 +605,7 @@ Future<List<dynamic>> _applyMileageFilter(String selectedMileage) async {
   }
 }
 
-Future<List<dynamic>> _applyInsuranceFilter(String selectedInsurance) async {
+  Future<List<dynamic>> _applyInsuranceFilter(String selectedInsurance) async {
   final url = Uri.parse('http://10.0.2.2:8000/filter-by-insurance/');
   final body = {'insurance': selectedInsurance};
 
@@ -604,7 +639,7 @@ Future<List<dynamic>> _applyInsuranceFilter(String selectedInsurance) async {
       children: [
         const SizedBox(height: 16),
         // Search bar
-        Padding(
+        /* Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: TextField(
           decoration: InputDecoration(
@@ -630,7 +665,7 @@ Future<List<dynamic>> _applyInsuranceFilter(String selectedInsurance) async {
             });
           }, 
         ),
-      ),
+      ), */
         const SizedBox(height: 16),
 
         // Filter and Sort Buttons Row
