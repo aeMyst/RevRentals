@@ -3,7 +3,8 @@ import 'package:revrentals/user/notifications/agreement_transaction.dart';
 import 'package:revrentals/user/notifications/rental_approval.dart';
 
 class NotificationsPage extends StatefulWidget {
-  const NotificationsPage({super.key});
+  final int profileId;
+  const NotificationsPage({super.key, required this.profileId});
 
   @override
   State<NotificationsPage> createState() => _NotificationsPageState();
@@ -11,11 +12,13 @@ class NotificationsPage extends StatefulWidget {
 
 class _NotificationsPageState extends State<NotificationsPage> {
   // Dictionary of notifications
-  final Map<int, String> notifications = {
-    1: "Your rental request has been approved!",
-    2: "You have a new rental request for your item!",
-    3: "Your item is now available for rent.",
+  final Map<int, Map<String, dynamic>> notifications = {
+    // hardcoded notifications, need some way to retrieve corresponding reservation_no
+    1: {"message": "Your rental request has been approved!", "reservation_no": 19},
+    2: {"message": "You have a new rental request for your item!", "reservation_no": 19},
+    3: {"message": "Your item is now available for rent.", "reservation_no": 103},
   };
+
 
   // Method to remove a notification by its ID
   void removeNotification(int id) {
@@ -35,12 +38,13 @@ class _NotificationsPageState extends State<NotificationsPage> {
         itemCount: notifications.length,
         itemBuilder: (context, index) {
           // Get the notification ID and message
-          final notificationId = notifications.keys.elementAt(index);
-          final notificationMessage = notifications[notificationId]!;
-
+          final notificationId = notifications.keys.elementAt(index);   // gets the ID of the notification
+          final notificationData = notifications[notificationId]!;      // gets message and reservation_no of notifID
+          final int reservationNo = notificationData['reservation_no'] as int; // extract reservation_no
+          
           return ListTile(
             leading: const Icon(Icons.notifications, color: Colors.blue),
-            title: Text(notificationMessage),
+            title: Text(notificationData['message']),
             subtitle: const Text("Tap to view details"),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () {
@@ -58,6 +62,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                               onActionCompleted: () {
                                 removeNotification(notificationId);
                               },
+                              agreementId: reservationNo,   // agreementID is the same as reservationNo
                             ),));
               } else if (notificationId == 2) {
                 // Navigate to rental approval page
@@ -65,6 +70,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => RentalApprovalPage(
+                      reservationNo: reservationNo,
                       onActionCompleted: () {
                         removeNotification(
                             notificationId); // Dismiss notification after action
