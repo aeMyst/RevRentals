@@ -603,7 +603,6 @@ Future<List<dynamic>> _applyInsuranceFilter(String selectedInsurance) async {
     return Column(
       children: [
         const SizedBox(height: 16),
-
         // Search bar
         Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -726,9 +725,315 @@ class GearTab extends StatelessWidget {
 
   const GearTab({super.key, required this.profileId, required this.gearFuture});
 
+  void _showFilterDialog(BuildContext context) {
+    String selectedGear = 'All';
+    String selectedPriceRange = 'Any';
+    String selectedBrand = 'Any';
+    String selectedSize = 'Any';
+    String selectedMaterial = 'Any';
+
+    final List<String> gearType = [
+      'All',
+      'Helmet',
+      'Gloves',
+      'Jacket',
+      'Boots',
+      'Pants',
+    ];
+    final List<String> priceRanges = [
+      'Any',
+      'Under \$100',
+      'Above \$100',
+      'Under \$200',
+      'Above \$200'
+    ];
+
+    final List<String> brandOptions = [
+      'Any',
+      'Alpinestars',
+      'AGV',
+      'Shoei',
+      'HJC',
+      'Arai',
+    ];
+
+    final List<String> materialOptions = [
+      'Any',
+      'Leather',
+      'Plastic',
+      'Textile',
+      'Kevlar',
+    ];
+
+    final List<String> sizeOptions = [
+      'Any',
+      'X-Small',
+      'Small',
+      'Medium',
+      'Large',
+      'X-Large',
+    ];
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: const Text('Filter Options'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Dropdown for Category
+                  DropdownButtonFormField<String>(
+                    dropdownColor: Colors.white,
+                    value: selectedGear,
+                    decoration: const InputDecoration(
+                      labelText: 'Type',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: gearType.map((String category) {
+                      return DropdownMenuItem<String>(
+                        value: category,
+                        child: Text(category),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedGear = newValue!;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  // Dropdown for Price Range
+                  DropdownButtonFormField<String>(
+                    dropdownColor: Colors.white,
+                    value: selectedPriceRange,
+                    decoration: const InputDecoration(
+                      labelText: 'Price Range',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: priceRanges.map((String range) {
+                      return DropdownMenuItem<String>(
+                        value: range,
+                        child: Text(range),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedPriceRange = newValue!;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Dropdown for Insurance
+                  DropdownButtonFormField<String>(
+                    dropdownColor: Colors.white,
+                    value: selectedBrand,
+                    decoration: const InputDecoration(
+                      labelText: 'Brand',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: brandOptions.map((String brand) {
+                      return DropdownMenuItem<String>(
+                        value: brand,
+                        child: Text(brand),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedBrand = newValue!;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    dropdownColor: Colors.white,
+                    value: selectedSize,
+                    decoration: const InputDecoration(
+                      labelText: 'Size',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: sizeOptions.map((String size) {
+                      return DropdownMenuItem<String>(
+                        value: size,
+                        child: Text(size),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedSize = newValue!;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  // Dropdown for Color
+                  DropdownButtonFormField<String>(
+                    dropdownColor: Colors.white,
+                    value: selectedMaterial,
+                    decoration: const InputDecoration(
+                      labelText: 'Material',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: materialOptions.map((String material) {
+                      return DropdownMenuItem<String>(
+                        value: material,
+                        child: Text(material),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedMaterial = newValue!;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    // Handle the filter logic here
+                    print(
+                        'Category: $selectedGear, Price Range: $selectedPriceRange');
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Apply'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showSortDialog(BuildContext context) {
+    String selectedSortOption = 'None';
+    final List<String> sortOptions = [
+      'None',
+      'Price: Low to High',
+      'Price: High to Low',
+      'Newest First'
+    ];
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: const Text('Sort Options'),
+              content: DropdownButtonFormField<String>(
+                dropdownColor: Colors.white,
+                value: selectedSortOption,
+                decoration: const InputDecoration(
+                  labelText: 'Sort By',
+                  border: OutlineInputBorder(),
+                ),
+                items: sortOptions.map((String option) {
+                  return DropdownMenuItem<String>(
+                    value: option,
+                    child: Text(option),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedSortOption = newValue!;
+                  });
+                },
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    // Handle the sort logic here
+                    print('Sort Option: $selectedSortOption');
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Apply'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<dynamic>>(
+    return Column(
+      children: [
+        const SizedBox(height: 16),
+        // Search bar
+        Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: TextField(
+          decoration: InputDecoration(
+            hintText: 'Search Motorcycles...',
+            prefixIcon: const Icon(Icons.search),
+
+            // need to keep all three of these so it stays rounded 
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20.0),  
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20.0),  
+              borderSide: const BorderSide(color: Colors.grey), 
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20.0),  
+              borderSide: const BorderSide(color: Colors.grey), 
+            ),
+          ),
+          /*onChanged: (query) {
+            setState(() {
+              _searchQuery = query;
+            });
+          }, */
+        ),
+      ),
+        const SizedBox(height: 16),
+
+        // Filter and Sort Buttons Row
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton.icon(
+              icon: const Icon(Icons.filter_list),
+              label: const Text(
+                'Filter',
+              ),
+              onPressed: () {
+                _showFilterDialog(context);
+              },
+            ),
+            const SizedBox(width: 16),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.sort),
+              label: const Text(
+                'Sort',
+              ),
+              onPressed: () {
+                  // TODO: Add sort functionality
+                  _showSortDialog(context);
+              },
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+
+      Expanded (
+        child: FutureBuilder<List<dynamic>>(
+         
       future: gearFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -763,7 +1068,9 @@ class GearTab extends StatelessWidget {
           return const Center(child: Text("No gear items found."));
         }
       },
-    );
+      ),
+      ),
+    ]);
   }
 }
 
