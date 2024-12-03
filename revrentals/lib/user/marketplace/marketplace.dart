@@ -239,6 +239,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   String selectedInsurance = 'Any';
   String selectedMileage = 'Any';
   String selectedColor = 'Any';
+  String selectedEngineType = 'Any';
 
   final List<String> vehicleType = [
     'All',
@@ -280,6 +281,12 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     '10,000 - 50,000 km',
     'Above 50,000 km'
   ];
+  final List<String> engineTypes = [
+    'Any',
+    'Inline-4',
+    'V-Twin',
+    'Electric'
+  ];
 
   showDialog(
     context: context,
@@ -311,6 +318,29 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                   },
                 ),
                 const SizedBox(height: 16),
+
+                // Conditional dropdown for engine type
+                if (selectedVehicle == 'Motorcycles') ...[
+                  DropdownButtonFormField<String> (
+                    value: selectedEngineType,
+                    decoration: const InputDecoration (
+                      labelText: 'Engine Type',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: engineTypes.map((String engine) {
+                      return DropdownMenuItem<String> (
+                        value: engine,
+                        child: Text(engine),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedEngineType = newValue!;
+                      });
+                    },
+                  ),
+                const SizedBox(height:16),
+                ],
 
                 // Dropdown for Price Range
                 DropdownButtonFormField<String>(
