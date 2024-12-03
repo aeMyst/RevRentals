@@ -240,6 +240,8 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   String selectedMileage = 'Any';
   String selectedColor = 'Any';
   String selectedEngineType = 'Any';
+  String selectedCargoRacks = 'Any';
+  String selectedDirtbikeType = 'Any';
 
   final List<String> vehicleType = [
     'All',
@@ -287,6 +289,16 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     'V-Twin',
     'Electric'
   ];
+  final List<String> cargoRacks = [
+    'Any',
+    '1',
+    '2'
+  ];
+  final List<String> dirtbikeType = [
+    'Any',
+    'Motocross',
+    'Enduro'
+  ];
 
   showDialog(
     context: context,
@@ -319,7 +331,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                 ),
                 const SizedBox(height: 16),
 
-                // Conditional dropdown for engine type
+                // Conditional dropdown for engine type when Motorcycles is selected
                 if (selectedVehicle == 'Motorcycles') ...[
                   DropdownButtonFormField<String> (
                     value: selectedEngineType,
@@ -336,6 +348,52 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                     onChanged: (String? newValue) {
                       setState(() {
                         selectedEngineType = newValue!;
+                      });
+                    },
+                  ),
+                const SizedBox(height:16),
+                ],
+
+                // Conditional dropdown for engine type when Moped is selected
+                if (selectedVehicle == 'Moped') ...[
+                  DropdownButtonFormField<String> (
+                    value: selectedCargoRacks,
+                    decoration: const InputDecoration (
+                      labelText: 'Cargo Racks',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: cargoRacks.map((String cargo) {
+                      return DropdownMenuItem<String> (
+                        value: cargo,
+                        child: Text(cargo),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedCargoRacks = newValue!;
+                      });
+                    },
+                  ),
+                const SizedBox(height:16),
+                ],
+
+                // Conditional dropdown for engine type when Dirtbike is selected
+                if (selectedVehicle == 'Dirtbike') ...[
+                  DropdownButtonFormField<String> (
+                    value: selectedDirtbikeType,
+                    decoration: const InputDecoration (
+                      labelText: 'Dirtbike type',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: dirtbikeType.map((String dBikeType) {
+                      return DropdownMenuItem<String> (
+                        value: dBikeType,
+                        child: Text(dBikeType),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedDirtbikeType = newValue!;
                       });
                     },
                   ),
