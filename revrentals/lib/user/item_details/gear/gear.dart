@@ -47,7 +47,7 @@ class _GearTabState extends State<GearTab> {
       'Helmet',
       'Gloves',
       'Jacket',
-      'Boots',
+      //'Boots',
       'Pants',
     ];
     final List<String> priceRanges = [
@@ -66,6 +66,7 @@ class _GearTabState extends State<GearTab> {
       'Shoei',
       'HJC',
       'Arai',
+      'Dainese',
     ];
 
     final List<String> materialOptions = [
@@ -256,7 +257,9 @@ class _GearTabState extends State<GearTab> {
       }
     } else {
       List<dynamic> filteredGearList = [];
+      final Set<String> uniqueProductNo = {}; // prevents duplications, tracks unique IDs
 
+      // multiple filtering
       if (selectedGear != "All" ||
         selectedSize != "Any" ||
         selectedPriceRange != "Any" ||
@@ -274,19 +277,34 @@ class _GearTabState extends State<GearTab> {
         maxPrice: numericPrice?.toDouble(),
       );
 
-      filteredGearList.addAll(multipleFilterResults);
+      for (var item in multipleFilterResults) {
+          if (!uniqueProductNo.contains(item['Product_no'])) {
+            uniqueProductNo.add(item['Product_no']);
+            filteredGearList.add(item);
+          }
+        }
       }
 
        // Apply gear filter
       if (selectedGear != null && selectedGear != "All") {
         final gearFilteredList = await _applyGearFilter(selectedGear);
-        filteredGearList.addAll(gearFilteredList);
+        for (var item in gearFilteredList) {
+        if (!uniqueProductNo.contains(item['Product_no'])) {
+          uniqueProductNo.add(item['Product_no']);
+          filteredGearList.add(item);
+          }
+        }
       }
 
       // Apply brand filter
       if (selectedBrand != null && selectedBrand != "Any") {
         final brandFilteredList = await _applyBrandFilter(selectedBrand);
-        filteredGearList.addAll(brandFilteredList);
+        for (var item in brandFilteredList) {
+        if (!uniqueProductNo.contains(item['Product_no'])) {
+          uniqueProductNo.add(item['Product_no']);
+          filteredGearList.add(item);
+          }
+        }
       }
 
       // Apply price range filter
@@ -298,25 +316,41 @@ class _GearTabState extends State<GearTab> {
 
         // Call the filter function with the numeric price
         final priceFilteredList = await _applyPriceFilter(numericPrice);
-        filteredGearList.addAll(priceFilteredList);
+        for (var item in priceFilteredList) {
+        if (!uniqueProductNo.contains(item['Product_no'])) {
+          uniqueProductNo.add(item['Product_no']);
+          filteredGearList.add(item);
+          }
+        }
       }
 
       // Apply size filter
       if (selectedSize != null && selectedSize != "Any") {
         final sizeFilteredList = await _applySizeFilter(selectedSize);
-        filteredGearList.addAll(sizeFilteredList);
+        for (var item in sizeFilteredList) {
+        if (!uniqueProductNo.contains(item['Product_no'])) {
+          uniqueProductNo.add(item['Product_no']);
+          filteredGearList.add(item);
+          }
+        }
       }
 
       // Apply material filter
       if (selectedMaterial != null && selectedMaterial != "Any") {
         final insuranceFilteredList = await _applyMaterialFilter(selectedMaterial);
-        filteredGearList.addAll(insuranceFilteredList);
+        for (var item in insuranceFilteredList) {
+        if (!uniqueProductNo.contains(item['Product_no'])) {
+          uniqueProductNo.add(item['Product_no']);
+          filteredGearList.add(item);
+          }
+        }
       }
 
       // Update state with the filtered list or reset if no results
       if (filteredGearList.isNotEmpty) {
         setState(() {
           _filteredGear = filteredGearList;
+          filterApplied = true;
         });
       } else {
         setState(() {
@@ -640,7 +674,7 @@ class _GearTabState extends State<GearTab> {
                     return ListTile(
                        title: Text(gear['Gear_Name'] ?? 'Unknown Gear'),
                             subtitle: Text("Rental Price: \$${gear['GRentalPrice']}"),
-                            trailing: const Icon(Icons.motorcycle),
+                            trailing: const Icon(Icons.settings),
                             onTap: () {
                               Navigator.push(
                                 context,
@@ -688,7 +722,7 @@ class _GearTabState extends State<GearTab> {
                           return ListTile(
                             title: Text(gear['Gear_Name'] ?? 'Unknown Gear'),
                             subtitle: Text("Rental Price: \$${gear['GRentalPrice']}"),
-                            trailing: const Icon(Icons.motorcycle),
+                            trailing: const Icon(Icons.settings),
                             onTap: () {
                               Navigator.push(
                                 context,
