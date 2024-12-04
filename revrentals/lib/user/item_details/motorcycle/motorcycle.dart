@@ -405,6 +405,18 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     String? selectedInsurance,
 
   }) async {
+    // tracker
+    int defaultFilterChanged = 0;
+
+    //track user change 
+    if (selectedVehicle != "All") defaultFilterChanged++;
+    if (selectedColor != "Any") defaultFilterChanged++;
+    if (selectedPriceRange != "Any") defaultFilterChanged++;
+    if (selectedMileage != "Any") defaultFilterChanged++;
+    if (selectedInsurance != "Any") defaultFilterChanged++;
+
+    bool multipleFiltersUsed = defaultFilterChanged > 1;
+
     // If no filters are selected, reset to the original list (motorcyclesFuture)
     if (selectedVehicle == "All" && selectedColor == "Any" &&
     selectedPriceRange == "Any" &&
@@ -430,98 +442,103 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
       List<dynamic> filteredList = [];
       final Set<String> uniqueVINs = {}; // prevent duplications
 
-      // MULTIPLE FILTERING
-      if (selectedVehicle != "All" ||
-        selectedColor != "Any" ||
-        selectedPriceRange != "Any" ||
-        selectedMileage != "Any" ||
-        selectedInsurance != "Any") {
-        final numericPrice = (selectedPriceRange != null && selectedPriceRange != "Any")
-            ? int.tryParse(selectedPriceRange.replaceAll(RegExp(r'[^0-9]'), ''))
-            : null;
+      if (multipleFiltersUsed) {
+        print("Multiple filtering in progress....");
 
-        final multipleFilterResults = await _applyMultipleFilters(
-          color: selectedColor != "Any" ? selectedColor : null,
-          mileage: selectedMileage != "Any" ? selectedMileage : null,
-          insurance: selectedInsurance != "Any" ? selectedInsurance : null,
-          vehicle: selectedVehicle != "All" ? selectedVehicle : null,
-          maxPrice: numericPrice?.toDouble(),
-        );
+        // MULTIPLE FILTERING
+        if (selectedVehicle != "All" ||
+          selectedColor != "Any" ||
+          selectedPriceRange != "Any" ||
+          selectedMileage != "Any" ||
+          selectedInsurance != "Any") {
+          final numericPrice = (selectedPriceRange != null && selectedPriceRange != "Any")
+              ? int.tryParse(selectedPriceRange.replaceAll(RegExp(r'[^0-9]'), ''))
+              : null;
 
-        for (var item in multipleFilterResults) {
+          final multipleFilterResults = await _applyMultipleFilters(
+            color: selectedColor != "Any" ? selectedColor : null,
+            mileage: selectedMileage != "Any" ? selectedMileage : null,
+            insurance: selectedInsurance != "Any" ? selectedInsurance : null,
+            vehicle: selectedVehicle != "All" ? selectedVehicle : null,
+            maxPrice: numericPrice?.toDouble(),
+          );
+
+          for (var item in multipleFilterResults) {
+            if (!uniqueVINs.contains(item['VIN'])) {
+              uniqueVINs.add(item['VIN']);
+              filteredList.add(item);
+            }
+          }
+        }
+        print("More than one filter used");
+      } else {
+        // Apply vehicle filter
+        if (selectedVehicle != null && selectedVehicle != "Any") {
+          final vehicleFilteredList = await _applyVehicleFilter(selectedVehicle);
+          for (var item in vehicleFilteredList) {
           if (!uniqueVINs.contains(item['VIN'])) {
             uniqueVINs.add(item['VIN']);
             filteredList.add(item);
+            }
           }
         }
-      }
 
-      // Apply vehicle filter
-      if (selectedVehicle != null && selectedVehicle != "Any") {
-        final vehicleFilteredList = await _applyVehicleFilter(selectedVehicle);
-        for (var item in vehicleFilteredList) {
-        if (!uniqueVINs.contains(item['VIN'])) {
-          uniqueVINs.add(item['VIN']);
-          filteredList.add(item);
+        // Apply color filter
+        if (selectedColor != null && selectedColor != "Any") {
+          final colorFilteredList = await _applyColorFilter(selectedColor);
+          for (var item in colorFilteredList) {
+          if (!uniqueVINs.contains(item['VIN'])) {
+            uniqueVINs.add(item['VIN']);
+            filteredList.add(item);
+            }
+          }
         }
-      }
-    }
 
-      // Apply color filter
-      if (selectedColor != null && selectedColor != "Any") {
-        final colorFilteredList = await _applyColorFilter(selectedColor);
-        for (var item in colorFilteredList) {
-        if (!uniqueVINs.contains(item['VIN'])) {
-          uniqueVINs.add(item['VIN']);
-          filteredList.add(item);
+        // Apply price range filter
+        if (selectedPriceRange != null && selectedPriceRange != "Any") {
+          // Extract the numeric value from the selected price range
+          final numericPrice = int.parse(
+            selectedPriceRange.replaceAll(RegExp(r'[^0-9]'), '')
+          );
+
+          // Call the filter function with the numeric price
+          final priceFilteredList = await _applyPriceFilter(numericPrice);
+          for (var item in priceFilteredList) {
+          if (!uniqueVINs.contains(item['VIN'])) {
+            uniqueVINs.add(item['VIN']);
+            filteredList.add(item);
+            }
+          }
         }
-      }
-    }
 
-      // Apply price range filter
-      if (selectedPriceRange != null && selectedPriceRange != "Any") {
-        // Extract the numeric value from the selected price range
-        final numericPrice = int.parse(
-          selectedPriceRange.replaceAll(RegExp(r'[^0-9]'), '')
+        // Apply mileage filter
+        if (selectedMileage != null && selectedMileage != "Any") {
+        final numericMileage = int.parse(
+            selectedMileage.replaceAll(RegExp(r'[^0-9]'), '')
         );
 
         // Call the filter function with the numeric price
-        final priceFilteredList = await _applyPriceFilter(numericPrice);
-        for (var item in priceFilteredList) {
-        if (!uniqueVINs.contains(item['VIN'])) {
-          uniqueVINs.add(item['VIN']);
-          filteredList.add(item);
+        final mileageFilteredList = await _applyPriceFilter(numericMileage);
+        for (var item in mileageFilteredList) {
+          if (!uniqueVINs.contains(item['VIN'])) {
+            uniqueVINs.add(item['VIN']);
+            filteredList.add(item);
+            }
+          }
+        }
+
+        // Apply insurance filter
+        if (selectedInsurance != null && selectedInsurance != "Any") {
+          final insuranceFilteredList = await _applyInsuranceFilter(selectedInsurance);
+          for (var item in insuranceFilteredList) {
+          if (!uniqueVINs.contains(item['VIN'])) {
+            uniqueVINs.add(item['VIN']);
+            filteredList.add(item);
+            }
+          }
         }
       }
-    }
-
-      // Apply mileage filter
-      if (selectedMileage != null && selectedMileage != "Any") {
-      final numericMileage = int.parse(
-          selectedMileage.replaceAll(RegExp(r'[^0-9]'), '')
-      );
-
-      // Call the filter function with the numeric price
-      final mileageFilteredList = await _applyPriceFilter(numericMileage);
-      for (var item in mileageFilteredList) {
-        if (!uniqueVINs.contains(item['VIN'])) {
-          uniqueVINs.add(item['VIN']);
-          filteredList.add(item);
-        }
-      }
-    }
-
-      // Apply insurance filter
-      if (selectedInsurance != null && selectedInsurance != "Any") {
-        final insuranceFilteredList = await _applyInsuranceFilter(selectedInsurance);
-        for (var item in insuranceFilteredList) {
-        if (!uniqueVINs.contains(item['VIN'])) {
-          uniqueVINs.add(item['VIN']);
-          filteredList.add(item);
-        }
-      }
-    }
-
+     
       // Update state with the filtered list or reset if no results
       if (filteredList.isNotEmpty) {
         setState(() {
