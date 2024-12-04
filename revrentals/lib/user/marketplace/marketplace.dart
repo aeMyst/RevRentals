@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:revrentals/main_pages/auth_page.dart';
-import 'package:revrentals/user/item_details/gear/gear_details.dart';
-import 'package:revrentals/user/item_details/lot/lot_details.dart';
-import 'package:revrentals/user/item_details/motorcycle/motorcycle_details.dart';
 import 'package:revrentals/user/item_details/gear/gear.dart';
 import 'package:revrentals/user/notifications/notifications.dart';
 import 'package:revrentals/user/profile_detail.dart';
 import 'package:revrentals/user/item_details/motorcycle/motorcycle.dart';
 import 'package:revrentals/user/item_details/lot/lot.dart';
 import 'package:revrentals/services/listing_service.dart'; // Import ListingService
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class MarketplacePage extends StatefulWidget {
   final int profileId;
