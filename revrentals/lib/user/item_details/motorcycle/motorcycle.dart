@@ -38,101 +38,27 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   }
 
 
-void _applySort(String selectedSortOption) {
-  motorcyclesFuture.then((motorcycles) {
-    switch (selectedSortOption) {
-      case 'Price: Low to High':
-        motorcycles.sort((a, b) => a['Rental_Price'].compareTo(b['Rental_Price']));
-        break;
-      case 'Price: High to Low':
-        motorcycles.sort((a, b) => b['Rental_Price'].compareTo(a['Rental_Price']));
-        break;
-      case 'Newest First':
-        motorcycles.sort((a, b) => b['dateAdded'].compareTo(a['dateAdded'])); // TO FIX
-        break;
-      default:
-        break;
-    }
+  void _applySort(String selectedSortOption) {
+    motorcyclesFuture.then((motorcycles) {
+      switch (selectedSortOption) {
+        case 'Price: Low to High':
+          motorcycles.sort((a, b) => a['Rental_Price'].compareTo(b['Rental_Price']));
+          break;
+        case 'Price: High to Low':
+          motorcycles.sort((a, b) => b['Rental_Price'].compareTo(a['Rental_Price']));
+          break;
+        case 'Newest First':
+          motorcycles.sort((a, b) => b['dateAdded'].compareTo(a['dateAdded'])); // TO FIX
+          break;
+        default:
+          break;
+      }
 
-    // Update the motorcycles list
-    setState(() {
-      motorcyclesFuture = Future.value(motorcycles);
-    });
-  });
-}
-
-void _applySortTEST({
-    required BuildContext context,
-    String? selectedVehicle,
-    String? selectedColor,
-    String? selectedPriceRange,
-    String? selectedMileage,
-    String? selectedInsurance,
-  }) async {
-    // If no filters are selected, reset to the original list (motorcyclesFuture)
-    if (selectedVehicle == "All" && selectedColor == "Any" &&
-    selectedPriceRange == "Any" &&
-    selectedMileage == "Any" &&
-    selectedInsurance == "Any") {
-    try {
-      final motorcycles = await motorcyclesFuture;
+      // Update the motorcycles list
       setState(() {
-        _filteredMotorcycles = motorcycles;
+        motorcyclesFuture = Future.value(motorcycles);
       });
-    } catch (error) {
-      print("Error resolving motorcyclesFuture: $error");
-    }
-  } else{
-      // Initialize an empty list to collect filtered motorcycles
-      List<dynamic> filteredList = [];
-
-      // Apply vehicle filter
-      if (selectedVehicle != null && selectedVehicle != "Any") {
-        final vehicleFilteredList = await _applyVehicleFilter(selectedVehicle);
-        filteredList.addAll(vehicleFilteredList);
-      }
-
-      // Apply color filter
-      if (selectedColor != null && selectedColor != "Any") {
-        final colorFilteredList = await _applyColorFilter(selectedColor);
-        filteredList.addAll(colorFilteredList);
-      }
-
-      // Apply price range filter
-      if (selectedPriceRange != null && selectedPriceRange != "Any") {
-        // Extract the numeric value from the selected price range
-        final numericPrice = int.parse(
-          selectedPriceRange.replaceAll(RegExp(r'[^0-9]'), '')
-        );
-
-        // Call the filter function with the numeric price
-        final priceFilteredList = await _applyPriceFilter(numericPrice);
-        filteredList.addAll(priceFilteredList);
-      }
-
-      // Apply mileage filter
-      if (selectedMileage != null && selectedMileage != "Any") {
-        final mileageFilteredList = await _applyMileageFilter(selectedMileage);
-        filteredList.addAll(mileageFilteredList);
-      }
-
-      // Apply insurance filter
-      if (selectedInsurance != null && selectedInsurance != "Any") {
-        final insuranceFilteredList = await _applyInsuranceFilter(selectedInsurance);
-        filteredList.addAll(insuranceFilteredList);
-      }
-
-      // Update state with the filtered list or reset if no results
-      if (filteredList.isNotEmpty) {
-        setState(() {
-          _filteredMotorcycles = filteredList;
-        });
-      } else {
-        setState(() {
-          _filteredMotorcycles = [];
-        });
-      }
-    }
+    });
   }
 
   void _showSortDialog(BuildContext context) {
@@ -193,7 +119,6 @@ void _applySortTEST({
       },
     );
   }
-
   
   void _showFilterDialog(BuildContext context) {
   String selectedVehicle = 'All';
@@ -487,14 +412,60 @@ void _applySortTEST({
     selectedMileage == "Any" &&
     selectedInsurance == "Any") {
     try {
+      // original list
       final motorcycles = await motorcyclesFuture;
+
+      // filtering
+      List<dynamic> filteredList = motorcycles;
+
+      // applying filtering
+
+      // Apply vehicle filter
+      if (selectedVehicle != null && selectedVehicle != "Any") {
+        final vehicleFilteredList = await _applyVehicleFilter(selectedVehicle);
+        filteredList.addAll(vehicleFilteredList);
+      }
+
+      // Apply color filter
+      if (selectedColor != null && selectedColor != "Any") {
+        final colorFilteredList = await _applyColorFilter(selectedColor);
+        filteredList.addAll(colorFilteredList);
+      }
+
+      // Apply price range filter
+      if (selectedPriceRange != null && selectedPriceRange != "Any") {
+        // Extract the numeric value from the selected price range
+        final numericPrice = int.parse(
+          selectedPriceRange.replaceAll(RegExp(r'[^0-9]'), '')
+        );
+
+        // Call the filter function with the numeric price
+        final priceFilteredList = await _applyPriceFilter(numericPrice);
+        filteredList.addAll(priceFilteredList);
+      }
+
+      // Apply mileage filter
+      if (selectedMileage != null && selectedMileage != "Any") {
+        final mileageFilteredList = await _applyMileageFilter(selectedMileage);
+        filteredList.addAll(mileageFilteredList);
+      }
+
+      // Apply insurance filter
+      if (selectedInsurance != null && selectedInsurance != "Any") {
+        final insuranceFilteredList = await _applyInsuranceFilter(selectedInsurance);
+        filteredList.addAll(insuranceFilteredList);
+      }
+
+
       setState(() {
-        _filteredMotorcycles = motorcycles;
+        _filteredMotorcycles = filteredList;
       });
+
+
     } catch (error) {
       print("Error resolving motorcyclesFuture: $error");
     }
-  } else{
+  } else {
       // Initialize an empty list to collect filtered motorcycles
       List<dynamic> filteredList = [];
 
@@ -682,7 +653,7 @@ void _applySortTEST({
     return Column(
       children: [
         const SizedBox(height: 16),
-        const SizedBox(height: 16),
+       // const SizedBox(height: 16),
 
         // Filter and Sort Buttons Row
         Row(
@@ -704,7 +675,6 @@ void _applySortTEST({
                 'Sort',
               ),
               onPressed: () {
-                  // TODO: Add sort functionality
                   _showSortDialog(context);
               },
             ),
@@ -735,10 +705,25 @@ void _applySortTEST({
                     .contains(_searchQuery.toLowerCase());
               }).toList();
 
+              // for filtering - if there is no result
+              if (_filteredMotorcycles.isEmpty) {
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 15.0), // Add 15 padding to both sides
+                    child: Text(
+                      "No vehicles available. Please select other filter option(s).",
+                      style: TextStyle(fontSize: 14),
+                      textAlign: TextAlign.center, // Optional: Center-align the text
+                    ),
+                  ),
+                );
+              }
+
+
               return ListView.builder(
-                itemCount: filteredBySearch.length,
+                itemCount: vehicles.length,
                 itemBuilder: (context, index) {
-                  final vehicle = filteredBySearch[index];
+                  final vehicle = vehicles[index];
 
                   return ListTile(
                     title: Text(vehicle['Model'] ?? 'Unknown Model'),
