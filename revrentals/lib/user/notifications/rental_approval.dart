@@ -45,41 +45,23 @@ class _RentalApprovalPageState extends State<RentalApprovalPage> {
     }
   }
 
-  Future<void> _approveRental() async {
+    Future<void> _approveRental() async {
     setState(() => isLoading = true);
 
     try {
       final response = await _listingService.addAgreement({
         "reservation_no": widget.reservationNo,
-      });
+    });
 
-      if (response['success']) {
+    if (response['success']) {
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Rental request approved')),
         );
 
-        // Navigate to the agreement transaction page
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AgreementTransactionPage(
-              itemName: response['item_name'],
-              renterName:
-                  "${reservationDetails?['renter_first_name'] ?? ''} ${reservationDetails?['renter_last_name'] ?? ''}",
-              rentalPeriod: response['rental_overview'],
-              rentalPrice: response['agreement_fee'].toDouble(),
-              totalPrice:
-                  (response['agreement_fee'] + response['damage_compensation'])
-                      .toDouble(),
-              onActionCompleted: widget.onActionCompleted,
-              agreementId: widget.reservationNo,
-            ),
-          ),
-        );
-
-        widget.onActionCompleted();
-      }
+        widget.onActionCompleted(); // Refresh notifications
+        Navigator.pop(context); // Return to notifications page
+    }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error approving rental: $e')),
