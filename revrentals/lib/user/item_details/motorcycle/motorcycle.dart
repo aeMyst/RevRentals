@@ -23,11 +23,11 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   late List<dynamic> _filteredMotorcycles = [];  // local storage of filtered vehicles
   late final int profileId;
 
-  String _searchQuery = '';
   String selectedColor = 'Any';
   String selectedMileage = 'Any';
   String selectedPriceRange = 'Any';
   String selectedVehicle = 'All';
+  String selectedInsurance = 'Any';
 
   @override
   void initState() {
@@ -481,6 +481,14 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     }
   }
 
+  bool _filtersApplied() {
+  return selectedVehicle != "All" ||
+      selectedColor != "Any" ||
+      selectedPriceRange != "Any" ||
+      selectedMileage != "Any" ||
+      selectedInsurance != "Any";
+  }
+
   Future<List<dynamic>> _applyVehicleFilter(String selectedVehicle) async {
     final url = Uri.parse('http://10.0.2.2:8000/filter-by-vehicle/');
     final body = {'vehicle': selectedVehicle};
@@ -661,8 +669,62 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                   ? _filteredMotorcycles
                   : vehicles; // Use the filtered list if available, otherwise the original list
 
+                return displayMotorcycles.isEmpty
+                    ? const Center(
+                        child: Text(
+                          "No vehicles available. Please select other filter option(s).",
+                          style: TextStyle(fontSize: 14),
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: displayMotorcycles.length,
+                        itemBuilder: (context, index) {
+                          final vehicle = displayMotorcycles[index];
+                          return ListTile(
+                            title: Text(vehicle['Model'] ?? 'Unknown Model'),
+                            subtitle:
+                                Text("Rental Price: \$${vehicle['Rental_Price']}"),
+                            trailing: const Icon(Icons.motorcycle),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MotorcycleDetailPage(
+                                    profileId: widget.profileId,
+                                    motorcycleData: vehicle,
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      );
+              } else {
+                return const Center(child: Text("No vehicles available."));
+              }
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+            
+           /*   if (_filteredMotorcycles.isEmpty && _filtersApplied()) {
+                // Show "No vehicles available" if filters are applied but return no results
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 15),
+                    child: Text(
+                      "No vehicles available. Please select other filter option(s).",
+                      style: TextStyle(fontSize: 14),
+                    ),
+                  ),
+                );
+              } */
+
               // for filtering - if there is no result
-              if (_filteredMotorcycles.isEmpty) {
+            /*  if (_filteredMotorcycles.isEmpty) {
                 return const Center(
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 15.0), // Add 15 padding to both sides
@@ -673,9 +735,9 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                     ),
                   ),
                 );
-              }
+              } */
 
-
+/*
               return ListView.builder(
                 itemCount: vehicles.length,
                 itemBuilder: (context, index) {
@@ -707,7 +769,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
       ),
     ],
   );}
-}
+} */
 
 // Motorcycle card
 /*
