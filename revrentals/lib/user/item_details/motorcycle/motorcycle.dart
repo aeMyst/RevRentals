@@ -475,11 +475,10 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
             dirtbikeType: selectedDirtbikeType,
           );
 
-          print("Checkpoint 1");
-
           print("multipleFilterResults type: ${multipleFilterResults.runtimeType}");
           print("multipleFilterResults length: ${multipleFilterResults.length}");
           print("Multiple filter results: $multipleFilterResults");
+          print("_filteredMotorcycles + $_filteredMotorcycles");
 
 
           for (var item in multipleFilterResults) {
@@ -760,8 +759,8 @@ Future<List<dynamic>> _applyMultipleFilters({
 
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
-      if (responseData.containsKey('gear') && responseData['gear'] is List) {
-        return responseData['gear'];
+      if (responseData.containsKey('vehicles') && responseData['vehicles'] is List) {
+        return responseData['vehicles'];
       } else {
         return [];
       }
