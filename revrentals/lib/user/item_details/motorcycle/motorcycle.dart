@@ -422,7 +422,6 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
         _filteredMotorcycles = filteredList;
       });
 
-
     } catch (error) {
       print("Error resolving motorcyclesFuture: $error");
     }
@@ -431,8 +430,8 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
       List<dynamic> filteredList = [];
 
       // MULTIPLE FILTERING
-      
-      if (selectedVehicle != "All" ||
+  /*    if (!filterApplied && 
+        selectedVehicle != "All" ||
         selectedColor != "Any" ||
         selectedPriceRange != "Any" ||
         selectedMileage != "Any" ||
@@ -449,8 +448,12 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
           maxPrice: numericPrice?.toDouble(),
         );
 
-        filteredList.addAll(multipleFilterResults);
-      }
+        if (multipleFilterResults.isNotEmpty) {
+          filteredList.addAll(multipleFilterResults);
+          //filterApplied = true;
+        }
+        print(filterApplied);
+      } */
 
       // Apply vehicle filter
       if (selectedVehicle != null && selectedVehicle != "Any") {
@@ -486,7 +489,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
       if (selectedInsurance != null && selectedInsurance != "Any") {
         final insuranceFilteredList = await _applyInsuranceFilter(selectedInsurance);
         filteredList.addAll(insuranceFilteredList);
-      }
+      } 
 
       // Update state with the filtered list or reset if no results
       if (filteredList.isNotEmpty) {
@@ -633,7 +636,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   }
 }
 
-  Future<List<dynamic>> _applyMultipleFilters({
+/*  Future<List<dynamic>> _applyMultipleFilters({
   String? vehicle,
   String? color,
   String? mileage,
@@ -681,7 +684,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     print('Error: $error');
     return [];
   }
-}
+} */
 
 
   @override

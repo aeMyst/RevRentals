@@ -257,7 +257,8 @@ class _GearTabState extends State<GearTab> {
     } else {
       List<dynamic> filteredGearList = [];
 
-      if (selectedGear != "All" ||
+     /* if (!filterApplied && 
+        selectedGear != "All" ||
         selectedSize != "Any" ||
         selectedPriceRange != "Any" ||
         selectedMaterial != "Any" ||
@@ -274,8 +275,11 @@ class _GearTabState extends State<GearTab> {
         maxPrice: numericPrice?.toDouble(),
       );
 
-      filteredGearList.addAll(multipleFilterResults);
-      }
+        if (multipleFilterResults.isNotEmpty) {
+          filteredGearList.addAll(multipleFilterResults);
+          filterApplied = true;
+        }
+      } */
 
        // Apply gear filter
       if (selectedGear != null && selectedGear != "All") {
@@ -317,6 +321,7 @@ class _GearTabState extends State<GearTab> {
       if (filteredGearList.isNotEmpty) {
         setState(() {
           _filteredGear = filteredGearList;
+          filterApplied = true;
         });
       } else {
         setState(() {
@@ -457,7 +462,7 @@ class _GearTabState extends State<GearTab> {
   }
 }
 
-  Future<List<dynamic>> _applyMultipleFilters({
+  /* Future<List<dynamic>> _applyMultipleFilters({
   String? brand,
   String? material,
   String? gearType,
@@ -506,7 +511,7 @@ class _GearTabState extends State<GearTab> {
     print('Error: $error');
     return [];
   }
-}
+} */
 
 
 
