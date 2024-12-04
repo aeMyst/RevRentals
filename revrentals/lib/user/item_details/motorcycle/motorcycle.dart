@@ -108,6 +108,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                     print('Sort Option: $selectedSortOption');
 
                     _applySort(selectedSortOption);
+                    print('Applying Sort Option: $selectedSortOption');
 
                     Navigator.pop(context);
                   },
@@ -652,12 +653,14 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
           child: Builder(
             builder: (context) {
               if (_filteredMotorcycles.isNotEmpty) {
+
                 // SHOW FILTERED MOTORCYCLES
                 print("Displaying filtered motorcycles");
                 return ListView.builder(
                   itemCount: _filteredMotorcycles.length,
                   itemBuilder: (context, index) {
                     final motorcycle = _filteredMotorcycles[index];
+
                     return ListTile(
                        title: Text(motorcycle['Model'] ?? 'Unknown Model'),
                             subtitle: Text("Rental Price: \$${motorcycle['Rental_Price']}"),
@@ -733,7 +736,9 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
             },
           ),
         ),
-
+      ],
+    );}
+  } 
      /*   Expanded (
           child: FutureBuilder<List<dynamic>>(
           future: motorcyclesFuture, // The original list is fetched here.
@@ -797,9 +802,6 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
           },
         ),
       ), */
-    ],
-  );}
-} 
 
 // Motorcycle card - not using
 /*

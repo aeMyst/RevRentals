@@ -441,14 +441,14 @@ class _GearTabState extends State<GearTab> {
     gearFuture.then((gear) {
       switch (selectedSortOption) {
         case 'Price: Low to High':
-          gear.sort((a, b) => a['Rental_Price'].compareTo(b['Rental_Price']));
+          gear.sort((a, b) => a['GRentalPrice'].compareTo(b['GRentalPrice']));
           break;
         case 'Price: High to Low':
-          gear.sort((a, b) => b['Rental_Price'].compareTo(a['Rental_Price']));
+          gear.sort((a, b) => b['GRentalPrice'].compareTo(a['GRentalPrice']));
           break;
-        case 'Newest First':
+       /* case 'Newest First':
           gear.sort((a, b) => b['dateAdded'].compareTo(a['dateAdded'])); // TO DO>?? idk
-          break;
+          break; */
         default:
           break;
       }
@@ -502,8 +502,9 @@ class _GearTabState extends State<GearTab> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    // Handle the sort logic here
-                    print('Sort Option: $selectedSortOption');
+                    _applySortGear(selectedSortOption);
+
+                    print('Applying Sort Option: $selectedSortOption');
                     Navigator.pop(context);
                   },
                   child: const Text('Apply'),
