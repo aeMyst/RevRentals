@@ -139,12 +139,11 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   ];
   final List<String> priceRanges = [
     'Any',
-    'Under \$100',
-    'Under \$150',
-    //'Above \$100',
-    'Under \$200',
-    'Under \$250',
-    //'Above \$200'
+    'Below \$100',
+    'Below \$150',
+    'Below \$200',
+    'Below \$250',
+    'Below \$300',
   ];
   final List<String> insuranceOptions = [
     'Any',
@@ -168,8 +167,8 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   final List<String> mileageOptions = [
     'Any',
     'Under 10,000 km',
-    '10,000 - 50,000 km',
-    'Above 50,000 km'
+    'Under 50,000 km',
+    'Under 100,000 km'
   ];
   final List<String> engineTypes = [
     'Any',
@@ -421,7 +420,6 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
       List<dynamic> filteredList = motorcycles;
 
       // applying filtering
-
       setState(() {
         _filteredMotorcycles = filteredList;
       });
@@ -474,32 +472,16 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
       if (filteredList.isNotEmpty) {
         setState(() {
           _filteredMotorcycles = filteredList;
+          filterApplied = true;
         });
       } else {
         setState(() {
           _filteredMotorcycles = [];
           filterApplied = true;
-           const Center(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15),
-                child: Text(
-                  "No vehicles available. Please select other filter option(s).",
-                  style: TextStyle(fontSize: 14),
-                ),
-              ),
-            );
         });
       }
     }
   }
-
-/*  bool _filtersApplied() {
-  return selectedVehicle != "All" ||
-      selectedColor != "Any" ||
-      selectedPriceRange != "Any" ||
-      selectedMileage != "Any" ||
-      selectedInsurance != "Any";
-  } */
 
   Future<List<dynamic>> _applyVehicleFilter(String selectedVehicle) async {
     final url = Uri.parse('http://10.0.2.2:8000/filter-by-vehicle/');
@@ -633,12 +615,11 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
 
   @override
   Widget build(BuildContext context) {
-    List<dynamic> displayMotorcycles;
+   List<dynamic> displayMotorcycles;
 
     return Column(
       children: [
         const SizedBox(height: 16),
-       // const SizedBox(height: 16),
 
         // Filter and Sort Buttons Row
         Row(
@@ -667,7 +648,93 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
         ),
         const SizedBox(height: 16),
 
-        Expanded (
+        Expanded(
+          child: Builder(
+            builder: (context) {
+              if (_filteredMotorcycles.isNotEmpty) {
+                // SHOW FILTERED MOTORCYCLES
+                print("Displaying filtered motorcycles");
+                return ListView.builder(
+                  itemCount: _filteredMotorcycles.length,
+                  itemBuilder: (context, index) {
+                    final motorcycle = _filteredMotorcycles[index];
+                    return ListTile(
+                       title: Text(motorcycle['Model'] ?? 'Unknown Model'),
+                            subtitle: Text("Rental Price: \$${motorcycle['Rental_Price']}"),
+                            trailing: const Icon(Icons.motorcycle),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MotorcycleDetailPage(
+                                    profileId: widget.profileId, 
+                                    motorcycleData: motorcycle, // GRRRAHHHHH??!?@?#?!@?
+                                    ),
+                                  ),
+                              );
+                            }
+                    );
+                  },
+                );
+              } else if (filterApplied) {
+                // If a filter was applied and no motorcycles match, show a message
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Text(
+                      "No vehicles available. Please select other filter option(s).",
+                      style: TextStyle(fontSize: 14),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                );
+              } else {
+                // Use FutureBuilder only for the initial fetch
+                return FutureBuilder<List<dynamic>>(
+                  future: motorcyclesFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text("Error: ${snapshot.error}"));
+                    } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                      print("Displaying original motorcycles list");
+                      final vehicles = snapshot.data!;
+
+                      return ListView.builder(
+                        itemCount: vehicles.length,
+                        itemBuilder: (context, index) {
+                          final motorcycle = vehicles[index];
+
+                          return ListTile(
+                            title: Text(motorcycle['Model'] ?? 'Unknown Model'),
+                            subtitle: Text("Rental Price: \$${motorcycle['Rental_Price']}"),
+                            trailing: const Icon(Icons.motorcycle),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MotorcycleDetailPage(
+                                    profileId: widget.profileId, 
+                                    motorcycleData: motorcycle, // GRRRAHHHHH??!?@?#?!@?
+                                    ),
+                                  ),
+                              );
+                            }
+                          );
+                        },
+                      );
+                    } else {
+                      return const Center(child: Text("No vehicles available."));
+                    }
+                  },
+                );
+              }
+            },
+          ),
+        ),
+
+     /*   Expanded (
           child: FutureBuilder<List<dynamic>>(
           future: motorcyclesFuture, // The original list is fetched here.
           builder: (context, snapshot) {
@@ -678,15 +745,16 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
             } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
               final vehicles = snapshot.data!;
 
-
-              if (_filteredMotorcycles.isNotEmpty) {
+              if (_filteredMotorcycles.isNotEmpty && filterApplied) {
                 // If there are filtered motorcycles, show them
                 displayMotorcycles = _filteredMotorcycles;
+                print("display");
+
               } else if (filterApplied) {
                 // If a filter was applied and no motorcycles match, show a "No vehicles available" message
                 return const Center(
                   child: Padding(
-                    padding: const EdgeInsets.all(16.0), // Adjust the padding value as needed
+                    padding: const EdgeInsets.all(16.0), 
                     child: Text(
                       "No vehicles available. Please select other filter option(s).",
                       style: TextStyle(fontSize: 14), 
@@ -697,6 +765,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
               } else {
                 // If no filter is applied, show the original list
                 displayMotorcycles = vehicles;
+                print("HERE");
               }
 
               return ListView.builder(
@@ -727,7 +796,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
             }
           },
         ),
-      ),
+      ), */
     ],
   );}
 } 
