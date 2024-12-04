@@ -447,7 +447,7 @@ class _GearTabState extends State<GearTab> {
           gear.sort((a, b) => b['Rental_Price'].compareTo(a['Rental_Price']));
           break;
         case 'Newest First':
-          gear.sort((a, b) => b['dateAdded'].compareTo(a['dateAdded'])); // TO FIX
+          gear.sort((a, b) => b['dateAdded'].compareTo(a['dateAdded'])); // TO DO>?? idk
           break;
         default:
           break;
@@ -516,8 +516,6 @@ class _GearTabState extends State<GearTab> {
     );
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     List<dynamic> displayGear;
@@ -553,7 +551,98 @@ class _GearTabState extends State<GearTab> {
         ),
         const SizedBox(height: 16),
 
-      Expanded (
+        Expanded(
+          child: Builder(
+            builder: (context) {
+              if (_filteredGear.isNotEmpty) {
+
+                // SHOW FILTERED GEAR
+                print("Displaying filtered GEAR");
+                return ListView.builder(
+                  itemCount: _filteredGear.length,
+                  itemBuilder: (context, index) {
+                    final gear = _filteredGear[index];
+
+                    return ListTile(
+                       title: Text(gear['Gear_Name'] ?? 'Unknown Gear'),
+                            subtitle: Text("Rental Price: \$${gear['GRentalPrice']}"),
+                            trailing: const Icon(Icons.motorcycle),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => GearDetailPage(
+                                    profileId: widget.profileId, 
+                                    gearData: gear, 
+                                    ),
+                                  ),
+                              );
+                            }
+                    );
+                  },
+                );
+              } else if (filterApplied) {
+                // If a filter was applied and no motorcycles match, show a message
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Text(
+                      "No gear available. Please select other filter option(s).",
+                      style: TextStyle(fontSize: 14),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                );
+              } else {
+                // Use FutureBuilder only for the initial fetch
+                return FutureBuilder<List<dynamic>>(
+                  future: gearFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text("Error: ${snapshot.error}"));
+                    } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                      print("Displaying original motorcycles list");
+                      final vehicles = snapshot.data!;
+
+                      return ListView.builder(
+                        itemCount: vehicles.length,
+                        itemBuilder: (context, index) {
+                          final gear = vehicles[index];
+
+                          return ListTile(
+                            title: Text(gear['Gear_Name'] ?? 'Unknown Gear'),
+                            subtitle: Text("Rental Price: \$${gear['GRentalPrice']}"),
+                            trailing: const Icon(Icons.motorcycle),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => GearDetailPage(
+                                    profileId: profileId, 
+                                    gearData: gear, // GRRRAHHHHH??!?@?#?!@?
+                                    ),
+                                  ),
+                              );
+                            }
+                          );
+                        },
+                      );
+                    } else {
+                      return const Center(child: Text("No vehicles available."));
+                    }
+                  },
+                );
+              }
+            },
+          ),
+        ),
+      ],
+    );}
+  } 
+
+  /*    Expanded (
         child: FutureBuilder<List<dynamic>>(
         future: gearFuture,
         builder: (context, snapshot) {
@@ -583,7 +672,6 @@ class _GearTabState extends State<GearTab> {
                 // If no filter is applied, show the original list
                 displayGear = gearItems;
               }
-
 
             return ListView.builder(
               itemCount: gearItems.length,
@@ -615,7 +703,7 @@ class _GearTabState extends State<GearTab> {
         ),
       ]);
     }
-}
+} */
 
 // Widget to display motorcycles in each tab
 /*class GearTab extends StatelessWidget {
