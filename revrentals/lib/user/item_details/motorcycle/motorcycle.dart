@@ -22,6 +22,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   late Future<List<dynamic>> motorcyclesFuture;
   late List<dynamic> _filteredMotorcycles = [];  // local storage of filtered vehicles
   late final int profileId;
+  bool filterApplied = false;
 
   String selectedColor = 'Any';
   String selectedMileage = 'Any';
@@ -405,6 +406,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     String? selectedPriceRange,
     String? selectedMileage,
     String? selectedInsurance,
+
   }) async {
     // If no filters are selected, reset to the original list (motorcyclesFuture)
     if (selectedVehicle == "All" && selectedColor == "Any" &&
@@ -476,18 +478,28 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
       } else {
         setState(() {
           _filteredMotorcycles = [];
+          filterApplied = true;
+           const Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 15),
+                child: Text(
+                  "No vehicles available. Please select other filter option(s).",
+                  style: TextStyle(fontSize: 14),
+                ),
+              ),
+            );
         });
       }
     }
   }
 
-  bool _filtersApplied() {
+/*  bool _filtersApplied() {
   return selectedVehicle != "All" ||
       selectedColor != "Any" ||
       selectedPriceRange != "Any" ||
       selectedMileage != "Any" ||
       selectedInsurance != "Any";
-  }
+  } */
 
   Future<List<dynamic>> _applyVehicleFilter(String selectedVehicle) async {
     final url = Uri.parse('http://10.0.2.2:8000/filter-by-vehicle/');
@@ -621,6 +633,8 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
 
   @override
   Widget build(BuildContext context) {
+    List<dynamic> displayMotorcycles;
+
     return Column(
       children: [
         const SizedBox(height: 16),
@@ -665,10 +679,32 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
               final vehicles = snapshot.data!;
 
               // If there are no filtered motorcycles, show the original list
-              final displayMotorcycles = _filteredMotorcycles.isNotEmpty
+             /* final displayMotorcycles = _filteredMotorcycles.isNotEmpty
                   ? _filteredMotorcycles
-                  : vehicles; // Use the filtered list if available, otherwise the original list
+                  : vehicles; // Use the filtered list if available, otherwise the original list */
 
+              if (_filteredMotorcycles.isNotEmpty) {
+                // If there are filtered motorcycles, show them
+                displayMotorcycles = _filteredMotorcycles;
+              } else if (filterApplied) {
+                // If a filter was applied and no motorcycles match, show a "No vehicles available" message
+                return const Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0), // Adjust the padding value as needed
+                    child: Text(
+                      "No vehicles available. Please select other filter option(s).",
+                      style: TextStyle(fontSize: 14), 
+                      textAlign: TextAlign.center,   
+                    ),
+                  ),
+                );
+              } else {
+                // If no filter is applied, show the original list
+                displayMotorcycles = vehicles;
+              }
+
+
+/*
                 return displayMotorcycles.isEmpty
                     ? const Center(
                         child: Text(
@@ -708,7 +744,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
       ],
     );
   }
-}
+}*/
             
            /*   if (_filteredMotorcycles.isEmpty && _filtersApplied()) {
                 // Show "No vehicles available" if filters are applied but return no results
@@ -737,7 +773,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                 );
               } */
 
-/*
+
               return ListView.builder(
                 itemCount: vehicles.length,
                 itemBuilder: (context, index) {
@@ -769,7 +805,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
       ),
     ],
   );}
-} */
+} 
 
 // Motorcycle card
 /*
