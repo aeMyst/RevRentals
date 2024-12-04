@@ -21,8 +21,8 @@ class MotorcycleTab extends StatefulWidget {
 class _MotorcycleTabState extends State<MotorcycleTab> {
   late Future<List<dynamic>> motorcyclesFuture;
   late List<dynamic> _filteredMotorcycles = [];  // local storage of filtered vehicles
-  final TextEditingController _searchController = TextEditingController();
   late final int profileId;
+
   String _searchQuery = '';
   String selectedColor = 'Any';
   String selectedMileage = 'Any';
@@ -420,43 +420,6 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
 
       // applying filtering
 
-      // Apply vehicle filter
-      if (selectedVehicle != null && selectedVehicle != "Any") {
-        final vehicleFilteredList = await _applyVehicleFilter(selectedVehicle);
-        filteredList.addAll(vehicleFilteredList);
-      }
-
-      // Apply color filter
-      if (selectedColor != null && selectedColor != "Any") {
-        final colorFilteredList = await _applyColorFilter(selectedColor);
-        filteredList.addAll(colorFilteredList);
-      }
-
-      // Apply price range filter
-      if (selectedPriceRange != null && selectedPriceRange != "Any") {
-        // Extract the numeric value from the selected price range
-        final numericPrice = int.parse(
-          selectedPriceRange.replaceAll(RegExp(r'[^0-9]'), '')
-        );
-
-        // Call the filter function with the numeric price
-        final priceFilteredList = await _applyPriceFilter(numericPrice);
-        filteredList.addAll(priceFilteredList);
-      }
-
-      // Apply mileage filter
-      if (selectedMileage != null && selectedMileage != "Any") {
-        final mileageFilteredList = await _applyMileageFilter(selectedMileage);
-        filteredList.addAll(mileageFilteredList);
-      }
-
-      // Apply insurance filter
-      if (selectedInsurance != null && selectedInsurance != "Any") {
-        final insuranceFilteredList = await _applyInsuranceFilter(selectedInsurance);
-        filteredList.addAll(insuranceFilteredList);
-      }
-
-
       setState(() {
         _filteredMotorcycles = filteredList;
       });
@@ -697,13 +660,6 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
               final displayMotorcycles = _filteredMotorcycles.isNotEmpty
                   ? _filteredMotorcycles
                   : vehicles; // Use the filtered list if available, otherwise the original list
-
-              // Apply search filtering if there is a search query
-              final filteredBySearch = displayMotorcycles.where((motorcycle) {
-                return motorcycle['Model']
-                    .toLowerCase()
-                    .contains(_searchQuery.toLowerCase());
-              }).toList();
 
               // for filtering - if there is no result
               if (_filteredMotorcycles.isEmpty) {

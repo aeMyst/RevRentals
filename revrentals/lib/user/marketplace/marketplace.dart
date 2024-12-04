@@ -3,11 +3,11 @@ import 'package:revrentals/main_pages/auth_page.dart';
 import 'package:revrentals/user/item_details/gear/gear_details.dart';
 import 'package:revrentals/user/item_details/lot/lot_details.dart';
 import 'package:revrentals/user/item_details/motorcycle/motorcycle_details.dart';
+import 'package:revrentals/user/item_details/gear/gear.dart';
 import 'package:revrentals/user/notifications/notifications.dart';
 import 'package:revrentals/user/profile_detail.dart';
 import 'package:revrentals/user/item_details/motorcycle/motorcycle.dart';
 import 'package:revrentals/services/listing_service.dart'; // Import ListingService
-
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -135,7 +135,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
 
 
 // GearTab updated to fetch and display gear items
-class GearTab extends StatelessWidget {
+/*class GearTab extends StatelessWidget {
   final Future<List<dynamic>> gearFuture;
   final int profileId;
 
@@ -488,7 +488,8 @@ class GearTab extends StatelessWidget {
       ),
     ]);
   }
-}
+} 
+*/
 
 // LotTab updated to fetch and display storage lots
 class LotTab extends StatelessWidget {
