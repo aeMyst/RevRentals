@@ -19,6 +19,13 @@ class _GearTabState extends State<GearTab> {
   late Future<List<dynamic>> gearFuture;
   late final int profileId;
   late List<dynamic> _filteredGear = [];
+  bool filterApplied = false;
+
+  String selectedGear = 'All';
+  String selectedBrand = 'Any';
+  String selectedSize = 'Any';
+  String selectedMaterial = 'Any';
+  String selectedPriceRange = 'Any';
 
   @override
   void initState() {
@@ -45,10 +52,11 @@ class _GearTabState extends State<GearTab> {
     ];
     final List<String> priceRanges = [
       'Any',
+      'Under \$50',
       'Under \$100',
-      'Above \$100',
+      'Under \$150',
       'Under \$200',
-      'Above \$200'
+      'Under \$250'
     ];
 
     final List<String> brandOptions = [
@@ -70,11 +78,11 @@ class _GearTabState extends State<GearTab> {
 
     final List<String> sizeOptions = [
       'Any',
-      'X-Small',
-      'Small',
-      'Medium',
-      'Large',
-      'X-Large',
+      'XS',
+      'S',
+      'M',
+      'L',
+      'XL',
     ];
 
     showDialog(
@@ -202,9 +210,300 @@ class _GearTabState extends State<GearTab> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    // Handle the filter logic here
-                    print(
-                        'Category: $selectedGear, Price Range: $selectedPriceRange');
+                    _applyGearPageFilter(
+                      context: context,
+                      selectedGear: selectedGear,
+                      selectedBrand: selectedBrand,
+                      selectedSize: selectedSize,
+                      selectedPriceRange: selectedPriceRange,
+                      selectedMaterial: selectedMaterial);
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Apply Filters'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+  
+  void _applyGearPageFilter(
+    {required BuildContext context,
+    String? selectedGear,
+    String? selectedPriceRange,
+    String? selectedBrand,
+    String? selectedMaterial,
+    String? selectedSize,
+
+    }) async {
+      if (selectedGear == "All" && selectedSize == "Any" &&
+          selectedPriceRange == "Any" &&
+          selectedMaterial == "Any" &&
+          selectedBrand == "Any") {
+
+      try {
+        final gear = await gearFuture;
+
+        List<dynamic> filteredGearList = gear;
+
+        setState (() {
+          _filteredGear = filteredGearList;
+        });
+      } catch (error){
+        print("Error resolving gearFuture: $error");
+      }
+    } else {
+      List<dynamic> filteredGearList = [];
+
+       // Apply gear filter
+      if (selectedGear != null && selectedGear != "All") {
+        final gearFilteredList = await _applyGearFilter(selectedGear);
+        filteredGearList.addAll(gearFilteredList);
+      }
+
+      // Apply brand filter
+      if (selectedBrand != null && selectedBrand != "Any") {
+        final brandFilteredList = await _applyBrandFilter(selectedBrand);
+        filteredGearList.addAll(brandFilteredList);
+      }
+
+      // Apply price range filter
+      if (selectedPriceRange != null && selectedPriceRange != "Any") {
+        // Extract the numeric value from the selected price range
+        final numericPrice = int.parse(
+          selectedPriceRange.replaceAll(RegExp(r'[^0-9]'), '')
+        );
+
+        // Call the filter function with the numeric price
+        final priceFilteredList = await _applyPriceFilter(numericPrice);
+        filteredGearList.addAll(priceFilteredList);
+      }
+
+      // Apply size filter
+      if (selectedSize != null && selectedSize != "Any") {
+        final sizeFilteredList = await _applySizeFilter(selectedSize);
+        filteredGearList.addAll(sizeFilteredList);
+      }
+
+      // Apply material filter
+      if (selectedMaterial != null && selectedMaterial != "Any") {
+        final insuranceFilteredList = await _applyMaterialFilter(selectedMaterial);
+        filteredGearList.addAll(insuranceFilteredList);
+      }
+
+      // Update state with the filtered list or reset if no results
+      if (filteredGearList.isNotEmpty) {
+        setState(() {
+          _filteredGear = filteredGearList;
+        });
+      } else {
+        setState(() {
+          _filteredGear = [];
+          filterApplied = true;
+        });
+      }
+    }
+  }
+
+  Future<List<dynamic>> _applyGearFilter(String selectedGear) async {
+    final url = Uri.parse('http://10.0.2.2:8000/filter-by-gear/');
+    final body = {'type': selectedGear};
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(body),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData.containsKey('gear') && responseData['gear'] is List) {
+          return responseData['gear'];
+        } else {
+          return [];
+        }
+      } else {
+        print('Error: ${response.body}');
+        return [];
+      }
+    } catch (error) {
+      print('Error: $error');
+      return [];
+    }
+  }
+
+  Future<List<dynamic>> _applyBrandFilter(String selectedBrand) async {
+    final url = Uri.parse('http://10.0.2.2:8000/filter-by-brand/');
+    final body = {'brand': selectedBrand};
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(body),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData.containsKey('gear') && responseData['gear'] is List) {
+          return responseData['gear'];
+        } else {
+          return [];
+        }
+      } else {
+        print('Error: ${response.body}');
+        return [];
+      }
+    } catch (error) {
+      print('Error: $error');
+      return [];
+    }
+  }
+
+  Future<List<dynamic>> _applyPriceFilter(int maxPrice) async {
+  final url = Uri.parse('http://10.0.2.2:8000/filter-by-gear-price/');
+  final body = {'rental_price': maxPrice};
+
+  final response = await http.post(
+    url,
+    headers: {'Content-Type': 'application/json'},
+    body: json.encode(body),
+  );
+
+  if (response.statusCode == 200) {
+    final responseData = json.decode(response.body);
+    return responseData['gear'] ?? [];
+  } else {
+    throw Exception('Failed to filter by price: ${response.body}');
+  }
+}
+
+  Future<List<dynamic>> _applySizeFilter(String selectedSize) async {
+  final url = Uri.parse('http://10.0.2.2:8000/filter-by-size/');
+  final body = {'size': selectedSize};
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(body),
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      if (responseData.containsKey('gear') && responseData['gear'] is List) {
+        return responseData['gear'];
+      } else {
+        return [];
+      }
+    } else {
+      print('Error: ${response.body}');
+      return [];
+    }
+  } catch (error) {
+    print('Error: $error');
+    return [];
+  }
+}
+
+  Future<List<dynamic>> _applyMaterialFilter(String selectedMaterial) async {
+  final url = Uri.parse('http://10.0.2.2:8000/filter-by-material/');
+  final body = {'material': selectedMaterial};
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(body),
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      if (responseData.containsKey('gear') && responseData['gear'] is List) {
+        return responseData['gear'];
+      } else {
+        return [];
+      }
+    } else {
+      print('Error: ${response.body}');
+      return [];
+    }
+  } catch (error) {
+    print('Error: $error');
+    return [];
+  }
+}
+
+  void _applySortGear(String selectedSortOption) {
+    gearFuture.then((gear) {
+      switch (selectedSortOption) {
+        case 'Price: Low to High':
+          gear.sort((a, b) => a['Rental_Price'].compareTo(b['Rental_Price']));
+          break;
+        case 'Price: High to Low':
+          gear.sort((a, b) => b['Rental_Price'].compareTo(a['Rental_Price']));
+          break;
+        case 'Newest First':
+          gear.sort((a, b) => b['dateAdded'].compareTo(a['dateAdded'])); // TO FIX
+          break;
+        default:
+          break;
+      }
+
+      // Update the motorcycles list
+      setState(() {
+        gearFuture = Future.value(gear);
+      });
+    });
+  }
+
+  void _showSortDialog(BuildContext context) {
+    String selectedSortOption = 'None';
+    final List<String> sortOptions = [
+      'None',
+      'Price: Low to High',
+      'Price: High to Low',
+      //'Newest First'
+    ];
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: const Text('Sort Options'),
+              content: DropdownButtonFormField<String>(
+                dropdownColor: Colors.white,
+                value: selectedSortOption,
+                decoration: const InputDecoration(
+                  labelText: 'Sort By',
+                  border: OutlineInputBorder(),
+                ),
+                items: sortOptions.map((String option) {
+                  return DropdownMenuItem<String>(
+                    value: option,
+                    child: Text(option),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedSortOption = newValue!;
+                  });
+                },
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    // Handle the sort logic here
+                    print('Sort Option: $selectedSortOption');
                     Navigator.pop(context);
                   },
                   child: const Text('Apply'),
@@ -216,9 +515,13 @@ class _GearTabState extends State<GearTab> {
       },
     );
   }
-  
+
+
+
   @override
   Widget build(BuildContext context) {
+    List<dynamic> displayGear;
+
     return Column(
       children: [
         const SizedBox(height: 16),
@@ -243,8 +546,7 @@ class _GearTabState extends State<GearTab> {
                 'Sort',
               ),
               onPressed: () {
-                  // TODO: Add sort functionality
-                  //_showSortDialog(context);
+                  _showSortDialog(context);
               },
             ),
           ],
@@ -261,6 +563,28 @@ class _GearTabState extends State<GearTab> {
             return Center(child: Text("Error: ${snapshot.error}"));
           } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
             final gearItems = snapshot.data!;
+
+            if (_filteredGear.isNotEmpty) {
+                // If there are filtered motorcycles, show them
+                displayGear = _filteredGear;
+              } else if (filterApplied) {
+                // If a filter was applied and no motorcycles match, show a "No vehicles available" message
+                return const Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0), 
+                    child: Text(
+                      "No gear available. Please select other filter option(s).",
+                      style: TextStyle(fontSize: 14), 
+                      textAlign: TextAlign.center,   
+                    ),
+                  ),
+                );
+              } else {
+                // If no filter is applied, show the original list
+                displayGear = gearItems;
+              }
+
+
             return ListView.builder(
               itemCount: gearItems.length,
               itemBuilder: (context, index) {
