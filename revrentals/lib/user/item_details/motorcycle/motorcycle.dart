@@ -1,194 +1,63 @@
 import 'package:flutter/material.dart';
 import 'package:revrentals/user/item_details/motorcycle/motorcycle_details.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 // Widget to display motorcycles in each tab
-class MotorcycleTab extends StatelessWidget {
-  const MotorcycleTab({super.key});
+class MotorcycleTab extends StatefulWidget {
+  final int profileId;
+  final Future<List<dynamic>> motorcyclesFuture;
+  
 
-  void _showFilterDialog(BuildContext context) {
-    String selectedVehicle = 'All';
-    String selectedPriceRange = 'Any';
-    String selectedInsurance = 'Any';
-    String selectedMileage = 'Any';
-    String selectedColor = 'Any';
+  const MotorcycleTab(
+      {super.key, required this.profileId, required this.motorcyclesFuture});
 
-    final List<String> vehicleType = [
-      'All',
-      'Motorcycles',
-      'Dirtbike',
-      'Moped'
-    ];
-    final List<String> priceRanges = [
-      'Any',
-      'Under \$100',
-      'Above \$100',
-      'Under \$200',
-      'Above \$200'
-    ];
-    final List<String> insuranceOptions = [
-      'Any',
-      'Basic',
-      'Premium',
-      'Comprehensive'
-    ];
-    final List<String> colorOptions = [
-      'Any',
-      'Red',
-      'Orange',
-      'Yellow',
-      'Green',
-      'Blue',
-      'Purple',
-      'Pink',
-      'Black',
-      'White',
-      'Other',
-    ];
+  @override
+  _MotorcycleTabState createState() => _MotorcycleTabState();
+}
 
-    final List<String> mileageOptions = [
-      'Any',
-      'Under 10,000 km',
-      '10,000 - 50,000 km',
-      'Above 50,000 km'
-    ];
+class _MotorcycleTabState extends State<MotorcycleTab> {
+  late Future<List<dynamic>> motorcyclesFuture;
+  late List<dynamic> _filteredMotorcycles = [];  // local storage of filtered vehicles
+  late final int profileId;
+  bool filterApplied = false;
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            return AlertDialog(
-              title: const Text('Filter Options'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Dropdown for Category
-                  DropdownButtonFormField<String>(
-                    dropdownColor: Colors.white,
-                    value: selectedVehicle,
-                    decoration: const InputDecoration(
-                      labelText: 'Type',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: vehicleType.map((String category) {
-                      return DropdownMenuItem<String>(
-                        value: category,
-                        child: Text(category),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedVehicle = newValue!;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  // Dropdown for Price Range
-                  DropdownButtonFormField<String>(
-                    dropdownColor: Colors.white,
-                    value: selectedPriceRange,
-                    decoration: const InputDecoration(
-                      labelText: 'Price Range',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: priceRanges.map((String range) {
-                      return DropdownMenuItem<String>(
-                        value: range,
-                        child: Text(range),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedPriceRange = newValue!;
-                      });
-                    },
-                  ),
+  String selectedColor = 'Any';
+  String selectedMileage = 'Any';
+  String selectedPriceRange = 'Any';
+  String selectedVehicle = 'All';
+  String selectedInsurance = 'Any';
 
-                  const SizedBox(height: 16),
-                  // Dropdown for Color
-                  DropdownButtonFormField<String>(
-                    dropdownColor: Colors.white,
-                    value: selectedColor,
-                    decoration: const InputDecoration(
-                      labelText: 'Color',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: colorOptions.map((String color) {
-                      return DropdownMenuItem<String>(
-                        value: color,
-                        child: Text(color),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedColor = newValue!;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<String>(
-                    dropdownColor: Colors.white,
-                    value: selectedMileage,
-                    decoration: const InputDecoration(
-                      labelText: 'Mileage',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: mileageOptions.map((String mileage) {
-                      return DropdownMenuItem<String>(
-                        value: mileage,
-                        child: Text(mileage),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedMileage = newValue!;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 16),
+  @override
+  void initState() {
+    super.initState();
+    motorcyclesFuture = widget.motorcyclesFuture;
+    
+    _filteredMotorcycles = [];
+  }
 
-                  // Dropdown for Insurance
-                  DropdownButtonFormField<String>(
-                    dropdownColor: Colors.white,
-                    value: selectedInsurance,
-                    decoration: const InputDecoration(
-                      labelText: 'Insurance',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: insuranceOptions.map((String insurance) {
-                      return DropdownMenuItem<String>(
-                        value: insurance,
-                        child: Text(insurance),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedInsurance = newValue!;
-                      });
-                    },
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    // Handle the filter logic here
-                    print(
-                        'Category: $selectedVehicle, Price Range: $selectedPriceRange');
-                    Navigator.pop(context);
-                  },
-                  child: const Text('Apply'),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
+
+  void _applySort(String selectedSortOption) {
+    motorcyclesFuture.then((motorcycles) {
+      switch (selectedSortOption) {
+        case 'Price: Low to High':
+          motorcycles.sort((a, b) => a['Rental_Price'].compareTo(b['Rental_Price']));
+          break;
+        case 'Price: High to Low':
+          motorcycles.sort((a, b) => b['Rental_Price'].compareTo(a['Rental_Price']));
+          break;
+        case 'Newest First':
+          motorcycles.sort((a, b) => b['dateAdded'].compareTo(a['dateAdded'])); // TO FIX
+          break;
+        default:
+          break;
+      }
+
+      // Update the motorcycles list
+      setState(() {
+        motorcyclesFuture = Future.value(motorcycles);
+      });
+    });
   }
 
   void _showSortDialog(BuildContext context) {
@@ -197,7 +66,7 @@ class MotorcycleTab extends StatelessWidget {
       'None',
       'Price: Low to High',
       'Price: High to Low',
-      'Newest First'
+      //'Newest First'
     ];
 
     showDialog(
@@ -233,8 +102,11 @@ class MotorcycleTab extends StatelessWidget {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    // Handle the sort logic here
                     print('Sort Option: $selectedSortOption');
+
+                    _applySort(selectedSortOption);
+                    print('Applying Sort Option: $selectedSortOption');
+
                     Navigator.pop(context);
                   },
                   child: const Text('Apply'),
@@ -246,15 +118,583 @@ class MotorcycleTab extends StatelessWidget {
       },
     );
   }
+  
+  void _showFilterDialog(BuildContext context) {
+  String selectedVehicle = 'All';
+  String selectedPriceRange = 'Any';
+  String selectedInsurance = 'Any';
+  String selectedMileage = 'Any';
+  String selectedColor = 'Any';
+  String selectedEngineType = 'Any';
+  String selectedCargoRacks = 'Any';
+  String selectedDirtbikeType = 'Any';
+
+  final List<String> vehicleType = [
+    'All',
+    'Motorcycle',
+    'Dirtbike',
+    'Moped'
+  ];
+  final List<String> priceRanges = [
+    'Any',
+    'Below \$100',
+    'Below \$150',
+    'Below \$200',
+    'Below \$250',
+    'Below \$300',
+  ];
+  final List<String> insuranceOptions = [
+    'Any',
+    'Basic',
+    'Premium',
+    'Comprehensive'
+  ];
+  final List<String> colorOptions = [
+    'Any',
+    'Red',
+    'Orange',
+    'Yellow',
+    'Green',
+    'Blue',
+    'Purple',
+    'Pink',
+    'Black',
+    'White',
+    'Other',
+  ];
+  final List<String> mileageOptions = [
+    'Any',
+    'Under 10,000 km',
+    'Under 50,000 km',
+    'Under 100,000 km'
+  ];
+  final List<String> engineTypes = [
+    'Any',
+    'Inline-4',
+    'V-Twin',
+    'Electric'
+  ];
+  final List<String> cargoRacks = [
+    'Any',
+    '1',
+    '2'
+  ];
+  final List<String> dirtbikeType = [
+    'Any',
+    'Motocross',
+    'Enduro'
+  ];
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return AlertDialog(
+            title: const Text('Filter Options'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Dropdown for Vehicle Type
+                DropdownButtonFormField<String>(
+                  value: selectedVehicle,
+                  decoration: const InputDecoration(
+                    labelText: 'Vehicle Type',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: vehicleType.map((String type) {
+                    return DropdownMenuItem<String>(
+                      value: type,
+                      child: Text(type),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedVehicle = newValue!;
+                    });
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Conditional dropdown for engine type when Motorcycles is selected
+                if (selectedVehicle == 'Motorcycle') ...[
+                  DropdownButtonFormField<String> (
+                    value: selectedEngineType,
+                    decoration: const InputDecoration (
+                      labelText: 'Engine Type',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: engineTypes.map((String engine) {
+                      return DropdownMenuItem<String> (
+                        value: engine,
+                        child: Text(engine),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedEngineType = newValue!;
+                      });
+                    },
+                  ),
+                const SizedBox(height:16),
+                ],
+
+                // Conditional dropdown for engine type when Moped is selected
+                if (selectedVehicle == 'Moped') ...[
+                  DropdownButtonFormField<String> (
+                    value: selectedCargoRacks,
+                    decoration: const InputDecoration (
+                      labelText: 'Cargo Racks',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: cargoRacks.map((String cargo) {
+                      return DropdownMenuItem<String> (
+                        value: cargo,
+                        child: Text(cargo),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedCargoRacks = newValue!;
+                      });
+                    },
+                  ),
+                const SizedBox(height:16),
+                ],
+
+                // Conditional dropdown for engine type when Dirtbike is selected
+                if (selectedVehicle == 'Dirtbike') ...[
+                  DropdownButtonFormField<String> (
+                    value: selectedDirtbikeType,
+                    decoration: const InputDecoration (
+                      labelText: 'Dirtbike Type',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: dirtbikeType.map((String dBikeType) {
+                      return DropdownMenuItem<String> (
+                        value: dBikeType,
+                        child: Text(dBikeType),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedDirtbikeType = newValue!;
+                      });
+                    },
+                  ),
+                const SizedBox(height:16),
+                ],
+
+                // Dropdown for Price Range
+                DropdownButtonFormField<String>(
+                  value: selectedPriceRange,
+                  decoration: const InputDecoration(
+                    labelText: 'Price Range',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: priceRanges.map((String range) {
+                    return DropdownMenuItem<String>(
+                      value: range,
+                      child: Text(range),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedPriceRange = newValue!;
+                    });
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Dropdown for Color
+                DropdownButtonFormField<String>(
+                  value: selectedColor,
+                  decoration: const InputDecoration(
+                    labelText: 'Color',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: colorOptions.map((String color) {
+                    return DropdownMenuItem<String>(
+                      value: color,
+                      child: Text(color),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedColor = newValue!;
+                    });
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Dropdown for Mileage
+                DropdownButtonFormField<String>(
+                  value: selectedMileage,
+                  decoration: const InputDecoration(
+                    labelText: 'Mileage',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: mileageOptions.map((String mileage) {
+                    return DropdownMenuItem<String>(
+                      value: mileage,
+                      child: Text(mileage),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedMileage = newValue!;
+                    });
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Dropdown for Insurance
+                DropdownButtonFormField<String>(
+                  value: selectedInsurance,
+                  decoration: const InputDecoration(
+                    labelText: 'Insurance',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: insuranceOptions.map((String insurance) {
+                    return DropdownMenuItem<String>(
+                      value: insurance,
+                      child: Text(insurance),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedInsurance = newValue!;
+                    });
+                  },
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  _applyFilter(
+                    context: context,
+                    selectedVehicle: selectedVehicle,
+                    selectedColor: selectedColor,
+                    selectedPriceRange: selectedPriceRange,
+                    selectedMileage: selectedMileage,
+                    selectedInsurance: selectedInsurance,
+                    );
+                  Navigator.pop(context);
+                },
+                child: const Text('Apply Filters'),
+              ),
+            ],
+          );
+        },
+      );
+    },
+  );
+}
+
+  void _applyFilter({
+    required BuildContext context,
+    String? selectedVehicle,
+    String? selectedColor,
+    String? selectedPriceRange,
+    String? selectedMileage,
+    String? selectedInsurance,
+
+  }) async {
+    // If no filters are selected, reset to the original list (motorcyclesFuture)
+    if (selectedVehicle == "All" && selectedColor == "Any" &&
+    selectedPriceRange == "Any" &&
+    selectedMileage == "Any" &&
+    selectedInsurance == "Any") {
+    try {
+      // original list
+      final motorcycles = await motorcyclesFuture;
+
+      // filtering
+      List<dynamic> filteredList = motorcycles;
+
+      // applying filtering
+      setState(() {
+        _filteredMotorcycles = filteredList;
+      });
+
+
+    } catch (error) {
+      print("Error resolving motorcyclesFuture: $error");
+    }
+  } else {
+      // Initialize an empty list to collect filtered motorcycles
+      List<dynamic> filteredList = [];
+
+      // MULTIPLE FILTERING
+      
+      if (selectedVehicle != "All" ||
+        selectedColor != "Any" ||
+        selectedPriceRange != "Any" ||
+        selectedMileage != "Any" ||
+        selectedInsurance != "Any") {
+        final numericPrice = (selectedPriceRange != null && selectedPriceRange != "Any")
+            ? int.tryParse(selectedPriceRange.replaceAll(RegExp(r'[^0-9]'), ''))
+            : null;
+
+        final multipleFilterResults = await _applyMultipleFilters(
+          color: selectedColor != "Any" ? selectedColor : null,
+          mileage: selectedMileage != "Any" ? selectedMileage : null,
+          insurance: selectedInsurance != "Any" ? selectedInsurance : null,
+          vehicle: selectedVehicle != "All" ? selectedVehicle : null,
+          maxPrice: numericPrice?.toDouble(),
+        );
+
+        filteredList.addAll(multipleFilterResults);
+      }
+
+      // Apply vehicle filter
+      if (selectedVehicle != null && selectedVehicle != "Any") {
+        final vehicleFilteredList = await _applyVehicleFilter(selectedVehicle);
+        filteredList.addAll(vehicleFilteredList);
+      }
+
+      // Apply color filter
+      if (selectedColor != null && selectedColor != "Any") {
+        final colorFilteredList = await _applyColorFilter(selectedColor);
+        filteredList.addAll(colorFilteredList);
+      }
+
+      // Apply price range filter
+      if (selectedPriceRange != null && selectedPriceRange != "Any") {
+        // Extract the numeric value from the selected price range
+        final numericPrice = int.parse(
+          selectedPriceRange.replaceAll(RegExp(r'[^0-9]'), '')
+        );
+
+        // Call the filter function with the numeric price
+        final priceFilteredList = await _applyPriceFilter(numericPrice);
+        filteredList.addAll(priceFilteredList);
+      }
+
+      // Apply mileage filter
+      if (selectedMileage != null && selectedMileage != "Any") {
+        final mileageFilteredList = await _applyMileageFilter(selectedMileage);
+        filteredList.addAll(mileageFilteredList);
+      }
+
+      // Apply insurance filter
+      if (selectedInsurance != null && selectedInsurance != "Any") {
+        final insuranceFilteredList = await _applyInsuranceFilter(selectedInsurance);
+        filteredList.addAll(insuranceFilteredList);
+      }
+
+      // Update state with the filtered list or reset if no results
+      if (filteredList.isNotEmpty) {
+        setState(() {
+          _filteredMotorcycles = filteredList;
+          filterApplied = true;
+        });
+      } else {
+        setState(() {
+          _filteredMotorcycles = [];
+          filterApplied = true;
+        });
+      }
+    }
+  }
+
+  Future<List<dynamic>> _applyVehicleFilter(String selectedVehicle) async {
+    final url = Uri.parse('http://10.0.2.2:8000/filter-by-vehicle/');
+    final body = {'vehicle': selectedVehicle};
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(body),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData.containsKey('vehicles') && responseData['vehicles'] is List) {
+          return responseData['vehicles'];
+        } else {
+          return [];
+        }
+      } else {
+        print('Error: ${response.body}');
+        return [];
+      }
+    } catch (error) {
+      print('Error: $error');
+      return [];
+    }
+  }
+
+  Future<List<dynamic>> _applyColorFilter(String selectedColor) async {
+    final url = Uri.parse('http://10.0.2.2:8000/filter-by-color/');
+    final body = {'color': selectedColor};
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(body),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData.containsKey('vehicles') && responseData['vehicles'] is List) {
+          return responseData['vehicles'];
+        } else {
+          return [];
+        }
+      } else {
+        print('Error: ${response.body}');
+        return [];
+      }
+    } catch (error) {
+      print('Error: $error');
+      return [];
+    }
+  }
+
+  Future<List<dynamic>> _applyPriceFilter(int maxPrice) async {
+  final url = Uri.parse('http://10.0.2.2:8000/filter-by-price/');
+  final body = {'rental_price': maxPrice};
+
+  final response = await http.post(
+    url,
+    headers: {'Content-Type': 'application/json'},
+    body: json.encode(body),
+  );
+
+  if (response.statusCode == 200) {
+    final responseData = json.decode(response.body);
+    return responseData['vehicles'] ?? [];
+  } else {
+    throw Exception('Failed to filter by price: ${response.body}');
+  }
+}
+
+  Future<List<dynamic>> _applyMileageFilter(String selectedMileage) async {
+  final url = Uri.parse('http://10.0.2.2:8000/filter-by-mileage/');
+  final body = {'mileage': selectedMileage};
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(body),
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      if (responseData.containsKey('vehicles') && responseData['vehicles'] is List) {
+        return responseData['vehicles'];
+      } else {
+        return [];
+      }
+    } else {
+      print('Error: ${response.body}');
+      return [];
+    }
+  } catch (error) {
+    print('Error: $error');
+    return [];
+  }
+}
+
+  Future<List<dynamic>> _applyInsuranceFilter(String selectedInsurance) async {
+  final url = Uri.parse('http://10.0.2.2:8000/filter-by-insurance/');
+  final body = {'insurance': selectedInsurance};
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(body),
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      if (responseData.containsKey('vehicles') && responseData['vehicles'] is List) {
+        return responseData['vehicles'];
+      } else {
+        return [];
+      }
+    } else {
+      print('Error: ${response.body}');
+      return [];
+    }
+  } catch (error) {
+    print('Error: $error');
+    return [];
+  }
+}
+
+  Future<List<dynamic>> _applyMultipleFilters({
+  String? vehicle,
+  String? color,
+  String? mileage,
+  String? insurance,
+  double? maxPrice,
+}) async {
+  final url = Uri.parse('http://10.0.2.2:8000/filter_by_multiple_conditions/');
+  
+  final body = <String, dynamic>{};
+  if (vehicle != null && vehicle.isNotEmpty) {
+    body['vehicle'] = vehicle;
+  }
+  if (color != null && color.isNotEmpty) {
+    body['color'] = color;
+  }
+  if (mileage != null && mileage.isNotEmpty) {
+    body['mileage'] = mileage;
+  }
+  if (insurance != null && insurance.isNotEmpty) {
+    body['insurance'] = insurance;
+  }
+  if (maxPrice != null) {
+    body['rental_price'] = maxPrice;
+  }
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(body),
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      if (responseData.containsKey('gear') && responseData['gear'] is List) {
+        return responseData['gear'];
+      } else {
+        return [];
+      }
+    } else {
+      print('Error: ${response.body}');
+      return [];
+    }
+  } catch (error) {
+    print('Error: $error');
+    return [];
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
+   List<dynamic> displayMotorcycles;
+
     return Column(
       children: [
         const SizedBox(height: 16),
+
         // Filter and Sort Buttons Row
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton.icon(
               icon: const Icon(Icons.filter_list),
@@ -272,44 +712,169 @@ class MotorcycleTab extends StatelessWidget {
                 'Sort',
               ),
               onPressed: () {
-                // TODO: Add sort functionality
-                _showSortDialog(context);
+                  _showSortDialog(context);
               },
             ),
           ],
         ),
         const SizedBox(height: 16),
-        // Motorcycle List
+
         Expanded(
-          child: ListView(
-            scrollDirection: Axis.vertical,
-            children: const [
-              MotorcycleCard(
-                imagePath: 'lib/images/motorcycle/ninja_zx4r.png',
-                isFavorite: true,
-                model: 'Kawasaki Ninja ZX-4R',
-                rentalPrice: 150,
-              ),
-              MotorcycleCard(
-                imagePath: 'lib/images/motorcycle/scooter.png',
-                isFavorite: false,
-                model: 'Velocifero TENNIS 4000W',
-                rentalPrice: 120,
-              ),
-              MotorcycleCard(
-                imagePath: 'lib/images/motorcycle/dirtbike.png',
-                isFavorite: false,
-                model: 'Honda CRF250R',
-                rentalPrice: 200,
-              ),
-            ],
+          child: Builder(
+            builder: (context) {
+              if (_filteredMotorcycles.isNotEmpty) {
+
+                // SHOW FILTERED MOTORCYCLES
+                print("Displaying filtered motorcycles");
+                return ListView.builder(
+                  itemCount: _filteredMotorcycles.length,
+                  itemBuilder: (context, index) {
+                    final motorcycle = _filteredMotorcycles[index];
+
+                    return ListTile(
+                       title: Text(motorcycle['Model'] ?? 'Unknown Model'),
+                            subtitle: Text("Rental Price: \$${motorcycle['Rental_Price']}"),
+                            trailing: const Icon(Icons.motorcycle),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MotorcycleDetailPage(
+                                    profileId: widget.profileId, 
+                                    motorcycleData: motorcycle, // GRRRAHHHHH??!?@?#?!@?
+                                    ),
+                                  ),
+                              );
+                            }
+                    );
+                  },
+                );
+              } else if (filterApplied) {
+                // If a filter was applied and no motorcycles match, show a message
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Text(
+                      "No vehicles available. Please select other filter option(s).",
+                      style: TextStyle(fontSize: 14),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                );
+              } else {
+                // Use FutureBuilder only for the initial fetch
+                return FutureBuilder<List<dynamic>>(
+                  future: motorcyclesFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text("Error: ${snapshot.error}"));
+                    } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                      print("Displaying original motorcycles list");
+                      final vehicles = snapshot.data!;
+
+                      return ListView.builder(
+                        itemCount: vehicles.length,
+                        itemBuilder: (context, index) {
+                          final motorcycle = vehicles[index];
+
+                          return ListTile(
+                            title: Text(motorcycle['Model'] ?? 'Unknown Model'),
+                            subtitle: Text("Rental Price: \$${motorcycle['Rental_Price']}"),
+                            trailing: const Icon(Icons.motorcycle),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MotorcycleDetailPage(
+                                    profileId: widget.profileId, 
+                                    motorcycleData: motorcycle, // GRRRAHHHHH??!?@?#?!@?
+                                    ),
+                                  ),
+                              );
+                            }
+                          );
+                        },
+                      );
+                    } else {
+                      return const Center(child: Text("No vehicles available."));
+                    }
+                  },
+                );
+              }
+            },
           ),
         ),
       ],
-    );
-  }
-}
+    );}
+  } 
+     /*   Expanded (
+          child: FutureBuilder<List<dynamic>>(
+          future: motorcyclesFuture, // The original list is fetched here.
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text("Error: ${snapshot.error}"));
+            } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+              final vehicles = snapshot.data!;
 
+              if (_filteredMotorcycles.isNotEmpty && filterApplied) {
+                // If there are filtered motorcycles, show them
+                displayMotorcycles = _filteredMotorcycles;
+                print("display");
+
+              } else if (filterApplied) {
+                // If a filter was applied and no motorcycles match, show a "No vehicles available" message
+                return const Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0), 
+                    child: Text(
+                      "No vehicles available. Please select other filter option(s).",
+                      style: TextStyle(fontSize: 14), 
+                      textAlign: TextAlign.center,   
+                    ),
+                  ),
+                );
+              } else {
+                // If no filter is applied, show the original list
+                displayMotorcycles = vehicles;
+                print("HERE");
+              }
+
+              return ListView.builder(
+                itemCount: vehicles.length,
+                itemBuilder: (context, index) {
+                  final vehicle = vehicles[index];
+
+                  return ListTile(
+                    title: Text(vehicle['Model'] ?? 'Unknown Model'),
+                    subtitle: Text("Rental Price: \$${vehicle['Rental_Price']}"),
+                    trailing: const Icon(Icons.motorcycle),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MotorcycleDetailPage(
+                            profileId: widget.profileId,
+                            motorcycleData: vehicle,
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              );
+            } else {
+              return const Center(child: Text("No motorcycles found."));
+            }
+          },
+        ),
+      ), */
+
+// Motorcycle card - not using
+/*
 class MotorcycleCard extends StatefulWidget {
   final String model;
   final double rentalPrice;
@@ -338,9 +903,13 @@ class _MotorcycleCardState extends State<MotorcycleCard> {
           context,
           MaterialPageRoute(
             builder: (context) => MotorcycleDetailPage(
-              model: widget.model, // Pass the model to the detail page
-              rentalPrice: widget.rentalPrice, // Pass rental price
-              imagePath: widget.imagePath, // Pass image path
+              profileId: widget.profileId,
+              motorcycleData: {
+                'model': widget.model, // Pass the model to the detail page
+                'rentalPrice': widget.rentalPrice, // Pass rental price
+                'imagePath': widget.imagePath, // Pass image path
+              },
+             
             ),
           ),
         );
@@ -479,4 +1048,4 @@ class _RentedMotorcycleCardState extends State<RentedMotorcycleCard> {
       ),
     );
   }
-}
+} */
