@@ -81,8 +81,9 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Motorcycle successfully rented for $rentalPeriod'),
-            duration: const Duration(seconds: 3),
+            content: Text(
+                'Motorcycle Request sent to Seller for Approval During This Period: $rentalPeriod'),
+            duration: const Duration(seconds: 5),
           ),
         );
         Navigator.pop(context);
@@ -105,8 +106,8 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
     final String model = widget.motorcycleData['Model'] ?? 'Unknown Model';
     final double rentalPrice =
         (widget.motorcycleData['Rental_Price'] as num?)?.toDouble() ?? 0.0;
-    final String imagePath =
-        widget.motorcycleData['Image_Path'] ?? 'lib/images/motorcycle/default_motorcycle.png';
+    final String imagePath = widget.motorcycleData['Image_Path'] ??
+        'lib/images/motorcycle/default_motorcycle.png';
     final String vin = (widget.motorcycleData['VIN']);
     return Scaffold(
       backgroundColor: Colors.white,
@@ -167,7 +168,11 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
                 const SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => DisplayMaintenanceRecordsPage(vin: vin)));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                DisplayMaintenanceRecordsPage(vin: vin)));
                   },
                   child: const Text('View Maintenance Records'),
                 ),

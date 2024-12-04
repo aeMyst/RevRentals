@@ -7,6 +7,7 @@ import 'package:revrentals/user/item_details/motorcycle/motorcycle.dart';
 import 'package:revrentals/user/item_details/lot/lot.dart';
 import 'package:revrentals/services/listing_service.dart'; // Import ListingService
 
+
 class MarketplacePage extends StatefulWidget {
   final int profileId;
   final Map<String, dynamic>? userData;
@@ -51,7 +52,9 @@ class _MarketplacePageState extends State<MarketplacePage> {
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => const NotificationsPage()),
+                  builder: (context) => NotificationsPage(
+                    profileId: widget.profileId,  // pass the profileId to the notifications page
+                  )),
             ),
           ),
           actions: [
@@ -64,7 +67,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => DisplayProfileDetailsPage(
+                  builder: (context) =>   DisplayProfileDetailsPage(
                     userData: widget.userData, // Pass from UserHomePage
                   ),
                 ),
