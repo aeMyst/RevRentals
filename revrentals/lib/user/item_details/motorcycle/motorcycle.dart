@@ -38,7 +38,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   }
 
 
-  void _applySort(String selectedSortOption) {
+void _applySort(String selectedSortOption) {
   motorcyclesFuture.then((motorcycles) {
     switch (selectedSortOption) {
       case 'Price: Low to High':
@@ -61,13 +61,87 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   });
 }
 
+void _applySortTEST({
+    required BuildContext context,
+    String? selectedVehicle,
+    String? selectedColor,
+    String? selectedPriceRange,
+    String? selectedMileage,
+    String? selectedInsurance,
+  }) async {
+    // If no filters are selected, reset to the original list (motorcyclesFuture)
+    if (selectedVehicle == "All" && selectedColor == "Any" &&
+    selectedPriceRange == "Any" &&
+    selectedMileage == "Any" &&
+    selectedInsurance == "Any") {
+    try {
+      final motorcycles = await motorcyclesFuture;
+      setState(() {
+        _filteredMotorcycles = motorcycles;
+      });
+    } catch (error) {
+      print("Error resolving motorcyclesFuture: $error");
+    }
+  } else{
+      // Initialize an empty list to collect filtered motorcycles
+      List<dynamic> filteredList = [];
+
+      // Apply vehicle filter
+      if (selectedVehicle != null && selectedVehicle != "Any") {
+        final vehicleFilteredList = await _applyVehicleFilter(selectedVehicle);
+        filteredList.addAll(vehicleFilteredList);
+      }
+
+      // Apply color filter
+      if (selectedColor != null && selectedColor != "Any") {
+        final colorFilteredList = await _applyColorFilter(selectedColor);
+        filteredList.addAll(colorFilteredList);
+      }
+
+      // Apply price range filter
+      if (selectedPriceRange != null && selectedPriceRange != "Any") {
+        // Extract the numeric value from the selected price range
+        final numericPrice = int.parse(
+          selectedPriceRange.replaceAll(RegExp(r'[^0-9]'), '')
+        );
+
+        // Call the filter function with the numeric price
+        final priceFilteredList = await _applyPriceFilter(numericPrice);
+        filteredList.addAll(priceFilteredList);
+      }
+
+      // Apply mileage filter
+      if (selectedMileage != null && selectedMileage != "Any") {
+        final mileageFilteredList = await _applyMileageFilter(selectedMileage);
+        filteredList.addAll(mileageFilteredList);
+      }
+
+      // Apply insurance filter
+      if (selectedInsurance != null && selectedInsurance != "Any") {
+        final insuranceFilteredList = await _applyInsuranceFilter(selectedInsurance);
+        filteredList.addAll(insuranceFilteredList);
+      }
+
+      // Update state with the filtered list or reset if no results
+      if (filteredList.isNotEmpty) {
+        setState(() {
+          _filteredMotorcycles = filteredList;
+        });
+      } else {
+        setState(() {
+          _filteredMotorcycles = [];
+        });
+      }
+    }
+  }
+
   void _showSortDialog(BuildContext context) {
     String selectedSortOption = 'None';
     final List<String> sortOptions = [
       'None',
       'Price: Low to High',
       'Price: High to Low',
-      'Newest First'
+      //'Newest First'
     ];
 
     showDialog(
@@ -120,6 +194,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     );
   }
 
+  
   void _showFilterDialog(BuildContext context) {
   String selectedVehicle = 'All';
   String selectedPriceRange = 'Any';
@@ -132,7 +207,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
 
   final List<String> vehicleType = [
     'All',
-    'Motorcycles',
+    'Motorcycle',
     'Dirtbike',
     'Moped'
   ];
@@ -219,7 +294,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                 const SizedBox(height: 16),
 
                 // Conditional dropdown for engine type when Motorcycles is selected
-                if (selectedVehicle == 'Motorcycles') ...[
+                if (selectedVehicle == 'Motorcycle') ...[
                   DropdownButtonFormField<String> (
                     value: selectedEngineType,
                     decoration: const InputDecoration (
@@ -269,7 +344,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                   DropdownButtonFormField<String> (
                     value: selectedDirtbikeType,
                     decoration: const InputDecoration (
-                      labelText: 'Dirtbike type',
+                      labelText: 'Dirtbike Type',
                       border: OutlineInputBorder(),
                     ),
                     items: dirtbikeType.map((String dBikeType) {
@@ -500,7 +575,6 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     }
   }
 
-
   Future<List<dynamic>> _applyColorFilter(String selectedColor) async {
     final url = Uri.parse('http://10.0.2.2:8000/filter-by-color/');
     final body = {'color': selectedColor};
@@ -608,34 +682,6 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     return Column(
       children: [
         const SizedBox(height: 16),
-        // Search bar
-        /* Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: TextField(
-          decoration: InputDecoration(
-            hintText: 'Search Motorcycles...',
-            prefixIcon: const Icon(Icons.search),
-
-            // need to keep all three of these so it stays rounded 
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0),  
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0),  
-              borderSide: const BorderSide(color: Colors.grey), 
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0),  
-              borderSide: const BorderSide(color: Colors.grey), 
-            ),
-          ),
-          onChanged: (query) {
-            setState(() {
-              _searchQuery = query;
-            });
-          }, 
-        ),
-      ), */
         const SizedBox(height: 16),
 
         // Filter and Sort Buttons Row
