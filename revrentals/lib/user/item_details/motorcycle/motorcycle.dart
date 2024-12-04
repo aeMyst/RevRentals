@@ -428,10 +428,10 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   } else {
       // Initialize an empty list to collect filtered motorcycles
       List<dynamic> filteredList = [];
+      final Set<String> uniqueVINs = {}; // prevent duplications
 
       // MULTIPLE FILTERING
-  /*    if (!filterApplied && 
-        selectedVehicle != "All" ||
+      if (selectedVehicle != "All" ||
         selectedColor != "Any" ||
         selectedPriceRange != "Any" ||
         selectedMileage != "Any" ||
@@ -448,24 +448,35 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
           maxPrice: numericPrice?.toDouble(),
         );
 
-        if (multipleFilterResults.isNotEmpty) {
-          filteredList.addAll(multipleFilterResults);
-          //filterApplied = true;
+        for (var item in multipleFilterResults) {
+          if (!uniqueVINs.contains(item['VIN'])) {
+            uniqueVINs.add(item['VIN']);
+            filteredList.add(item);
+          }
         }
-        print(filterApplied);
-      } */
+      }
 
       // Apply vehicle filter
       if (selectedVehicle != null && selectedVehicle != "Any") {
         final vehicleFilteredList = await _applyVehicleFilter(selectedVehicle);
-        filteredList.addAll(vehicleFilteredList);
+        for (var item in vehicleFilteredList) {
+        if (!uniqueVINs.contains(item['VIN'])) {
+          uniqueVINs.add(item['VIN']);
+          filteredList.add(item);
+        }
       }
+    }
 
       // Apply color filter
       if (selectedColor != null && selectedColor != "Any") {
         final colorFilteredList = await _applyColorFilter(selectedColor);
-        filteredList.addAll(colorFilteredList);
+        for (var item in colorFilteredList) {
+        if (!uniqueVINs.contains(item['VIN'])) {
+          uniqueVINs.add(item['VIN']);
+          filteredList.add(item);
+        }
       }
+    }
 
       // Apply price range filter
       if (selectedPriceRange != null && selectedPriceRange != "Any") {
@@ -476,20 +487,35 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
 
         // Call the filter function with the numeric price
         final priceFilteredList = await _applyPriceFilter(numericPrice);
-        filteredList.addAll(priceFilteredList);
+        for (var item in priceFilteredList) {
+        if (!uniqueVINs.contains(item['VIN'])) {
+          uniqueVINs.add(item['VIN']);
+          filteredList.add(item);
+        }
       }
+    }
 
       // Apply mileage filter
       if (selectedMileage != null && selectedMileage != "Any") {
         final mileageFilteredList = await _applyMileageFilter(selectedMileage);
-        filteredList.addAll(mileageFilteredList);
+        for (var item in mileageFilteredList) {
+        if (!uniqueVINs.contains(item['VIN'])) {
+          uniqueVINs.add(item['VIN']);
+          filteredList.add(item);
+        }
       }
+    }
 
       // Apply insurance filter
       if (selectedInsurance != null && selectedInsurance != "Any") {
         final insuranceFilteredList = await _applyInsuranceFilter(selectedInsurance);
-        filteredList.addAll(insuranceFilteredList);
-      } 
+        for (var item in insuranceFilteredList) {
+        if (!uniqueVINs.contains(item['VIN'])) {
+          uniqueVINs.add(item['VIN']);
+          filteredList.add(item);
+        }
+      }
+    }
 
       // Update state with the filtered list or reset if no results
       if (filteredList.isNotEmpty) {
