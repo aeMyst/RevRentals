@@ -678,10 +678,6 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
             } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
               final vehicles = snapshot.data!;
 
-              // If there are no filtered motorcycles, show the original list
-             /* final displayMotorcycles = _filteredMotorcycles.isNotEmpty
-                  ? _filteredMotorcycles
-                  : vehicles; // Use the filtered list if available, otherwise the original list */
 
               if (_filteredMotorcycles.isNotEmpty) {
                 // If there are filtered motorcycles, show them
@@ -702,77 +698,6 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                 // If no filter is applied, show the original list
                 displayMotorcycles = vehicles;
               }
-
-
-/*
-                return displayMotorcycles.isEmpty
-                    ? const Center(
-                        child: Text(
-                          "No vehicles available. Please select other filter option(s).",
-                          style: TextStyle(fontSize: 14),
-                        ),
-                      )
-                    : ListView.builder(
-                        itemCount: displayMotorcycles.length,
-                        itemBuilder: (context, index) {
-                          final vehicle = displayMotorcycles[index];
-                          return ListTile(
-                            title: Text(vehicle['Model'] ?? 'Unknown Model'),
-                            subtitle:
-                                Text("Rental Price: \$${vehicle['Rental_Price']}"),
-                            trailing: const Icon(Icons.motorcycle),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => MotorcycleDetailPage(
-                                    profileId: widget.profileId,
-                                    motorcycleData: vehicle,
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      );
-              } else {
-                return const Center(child: Text("No vehicles available."));
-              }
-            },
-          ),
-        ),
-      ],
-    );
-  }
-}*/
-            
-           /*   if (_filteredMotorcycles.isEmpty && _filtersApplied()) {
-                // Show "No vehicles available" if filters are applied but return no results
-                return const Center(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 15),
-                    child: Text(
-                      "No vehicles available. Please select other filter option(s).",
-                      style: TextStyle(fontSize: 14),
-                    ),
-                  ),
-                );
-              } */
-
-              // for filtering - if there is no result
-            /*  if (_filteredMotorcycles.isEmpty) {
-                return const Center(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 15.0), // Add 15 padding to both sides
-                    child: Text(
-                      "No vehicles available. Please select other filter option(s).",
-                      style: TextStyle(fontSize: 14),
-                      textAlign: TextAlign.center, // Optional: Center-align the text
-                    ),
-                  ),
-                );
-              } */
-
 
               return ListView.builder(
                 itemCount: vehicles.length,
@@ -807,7 +732,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   );}
 } 
 
-// Motorcycle card
+// Motorcycle card - not using
 /*
 class MotorcycleCard extends StatefulWidget {
   final String model;
