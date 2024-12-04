@@ -491,7 +491,7 @@ class _GearTabState extends State<GearTab> {
   }
 }
 
-  Future<List<dynamic>> _applyMultipleFilters({
+  /* Future<List<dynamic>> _applyMultipleFilters({
   String? brand,
   String? material,
   String? gearType,
@@ -540,7 +540,7 @@ class _GearTabState extends State<GearTab> {
     print('Error: $error');
     return [];
   }
-}
+} */
 
 
 
