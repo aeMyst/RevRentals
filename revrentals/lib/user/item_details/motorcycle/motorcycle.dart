@@ -3,8 +3,6 @@ import 'package:revrentals/user/item_details/motorcycle/motorcycle_details.dart'
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-
-
 // Widget to display motorcycles in each tab
 class MotorcycleTab extends StatefulWidget {
   final int profileId;
@@ -104,7 +102,6 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    // Handle the sort logic here
                     print('Sort Option: $selectedSortOption');
 
                     _applySort(selectedSortOption);
@@ -433,6 +430,28 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
       // Initialize an empty list to collect filtered motorcycles
       List<dynamic> filteredList = [];
 
+      // MULTIPLE FILTERING
+      
+      if (selectedVehicle != "All" ||
+        selectedColor != "Any" ||
+        selectedPriceRange != "Any" ||
+        selectedMileage != "Any" ||
+        selectedInsurance != "Any") {
+        final numericPrice = (selectedPriceRange != null && selectedPriceRange != "Any")
+            ? int.tryParse(selectedPriceRange.replaceAll(RegExp(r'[^0-9]'), ''))
+            : null;
+
+        final multipleFilterResults = await _applyMultipleFilters(
+          color: selectedColor != "Any" ? selectedColor : null,
+          mileage: selectedMileage != "Any" ? selectedMileage : null,
+          insurance: selectedInsurance != "Any" ? selectedInsurance : null,
+          vehicle: selectedVehicle != "All" ? selectedVehicle : null,
+          maxPrice: numericPrice?.toDouble(),
+        );
+
+        filteredList.addAll(multipleFilterResults);
+      }
+
       // Apply vehicle filter
       if (selectedVehicle != null && selectedVehicle != "Any") {
         final vehicleFilteredList = await _applyVehicleFilter(selectedVehicle);
@@ -613,6 +632,57 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     return [];
   }
 }
+
+  Future<List<dynamic>> _applyMultipleFilters({
+  String? vehicle,
+  String? color,
+  String? mileage,
+  String? insurance,
+  double? maxPrice,
+}) async {
+  final url = Uri.parse('http://10.0.2.2:8000/filter_by_multiple_conditions/');
+  
+  final body = <String, dynamic>{};
+  if (vehicle != null && vehicle.isNotEmpty) {
+    body['vehicle'] = vehicle;
+  }
+  if (color != null && color.isNotEmpty) {
+    body['color'] = color;
+  }
+  if (mileage != null && mileage.isNotEmpty) {
+    body['mileage'] = mileage;
+  }
+  if (insurance != null && insurance.isNotEmpty) {
+    body['insurance'] = insurance;
+  }
+  if (maxPrice != null) {
+    body['rental_price'] = maxPrice;
+  }
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(body),
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      if (responseData.containsKey('gear') && responseData['gear'] is List) {
+        return responseData['gear'];
+      } else {
+        return [];
+      }
+    } else {
+      print('Error: ${response.body}');
+      return [];
+    }
+  } catch (error) {
+    print('Error: $error');
+    return [];
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {

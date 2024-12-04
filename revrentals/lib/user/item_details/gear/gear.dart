@@ -257,6 +257,26 @@ class _GearTabState extends State<GearTab> {
     } else {
       List<dynamic> filteredGearList = [];
 
+      if (selectedGear != "All" ||
+        selectedSize != "Any" ||
+        selectedPriceRange != "Any" ||
+        selectedMaterial != "Any" ||
+        selectedBrand != "Any") {
+        final numericPrice = (selectedPriceRange != null && selectedPriceRange != "Any")
+            ? int.tryParse(selectedPriceRange.replaceAll(RegExp(r'[^0-9]'), ''))
+            : null;
+
+      final multipleFilterResults = await _applyMultipleFilters(
+        brand: selectedBrand != "Any" ? selectedBrand : null,
+        material: selectedMaterial != "Any" ? selectedMaterial : null,
+        gearType: selectedGear != "All" ? selectedGear : null,
+        size: selectedSize != "Any" ? selectedSize : null,
+        maxPrice: numericPrice?.toDouble(),
+      );
+
+      filteredGearList.addAll(multipleFilterResults);
+      }
+
        // Apply gear filter
       if (selectedGear != null && selectedGear != "All") {
         final gearFilteredList = await _applyGearFilter(selectedGear);
@@ -436,6 +456,59 @@ class _GearTabState extends State<GearTab> {
     return [];
   }
 }
+
+  Future<List<dynamic>> _applyMultipleFilters({
+  String? brand,
+  String? material,
+  String? gearType,
+  String? size,
+  double? maxPrice,
+}) async {
+  final url = Uri.parse('http://10.0.2.2:8000/filter-gear-by-multiple-conditions/');
+  
+  // Build the body dynamically
+  final body = <String, dynamic>{};
+  if (brand != null && brand.isNotEmpty) {
+    body['brand'] = brand;
+  }
+  if (material != null && material.isNotEmpty) {
+    body['material'] = material;
+  }
+  if (gearType != null && gearType.isNotEmpty) {
+    body['type'] = gearType;
+  }
+  if (size != null && size.isNotEmpty) {
+    body['size'] = size;
+  }
+  if (maxPrice != null) {
+    body['grental_price'] = maxPrice;
+  }
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(body),
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      if (responseData.containsKey('gear') && responseData['gear'] is List) {
+        return responseData['gear'];
+      } else {
+        return [];
+      }
+    } else {
+      print('Error: ${response.body}');
+      return [];
+    }
+  } catch (error) {
+    print('Error: $error');
+    return [];
+  }
+}
+
+
 
   void _applySortGear(String selectedSortOption) {
     gearFuture.then((gear) {
