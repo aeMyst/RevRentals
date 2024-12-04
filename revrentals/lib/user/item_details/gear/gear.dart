@@ -229,6 +229,7 @@ class _GearTabState extends State<GearTab> {
       },
     );
   }
+
   
   void _applyGearPageFilter(
     {required BuildContext context,
@@ -360,7 +361,7 @@ class _GearTabState extends State<GearTab> {
       }
     }
   }
-
+ 
   Future<List<dynamic>> _applyGearFilter(String selectedGear) async {
     final url = Uri.parse('http://10.0.2.2:8000/filter-by-gear/');
     final body = {'type': selectedGear};
@@ -491,7 +492,7 @@ class _GearTabState extends State<GearTab> {
   }
 }
 
-  /* Future<List<dynamic>> _applyMultipleFilters({
+  Future<List<dynamic>> _applyMultipleFilters({
   String? brand,
   String? material,
   String? gearType,
@@ -540,7 +541,7 @@ class _GearTabState extends State<GearTab> {
     print('Error: $error');
     return [];
   }
-} */
+} 
 
 
 

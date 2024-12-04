@@ -164,9 +164,9 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   ];
   final List<String> mileageOptions = [
     'Any',
-    'Under 10,000 km',
-    'Under 50,000 km',
-    'Under 100,000 km'
+    'Under 10000',
+    'Under 50000',
+    'Under 100000'
   ];
   final List<String> engineTypes = [
     'Any',
@@ -396,7 +396,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   );
 }
 
-  void _applyFilter({
+ void _applyFilter({
     required BuildContext context,
     String? selectedVehicle,
     String? selectedColor,
@@ -497,8 +497,13 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
 
       // Apply mileage filter
       if (selectedMileage != null && selectedMileage != "Any") {
-        final mileageFilteredList = await _applyMileageFilter(selectedMileage);
-        for (var item in mileageFilteredList) {
+      final numericMileage = int.parse(
+          selectedMileage.replaceAll(RegExp(r'[^0-9]'), '')
+      );
+
+      // Call the filter function with the numeric price
+      final mileageFilteredList = await _applyPriceFilter(numericMileage);
+      for (var item in mileageFilteredList) {
         if (!uniqueVINs.contains(item['VIN'])) {
           uniqueVINs.add(item['VIN']);
           filteredList.add(item);
@@ -531,6 +536,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
       }
     }
   }
+
 
   Future<List<dynamic>> _applyVehicleFilter(String selectedVehicle) async {
     final url = Uri.parse('http://10.0.2.2:8000/filter-by-vehicle/');
@@ -606,7 +612,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   }
 }
 
-  Future<List<dynamic>> _applyMileageFilter(String selectedMileage) async {
+  Future<List<dynamic>> _applyMileageFilter(int selectedMileage) async {
   final url = Uri.parse('http://10.0.2.2:8000/filter-by-mileage/');
   final body = {'mileage': selectedMileage};
 
@@ -662,7 +668,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   }
 }
 
-/*  Future<List<dynamic>> _applyMultipleFilters({
+Future<List<dynamic>> _applyMultipleFilters({
   String? vehicle,
   String? color,
   String? mileage,
@@ -710,7 +716,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     print('Error: $error');
     return [];
   }
-} */
+} 
 
 
   @override
