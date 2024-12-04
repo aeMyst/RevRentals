@@ -403,6 +403,9 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     String? selectedPriceRange,
     String? selectedMileage,
     String? selectedInsurance,
+    String? selectedCargoRacks,
+    String? selectedEngine,
+    String? selectedDirtbikeType,
 
   }) async {
     // tracker
@@ -449,28 +452,50 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
         if (selectedVehicle != "All" ||
           selectedColor != "Any" ||
           selectedPriceRange != "Any" ||
-          selectedMileage != "Any" ||
-          selectedInsurance != "Any") {
+          selectedInsurance != "Any" ||
+          selectedCargoRacks != "Any" ||
+          selectedEngine != "Any" ||
+          selectedDirtbikeType != "Any"
+          ) {
           final numericPrice = (selectedPriceRange != null && selectedPriceRange != "Any")
               ? int.tryParse(selectedPriceRange.replaceAll(RegExp(r'[^0-9]'), ''))
               : null;
+          final numericMileage = (selectedMileage != null && selectedMileage != "Any")
+              ? int.tryParse(selectedMileage.replaceAll(RegExp(r'[^0-9]'), ''))
+              : null;
 
           final multipleFilterResults = await _applyMultipleFilters(
-            color: selectedColor != "Any" ? selectedColor : null,
-            mileage: selectedMileage != "Any" ? selectedMileage : null,
-            insurance: selectedInsurance != "Any" ? selectedInsurance : null,
-            vehicle: selectedVehicle != "All" ? selectedVehicle : null,
+            vehicle: selectedVehicle,
+            color: selectedColor,
+            insurance: selectedInsurance,
+            mileage: numericMileage,
             maxPrice: numericPrice?.toDouble(),
+            engineType: selectedEngine,
+            cargoRacks: selectedCargoRacks,
+            dirtbikeType: selectedDirtbikeType,
           );
 
+          print("Checkpoint 1");
+
+          print("multipleFilterResults type: ${multipleFilterResults.runtimeType}");
+          print("multipleFilterResults length: ${multipleFilterResults.length}");
+          print("Multiple filter results: $multipleFilterResults");
+
+
           for (var item in multipleFilterResults) {
+            print("Inside for loop");
             if (!uniqueVINs.contains(item['VIN'])) {
               uniqueVINs.add(item['VIN']);
               filteredList.add(item);
+              print("GREEN ADDED");
             }
           }
+
+          _filteredMotorcycles = filteredList;
         }
         print("More than one filter used");
+
+
       } else {
         // Apply vehicle filter
         if (selectedVehicle != null && selectedVehicle != "Any") {
@@ -518,7 +543,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
         );
 
         // Call the filter function with the numeric price
-        final mileageFilteredList = await _applyPriceFilter(numericMileage);
+        final mileageFilteredList = await _applyMileageFilter(numericMileage);
         for (var item in mileageFilteredList) {
           if (!uniqueVINs.contains(item['VIN'])) {
             uniqueVINs.add(item['VIN']);
@@ -688,28 +713,43 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
 Future<List<dynamic>> _applyMultipleFilters({
   String? vehicle,
   String? color,
-  String? mileage,
   String? insurance,
+  int? mileage,
   double? maxPrice,
+  String? engineType,
+  String? cargoRacks,
+  String? dirtbikeType,
+  
 }) async {
-  final url = Uri.parse('http://10.0.2.2:8000/filter_by_multiple_conditions/');
+  final url = Uri.parse('http://10.0.2.2:8000/filter-by-multiple-conditions/');
   
   final body = <String, dynamic>{};
+
   if (vehicle != null && vehicle.isNotEmpty) {
-    body['vehicle'] = vehicle;
+    body['vehicle_type'] = vehicle;
   }
   if (color != null && color.isNotEmpty) {
     body['color'] = color;
   }
-  if (mileage != null && mileage.isNotEmpty) {
-    body['mileage'] = mileage;
-  }
   if (insurance != null && insurance.isNotEmpty) {
     body['insurance'] = insurance;
+  }
+  if (mileage != null) {
+    body['mileage'] = mileage;
   }
   if (maxPrice != null) {
     body['rental_price'] = maxPrice;
   }
+  if (engineType != null && engineType.isNotEmpty) {
+    body['engine_type'] = engineType;
+  }
+  if (cargoRacks != null && cargoRacks.isNotEmpty) {
+    body['cargo_rack'] = cargoRacks;
+  }
+  if (dirtbikeType != null && dirtbikeType.isNotEmpty) {
+    body['dirt_bike_type'] = dirtbikeType;
+  }
+
 
   try {
     final response = await http.post(
