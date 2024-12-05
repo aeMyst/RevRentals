@@ -274,9 +274,9 @@ class _GearTabState extends State<GearTab> {
       final Set<int> uniqueProductNo = {}; // prevents duplications, tracks unique IDs
 
       if (multipleFiltersUsed) {
-      print("Multiple filtering in progress....");
+        print("Multiple filtering in progress....");
 
-      // multiple filtering
+        // multiple filtering
         if (selectedGear != "All" ||
           selectedSize != "Any" ||
           selectedPriceRange != "Any" ||
@@ -294,6 +294,10 @@ class _GearTabState extends State<GearTab> {
           size: selectedSize,
           maxPrice: numericPrice?.toDouble(),
         );
+        print("multipleFilterResults type: ${multipleFilterResults.runtimeType}");
+        print("multipleFilterResults length: ${multipleFilterResults.length}");
+        print("Multiple filter results: $multipleFilterResults");
+        print("_filteredMotorcycles + $_filteredGear");
 
         for (var item in multipleFilterResults) {
             if (!uniqueProductNo.contains(item['Product_No'])) {
@@ -307,6 +311,9 @@ class _GearTabState extends State<GearTab> {
         } 
 
       print("More than one filter used");
+      setState (() {
+          _filteredGear = filteredGearList;
+        });
 
       } else {
       // Apply gear filter
