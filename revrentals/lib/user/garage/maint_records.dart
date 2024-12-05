@@ -8,7 +8,8 @@ import 'package:revrentals/user/user_home.dart'; // For formatting dates
 class MaintenanceRecordsPage extends StatefulWidget {
   final String vin;
   final int profileId;
-  MaintenanceRecordsPage({super.key, required this.vin, required this.profileId});
+  final garageId;
+  MaintenanceRecordsPage({super.key, required this.vin, required this.profileId, required this.garageId});
 
   @override
   State<MaintenanceRecordsPage> createState() => _MaintenanceRecordsPageState();
@@ -57,7 +58,8 @@ class _MaintenanceRecordsPageState extends State<MaintenanceRecordsPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _saveRecords(context);
-          Navigator.push(context, MaterialPageRoute(builder: (context)=> UserHomePage()));
+
+          Navigator.push(context, MaterialPageRoute(builder: (context)=> GaragePage(profileId: widget.profileId)));
         },
         child: const Icon(Icons.save),
       ),
