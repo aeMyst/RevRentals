@@ -34,11 +34,15 @@ class _AddListingPageState extends State<AddListingPage> {
   String? selectedMotorcycleType = 'Motorcycle';
   String? selectedGearType = 'Helmet';
   String? selectedInsuranceType = 'Basic';
-  String vehicleAttributeLabel = 'Engine Type';
+  //String vehicleAttributeLabel = 'Engine Type';
   String? selectedColor = 'Other';
   String? selectedSize = 'Any';
   String? selectedBrand = 'Any';
   String? selectedMaterial = 'Any';
+
+  String? selectedSpecificAttribute;
+  String? vehicleAttributeLabel = 'Vehicle Type First';
+  List<String> specificAttributeOptions = [];
 
   Future<void> _addListing() async {
     try {
@@ -176,19 +180,59 @@ class _AddListingPageState extends State<AddListingPage> {
                 onChanged: (value) {
                   setState(() {
                     selectedMotorcycleType = value;
-                    vehicleAttributeLabel = value == 'Motorcycle'
+                    /*vehicleAttributeLabel = value == 'Motorcycle'
                         ? 'Engine Type'
                         : value == 'Moped'
                             ? 'Cargo Rack'
-                            : 'Terrain Type';
+                            : 'Terrain Type';*/
+                            
+                    if (value == 'Motorcycle') {
+                      vehicleAttributeLabel = 'Engine Type';
+                      specificAttributeOptions = ['V-Twin', 'Inline-4', 'Single Cylinder'];
+                    } else if (value == 'Moped') {
+                      vehicleAttributeLabel = '# of Cargo Racks';
+                      specificAttributeOptions = ['1', '2'];
+                    } else if (value == 'Dirtbike') {
+                      vehicleAttributeLabel = 'Dirtbike Type';
+                      specificAttributeOptions = ['Off-Road', 'Trail', 'Motocross'];
+                    } else {
+                      specificAttributeOptions = [];
+                      vehicleAttributeLabel = null;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Please select a valid option!'),
+                        ),
+                      );
+                    }
+                    selectedSpecificAttribute = null;
                   });
                 },
               ),
-              const SizedBox(height: 16),
-              TextField(
+
+             /* TextField(
                 controller: specificAttributeController,
                 decoration: InputDecoration(labelText: vehicleAttributeLabel),
+              ),*/
+
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: selectedSpecificAttribute,
+                decoration: InputDecoration(
+                  labelText: 'Select ${vehicleAttributeLabel}'
+                ),
+                items: specificAttributeOptions
+                    .map((attribute) => DropdownMenuItem(
+                          value: attribute,
+                          child: Text(attribute),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    selectedSpecificAttribute = value;
+                  });
+                },
               ),
+
               const SizedBox(height: 16),
               TextField(
                 controller: vinController,
