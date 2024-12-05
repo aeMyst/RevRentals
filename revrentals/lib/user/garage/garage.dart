@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:revrentals/main_pages/auth_page.dart';
 import 'package:revrentals/user/garage/add_listing.dart';
+import 'package:revrentals/user/garage/maint_records.dart';
 import 'package:revrentals/user/notifications/notifications.dart';
 import 'package:revrentals/user/profile_detail.dart';
 import 'package:revrentals/services/listing_service.dart';
@@ -70,8 +71,8 @@ class _GaragePageState extends State<GaragePage> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => NotificationsPage(
-                          profileId: widget.profileId,
-                        )),
+                              profileId: widget.profileId,
+                            )),
                   ),
                 ),
                 actions: [
@@ -114,6 +115,7 @@ class _GaragePageState extends State<GaragePage> {
                           garageItemsFuture: _garageItemsFuture,
                           profileId: widget.profileId, // Pass profileId here
                         ),
+                        // TODO: Update to display rented items
                         const RentedTab(), // No changes needed
                       ],
                     ),
@@ -174,7 +176,10 @@ class _ListedTabState extends State<ListedTab> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => GarageVehiclePage()),
+                                builder: (context) => GarageVehiclePage(
+                                    vehicleData: vehicle,
+                                    // vin: vehicle['VIN'],
+                                    profileId: widget.profileId)),
                           );
                         },
                       )),
@@ -226,13 +231,33 @@ class _ListedTabState extends State<ListedTab> {
 }
 
 class GarageVehiclePage extends StatefulWidget {
-  const GarageVehiclePage({super.key});
+  final Map<String, dynamic>? vehicleData;
+  final int profileId;
+  const GarageVehiclePage(
+      {super.key, required this.vehicleData, required this.profileId});
 
   @override
   State<GarageVehiclePage> createState() => _GarageVehiclePageState();
 }
 
 class _GarageVehiclePageState extends State<GarageVehiclePage> {
+  final ListingService _listingService = ListingService();
+  final TextEditingController _rentalPriceController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    // Set the initial text for the rental price controller
+    _rentalPriceController.text =
+        widget.vehicleData?['Rental_Price']?.toString() ?? '';
+  }
+
+  @override
+  void dispose() {
+    // Dispose of the controller when the widget is disposed
+    _rentalPriceController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -248,20 +273,70 @@ class _GarageVehiclePageState extends State<GarageVehiclePage> {
               "Vehicle Information",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
+            Text(
+              "Model: " + widget.vehicleData?['Model'],
+            ),
+            Text(
+              "Mileage: ${widget.vehicleData?['Mileage']?.toString() ?? 'N/A'}",
+            ),
+            Text(
+              "Color: " + widget.vehicleData?['Color'],
+            ),
+            Text(
+              "VIN: " + widget.vehicleData?['VIN'],
+            ),
+            Text(
+              "Registration: " + widget.vehicleData?['Registration'],
+            ),
+            Text(
+              "Insurance: " + widget.vehicleData?['Insurance'],
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              "Update Rental Price",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            TextFormField(
+              controller: _rentalPriceController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: "Rental Price",
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Center(
+              child: ElevatedButton.icon(
+                onPressed: () async {
+                  bool success = await _listingService.updateRentalPrice(
+                    itemType: 'vehicle',
+                    itemId: widget.vehicleData?['VIN'],
+                    newPrice: double.parse(_rentalPriceController.text),
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text("Rental price updated successfully!")),
+                  );
+                },
+                label: const Text("Save Rental Price"),
+              ),
+            ),
             const SizedBox(height: 20),
             Center(
               child: ElevatedButton.icon(
                 onPressed: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     // builder: (context) => const UpdateMaintenancePage(),
-                  //   ),
-                  // );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DisplayMaintenanceRecordsPage(
+                          vin: widget.vehicleData?['VIN'],
+                          profileId: widget.profileId),
+                    ),
+                  );
                 },
-                icon: const Icon(Icons.build),
-                label: const Text("Update Maintenance Records"),
-           
+                icon: const Icon(Icons.list),
+                label: const Text("View Maintenance Records"),
               ),
             ),
           ],
@@ -271,7 +346,7 @@ class _GarageVehiclePageState extends State<GarageVehiclePage> {
   }
 }
 
-
+// TODO: Make gear page
 class GarageGearPage extends StatefulWidget {
   const GarageGearPage({super.key});
 
@@ -289,6 +364,7 @@ class _GarageGearPageState extends State<GarageGearPage> {
     );
   }
 }
+
 // class ListedTab extends StatefulWidget {
 //   final Future<Map<String, dynamic>> garageItemsFuture;
 //   final int profileId; // Accept profileId
