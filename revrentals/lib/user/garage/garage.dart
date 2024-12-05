@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:revrentals/main_pages/auth_page.dart';
 import 'package:revrentals/user/garage/add_listing.dart';
+import 'package:revrentals/user/garage/maint_records.dart';
 import 'package:revrentals/user/notifications/notifications.dart';
 import 'package:revrentals/user/profile_detail.dart';
 import 'package:revrentals/services/listing_service.dart';
@@ -70,8 +71,8 @@ class _GaragePageState extends State<GaragePage> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => NotificationsPage(
-                          profileId: widget.profileId,
-                        )),
+                              profileId: widget.profileId,
+                            )),
                   ),
                 ),
                 actions: [
@@ -114,6 +115,7 @@ class _GaragePageState extends State<GaragePage> {
                           garageItemsFuture: _garageItemsFuture,
                           profileId: widget.profileId, // Pass profileId here
                         ),
+                        // TODO: Update to display rented items
                         const RentedTab(), // No changes needed
                       ],
                     ),
@@ -174,7 +176,10 @@ class _ListedTabState extends State<ListedTab> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => GarageVehiclePage()),
+                                builder: (context) => GarageVehiclePage(
+                                  
+                                    vin: vehicle['VIN'],
+                                    profileId: widget.profileId)),
                           );
                         },
                       )),
@@ -226,7 +231,10 @@ class _ListedTabState extends State<ListedTab> {
 }
 
 class GarageVehiclePage extends StatefulWidget {
-  const GarageVehiclePage({super.key});
+  final String vin;
+  final int profileId;
+  const GarageVehiclePage(
+      {super.key, required this.profileId, required this.vin});
 
   @override
   State<GarageVehiclePage> createState() => _GarageVehiclePageState();
@@ -252,16 +260,16 @@ class _GarageVehiclePageState extends State<GarageVehiclePage> {
             Center(
               child: ElevatedButton.icon(
                 onPressed: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     // builder: (context) => const UpdateMaintenancePage(),
-                  //   ),
-                  // );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DisplayMaintenanceRecordsPage(
+                          vin: widget.vin, profileId: widget.profileId),
+                    ),
+                  );
                 },
-                icon: const Icon(Icons.build),
-                label: const Text("Update Maintenance Records"),
-           
+                icon: const Icon(Icons.list),
+                label: const Text("View Maintenance Records"),
               ),
             ),
           ],
@@ -271,7 +279,7 @@ class _GarageVehiclePageState extends State<GarageVehiclePage> {
   }
 }
 
-
+// TODO: Make gear page
 class GarageGearPage extends StatefulWidget {
   const GarageGearPage({super.key});
 
@@ -289,6 +297,7 @@ class _GarageGearPageState extends State<GarageGearPage> {
     );
   }
 }
+
 // class ListedTab extends StatefulWidget {
 //   final Future<Map<String, dynamic>> garageItemsFuture;
 //   final int profileId; // Accept profileId

@@ -8,8 +8,13 @@ import 'package:revrentals/user/user_home.dart'; // For formatting dates
 class MaintenanceRecordsPage extends StatefulWidget {
   final String vin;
   final int profileId;
-  final garageId;
-  MaintenanceRecordsPage({super.key, required this.vin, required this.profileId, required this.garageId});
+  // final garageId;
+  MaintenanceRecordsPage({
+    super.key,
+    required this.vin,
+    required this.profileId,
+    // required this.garageId
+  });
 
   @override
   State<MaintenanceRecordsPage> createState() => _MaintenanceRecordsPageState();
@@ -58,8 +63,6 @@ class _MaintenanceRecordsPageState extends State<MaintenanceRecordsPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _saveRecords(context);
-
-          Navigator.push(context, MaterialPageRoute(builder: (context)=> GaragePage(profileId: widget.profileId)));
         },
         child: const Icon(Icons.save),
       ),
@@ -70,7 +73,12 @@ class _MaintenanceRecordsPageState extends State<MaintenanceRecordsPage> {
     setState(() {
       print(widget.vin);
       maintenanceRecords.add(
-        {"vin":widget.vin, "date": null, "servicedBy": "", "serviceDetails": ""},
+        {
+          "vin": widget.vin,
+          "date": null,
+          "servicedBy": "",
+          "serviceDetails": ""
+        },
       );
     });
   }
@@ -131,20 +139,20 @@ class _MaintenanceRecordsPageState extends State<MaintenanceRecordsPage> {
   }
 
   Future<void> _saveRecords(BuildContext context) async {
-    // Handle saving records (e.g., sending to backend or storing locally)
-         print("Saving records: $maintenanceRecords");
-   
     if (!_validateRecords()) {
       errorMessage(context, "All fields must be filled.");
-      return;
     } else {
       try {
-
+        // Handle saving records (e.g., sending to backend or storing locally)
+        print("Saving records: $maintenanceRecords");
         await _listingService.addMaintRecords(maintenanceRecords);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Maintenance records saved.")),
         );
-        return;
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => GaragePage(profileId: widget.profileId)));
       } catch (e) {
         errorMessage(context, e.toString());
       }
@@ -214,7 +222,7 @@ class _MaintenanceRecordRowState extends State<MaintenanceRecordRow> {
         : ''; // You can use an empty string or null if you want to handle it differently
 
     widget.onUpdate({
-      "vin":widget.vin,
+      "vin": widget.vin,
       "date": formattedDate,
       "serviced_by": servicedByController.text,
       "service_details": serviceDetailsController.text,
@@ -277,8 +285,9 @@ class _MaintenanceRecordRowState extends State<MaintenanceRecordRow> {
 
 class DisplayMaintenanceRecordsPage extends StatefulWidget {
   final String vin;
-
-  const DisplayMaintenanceRecordsPage({super.key, required this.vin});
+  final int profileId;
+  const DisplayMaintenanceRecordsPage(
+      {super.key, required this.profileId, required this.vin});
 
   @override
   State<DisplayMaintenanceRecordsPage> createState() =>
@@ -302,54 +311,81 @@ class _DisplayMaintenanceRecordsPageState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Maintenance Records")),
-      body: FutureBuilder<List<dynamic>>(
-        future: _maintRecordsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                "Error fetching records: ${snapshot.error}",
-                style: const TextStyle(color: Colors.red),
-              ),
-            );
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Text("No maintenance records found."),
-            );
-          } else {
-            // Build the list of records
-            final records = snapshot.data!;
-            return ListView.builder(
-              padding: const EdgeInsets.all(16.0),
-              itemCount: records.length,
-              itemBuilder: (context, index) {
-                final record = records[index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Date: ${record['date'] != null ? DateFormat('yyyy-MM-dd').format(DateTime.parse(record['date'])) : 'Unknown'}",
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                            "Serviced By: ${record['serviced_by'] ?? 'Unknown'}"),
-                        const SizedBox(height: 8),
-                        Text("Details: ${record['service_details'] ?? 'N/A'}"),
-                      ],
+      body: Column(
+        children: [
+          Expanded(
+            child: FutureBuilder<List<dynamic>>(
+              future: _maintRecordsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(
+                    child: Text(
+                      "Error fetching records: ${snapshot.error}",
+                      style: const TextStyle(color: Colors.red),
                     ),
-                  ),
-                );
+                  );
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(
+                    child: Text("No maintenance records found."),
+                  );
+                } else {
+                  final records = snapshot.data!;
+                  return ListView.builder(
+                    padding: const EdgeInsets.all(16.0),
+                    itemCount: records.length,
+                    itemBuilder: (context, index) {
+                      final record = records[index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Date: ${record['date'] != null ? DateFormat('yyyy-MM-dd').format(DateTime.parse(record['date'])) : 'Unknown'}",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                  "Serviced By: ${record['serviced_by'] ?? 'Unknown'}"),
+                              const SizedBox(height: 8),
+                              Text(
+                                  "Service Details: ${record['service_details'] ?? 'N/A'}"),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                }
               },
-            );
-          }
-        },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Center(
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MaintenanceRecordsPage(
+                        vin: widget.vin,
+                        profileId: widget.profileId,
+                      ),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.build),
+                label: const Text("Update Maintenance Records"),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
