@@ -47,7 +47,7 @@ class _GearTabState extends State<GearTab> {
       'Helmet',
       'Gloves',
       'Jacket',
-      //'Boots',
+      'Boots',
       'Pants',
     ];
     final List<String> priceRanges = [
@@ -240,16 +240,29 @@ class _GearTabState extends State<GearTab> {
     String? selectedSize,
 
     }) async {
+      //tracker
+      int defaultFilterChanged = 0;
+
+      // track user change
+      if (selectedGear != "All") defaultFilterChanged++;
+      if (selectedSize != "Any") defaultFilterChanged++;
+      if (selectedPriceRange != "Any") defaultFilterChanged++;
+      if (selectedMaterial != "Any") defaultFilterChanged++;
+      if (selectedBrand != "Any") defaultFilterChanged++;
+
+      bool multipleFiltersUsed = defaultFilterChanged >1;
+
+      // No filters selected, reset to original list
       if (selectedGear == "All" && selectedSize == "Any" &&
           selectedPriceRange == "Any" &&
           selectedMaterial == "Any" &&
           selectedBrand == "Any") {
-
       try {
         final gear = await gearFuture;
 
         List<dynamic> filteredGearList = gear;
 
+        // applying
         setState (() {
           _filteredGear = filteredGearList;
         });
@@ -258,106 +271,117 @@ class _GearTabState extends State<GearTab> {
       }
     } else {
       List<dynamic> filteredGearList = [];
-      final Set<String> uniqueProductNo = {}; // prevents duplications, tracks unique IDs
+      final Set<int> uniqueProductNo = {}; // prevents duplications, tracks unique IDs
+
+      if (multipleFiltersUsed) {
+      print("Multiple filtering in progress....");
 
       // multiple filtering
-      if (selectedGear != "All" ||
-        selectedSize != "Any" ||
-        selectedPriceRange != "Any" ||
-        selectedMaterial != "Any" ||
-        selectedBrand != "Any") {
-        final numericPrice = (selectedPriceRange != null && selectedPriceRange != "Any")
-            ? int.tryParse(selectedPriceRange.replaceAll(RegExp(r'[^0-9]'), ''))
-            : null;
+        if (selectedGear != "All" ||
+          selectedSize != "Any" ||
+          selectedPriceRange != "Any" ||
+          selectedMaterial != "Any" ||
+          selectedBrand != "Any"
+          ) {
+          final numericPrice = (selectedPriceRange != null && selectedPriceRange != "Any")
+              ? int.tryParse(selectedPriceRange.replaceAll(RegExp(r'[^0-9]'), ''))
+              : null;
 
-      final multipleFilterResults = await _applyMultipleFilters(
-        brand: selectedBrand != "Any" ? selectedBrand : null,
-        material: selectedMaterial != "Any" ? selectedMaterial : null,
-        gearType: selectedGear != "All" ? selectedGear : null,
-        size: selectedSize != "Any" ? selectedSize : null,
-        maxPrice: numericPrice?.toDouble(),
-      );
-
-      for (var item in multipleFilterResults) {
-          if (!uniqueProductNo.contains(item['Product_no'])) {
-            uniqueProductNo.add(item['Product_no']);
-            filteredGearList.add(item);
-          }
-        }
-      }
-
-       // Apply gear filter
-      if (selectedGear != null && selectedGear != "All") {
-        final gearFilteredList = await _applyGearFilter(selectedGear);
-        for (var item in gearFilteredList) {
-        if (!uniqueProductNo.contains(item['Product_no'])) {
-          uniqueProductNo.add(item['Product_no']);
-          filteredGearList.add(item);
-          }
-        }
-      }
-
-      // Apply brand filter
-      if (selectedBrand != null && selectedBrand != "Any") {
-        final brandFilteredList = await _applyBrandFilter(selectedBrand);
-        for (var item in brandFilteredList) {
-        if (!uniqueProductNo.contains(item['Product_no'])) {
-          uniqueProductNo.add(item['Product_no']);
-          filteredGearList.add(item);
-          }
-        }
-      }
-
-      // Apply price range filter
-      if (selectedPriceRange != null && selectedPriceRange != "Any") {
-        // Extract the numeric value from the selected price range
-        final numericPrice = int.parse(
-          selectedPriceRange.replaceAll(RegExp(r'[^0-9]'), '')
+        final multipleFilterResults = await _applyMultipleFilters(
+          brand: selectedBrand,
+          material: selectedMaterial,
+          gearType: selectedGear,
+          size: selectedSize,
+          maxPrice: numericPrice?.toDouble(),
         );
 
-        // Call the filter function with the numeric price
-        final priceFilteredList = await _applyPriceFilter(numericPrice);
-        for (var item in priceFilteredList) {
-        if (!uniqueProductNo.contains(item['Product_no'])) {
-          uniqueProductNo.add(item['Product_no']);
-          filteredGearList.add(item);
+        for (var item in multipleFilterResults) {
+            if (!uniqueProductNo.contains(item['Product_No'])) {
+              uniqueProductNo.add(item['Product_No']);
+              filteredGearList.add(item);
+            }
           }
-        }
-      }
-
-      // Apply size filter
-      if (selectedSize != null && selectedSize != "Any") {
-        final sizeFilteredList = await _applySizeFilter(selectedSize);
-        for (var item in sizeFilteredList) {
-        if (!uniqueProductNo.contains(item['Product_no'])) {
-          uniqueProductNo.add(item['Product_no']);
-          filteredGearList.add(item);
-          }
-        }
-      }
-
-      // Apply material filter
-      if (selectedMaterial != null && selectedMaterial != "Any") {
-        final insuranceFilteredList = await _applyMaterialFilter(selectedMaterial);
-        for (var item in insuranceFilteredList) {
-        if (!uniqueProductNo.contains(item['Product_no'])) {
-          uniqueProductNo.add(item['Product_no']);
-          filteredGearList.add(item);
-          }
-        }
-      }
-
-      // Update state with the filtered list or reset if no results
-      if (filteredGearList.isNotEmpty) {
-        setState(() {
           _filteredGear = filteredGearList;
-          filterApplied = true;
-        });
+          print("_filteredGear: $_filteredGear");
+
+        } 
+
+      print("More than one filter used");
+
       } else {
-        setState(() {
-          _filteredGear = [];
-          filterApplied = true;
-        });
+      // Apply gear filter
+        if (selectedGear != null && selectedGear != "All") {
+          final gearFilteredList = await _applyGearFilter(selectedGear);
+          for (var item in gearFilteredList) {
+          if (!uniqueProductNo.contains(item['Product_No'])) {
+            uniqueProductNo.add(item['Product_No']);
+            filteredGearList.add(item);
+            }
+          }
+        }
+
+        // Apply brand filter
+        if (selectedBrand != null && selectedBrand != "Any") {
+          final brandFilteredList = await _applyBrandFilter(selectedBrand);
+          for (var item in brandFilteredList) {
+          if (!uniqueProductNo.contains(item['Product_No'])) {
+            uniqueProductNo.add(item['Product_No']);
+            filteredGearList.add(item);
+            }
+          }
+        }
+
+        // Apply price range filter
+        if (selectedPriceRange != null && selectedPriceRange != "Any") {
+          // Extract the numeric value from the selected price range
+          final numericPrice = int.parse(
+            selectedPriceRange.replaceAll(RegExp(r'[^0-9]'), '')
+          );
+
+          // Call the filter function with the numeric price
+          final priceFilteredList = await _applyPriceFilter(numericPrice);
+          for (var item in priceFilteredList) {
+          if (!uniqueProductNo.contains(item['Product_No'])) {
+            uniqueProductNo.add(item['Product_No']);
+            filteredGearList.add(item);
+            }
+          }
+        }
+
+        // Apply size filter
+        if (selectedSize != null && selectedSize != "Any") {
+          final sizeFilteredList = await _applySizeFilter(selectedSize);
+          for (var item in sizeFilteredList) {
+          if (!uniqueProductNo.contains(item['Product_No'])) {
+            uniqueProductNo.add(item['Product_No']);
+            filteredGearList.add(item);
+            }
+          }
+        }
+
+        // Apply material filter
+        if (selectedMaterial != null && selectedMaterial != "Any") {
+          final insuranceFilteredList = await _applyMaterialFilter(selectedMaterial);
+          for (var item in insuranceFilteredList) {
+          if (!uniqueProductNo.contains(item['Product_No'])) {
+            uniqueProductNo.add(item['Product_No']);
+            filteredGearList.add(item);
+            }
+          }
+        }
+
+        // Update state with the filtered list or reset if no results
+        if (filteredGearList.isNotEmpty) {
+          setState(() {
+            _filteredGear = filteredGearList;
+            filterApplied = true;
+          });
+        } else {
+          setState(() {
+            _filteredGear = [];
+            filterApplied = true;
+          });
+        }  
       }
     }
   }
@@ -420,7 +444,7 @@ class _GearTabState extends State<GearTab> {
 
   Future<List<dynamic>> _applyPriceFilter(int maxPrice) async {
   final url = Uri.parse('http://10.0.2.2:8000/filter-by-gear-price/');
-  final body = {'rental_price': maxPrice};
+  final body = {'grental_price': maxPrice};
 
   final response = await http.post(
     url,
@@ -500,9 +524,10 @@ class _GearTabState extends State<GearTab> {
   double? maxPrice,
 }) async {
   final url = Uri.parse('http://10.0.2.2:8000/filter-gear-by-multiple-conditions/');
+  print("Checkpoint1");
   
-  // Build the body dynamically
   final body = <String, dynamic>{};
+
   if (brand != null && brand.isNotEmpty) {
     body['brand'] = brand;
   }
@@ -517,7 +542,11 @@ class _GearTabState extends State<GearTab> {
   }
   if (maxPrice != null) {
     body['grental_price'] = maxPrice;
+    print("Checkpoint2");
+
   }
+  print("Checkpoint2");
+
 
   try {
     final response = await http.post(
@@ -525,6 +554,8 @@ class _GearTabState extends State<GearTab> {
       headers: {'Content-Type': 'application/json'},
       body: json.encode(body),
     );
+    print("Request Body: ${json.encode(body)}");
+
 
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
@@ -542,8 +573,6 @@ class _GearTabState extends State<GearTab> {
     return [];
   }
 } 
-
-
 
   void _applySortGear(String selectedSortOption) {
     gearFuture.then((gear) {
@@ -712,7 +741,7 @@ class _GearTabState extends State<GearTab> {
                     } else if (snapshot.hasError) {
                       return Center(child: Text("Error: ${snapshot.error}"));
                     } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                      print("Displaying original motorcycles list");
+                      print("Displaying original gears list");
                       final vehicles = snapshot.data!;
 
                       return ListView.builder(
@@ -730,7 +759,7 @@ class _GearTabState extends State<GearTab> {
                                 MaterialPageRoute(
                                   builder: (context) => GearDetailPage(
                                     profileId: profileId, 
-                                    gearData: gear, // GRRRAHHHHH??!?@?#?!@?
+                                    gearData: gear,
                                     ),
                                   ),
                               );

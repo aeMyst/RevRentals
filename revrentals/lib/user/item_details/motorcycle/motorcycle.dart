@@ -436,7 +436,6 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
       setState(() {
         _filteredMotorcycles = filteredList;
       });
-
     } catch (error) {
       print("Error resolving motorcyclesFuture: $error");
     }
@@ -475,25 +474,22 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
             dirtbikeType: selectedDirtbikeType,
           );
 
-          print("multipleFilterResults type: ${multipleFilterResults.runtimeType}");
+         /* print("multipleFilterResults type: ${multipleFilterResults.runtimeType}");
           print("multipleFilterResults length: ${multipleFilterResults.length}");
           print("Multiple filter results: $multipleFilterResults");
-          print("_filteredMotorcycles + $_filteredMotorcycles");
+          print("_filteredMotorcycles + $_filteredMotorcycles"); */
 
 
           for (var item in multipleFilterResults) {
-            print("Inside for loop");
             if (!uniqueVINs.contains(item['VIN'])) {
               uniqueVINs.add(item['VIN']);
               filteredList.add(item);
-              print("GREEN ADDED");
             }
           }
-
           _filteredMotorcycles = filteredList;
         }
+        
         print("More than one filter used");
-
 
       } else {
         // Apply vehicle filter
@@ -832,7 +828,7 @@ Future<List<dynamic>> _applyMultipleFilters({
                                 MaterialPageRoute(
                                   builder: (context) => MotorcycleDetailPage(
                                     profileId: widget.profileId, 
-                                    motorcycleData: motorcycle, // GRRRAHHHHH??!?@?#?!@?
+                                    motorcycleData: motorcycle, 
                                     ),
                                   ),
                               );
