@@ -35,6 +35,10 @@ class _AddListingPageState extends State<AddListingPage> {
   String? selectedGearType = 'Helmet';
   String? selectedInsuranceType = 'Basic';
   String vehicleAttributeLabel = 'Engine Type';
+  String? selectedColor = 'Other';
+  String? selectedSize = 'Any';
+  String? selectedBrand = 'Any';
+  String? selectedMaterial = 'Any';
 
   Future<void> _addListing() async {
     try {
@@ -91,10 +95,10 @@ class _AddListingPageState extends State<AddListingPage> {
         Map<String, dynamic> listingData = {
           "garage_id": garageId,
           "gear_name": gearNameController.text,
-          "brand": brandController.text,
-          "material": materialController.text,
+          "brand": selectedBrand,
+          "material": selectedMaterial,
           "type": selectedGearType,
-          "size": gearSizeController.text,
+          "size": selectedSize,
           "rental_price": double.parse(rentalPriceController.text),
         };
 
@@ -104,8 +108,8 @@ class _AddListingPageState extends State<AddListingPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Listing added successfully!')),
         );
-        Navigator.pop(context);
       }
+      Navigator.pop(context); // Pop the current page
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error adding listing: $e')),
@@ -201,9 +205,28 @@ class _AddListingPageState extends State<AddListingPage> {
                 decoration: const InputDecoration(labelText: 'Model'),
               ),
               const SizedBox(height: 16),
-              TextField(
-                controller: colorController,
+
+              DropdownButtonFormField<String>(
+                value: selectedColor,
                 decoration: const InputDecoration(labelText: 'Color'),
+                items: const [
+                  DropdownMenuItem(value: 'Other', child: Text('Other')),
+                  DropdownMenuItem(value: 'Red', child: Text('Basic')),
+                  DropdownMenuItem(value: 'Orange', child: Text('Orange')),
+                  DropdownMenuItem(value: 'Yellow', child: Text('Yellow')),
+                  DropdownMenuItem(value: 'Green', child: Text('Green')),
+                  DropdownMenuItem(value: 'Blue', child: Text('Blue')),
+                  DropdownMenuItem(value: 'Purple', child: Text('Purple')),
+                  DropdownMenuItem(value: 'Pink', child: Text('Pink')),
+                  DropdownMenuItem(value: 'Black', child: Text('Black')),
+                  DropdownMenuItem(value: 'White', child: Text('White')),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    selectedColor = value; // Update variable on selection
+                    print(selectedColor);
+                  });
+                },
               ),
               const SizedBox(height: 16),
               TextField(
@@ -224,10 +247,9 @@ class _AddListingPageState extends State<AddListingPage> {
                 ],
                 onChanged: (value) {
                   setState(() {
-                    
                     selectedInsuranceType =
                         value; // Update variable on selection
-                        print(selectedInsuranceType);
+                    print(selectedInsuranceType);
                   });
                 },
               ),
@@ -274,19 +296,58 @@ class _AddListingPageState extends State<AddListingPage> {
                 decoration: const InputDecoration(labelText: 'Gear Name'),
               ),
               const SizedBox(height: 16),
-              TextField(
-                controller: brandController,
+              DropdownButtonFormField<String>(
+                value: selectedBrand,
                 decoration: const InputDecoration(labelText: 'Brand'),
+                items: const [
+                  DropdownMenuItem(value: 'Any', child: Text('Any')),
+                  DropdownMenuItem(
+                      value: 'Alpinestars', child: Text('Alpinestars')),
+                  DropdownMenuItem(value: 'AGV', child: Text('AGV')),
+                  DropdownMenuItem(value: 'Shoei', child: Text('Shoei')),
+                  DropdownMenuItem(value: 'HJC', child: Text('HJC')),
+                  DropdownMenuItem(value: 'Arai', child: Text('Arai')),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    selectedBrand = value;
+                  });
+                },
               ),
               const SizedBox(height: 16),
-              TextField(
-                controller: materialController,
-                decoration: const InputDecoration(labelText: 'Material'),
+              DropdownButtonFormField<String>(
+                value: selectedMaterial,
+                decoration: const InputDecoration(labelText: 'Brand'),
+                items: const [
+                  DropdownMenuItem(value: 'Any', child: Text('Any')),
+                  DropdownMenuItem(value: 'Leather', child: Text('Leather')),
+                  DropdownMenuItem(value: 'Plastic', child: Text('Plastic')),
+                  DropdownMenuItem(value: 'Textile', child: Text('Textile')),
+                  DropdownMenuItem(value: 'Kevlar', child: Text('HJC')),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    selectedMaterial = value;
+                  });
+                },
               ),
               const SizedBox(height: 16),
-              TextField(
-                controller: gearSizeController,
-                decoration: const InputDecoration(labelText: 'Size'),
+              DropdownButtonFormField<String>(
+                value: selectedSize,
+                decoration: const InputDecoration(labelText: 'Gear Size'),
+                items: const [
+                  DropdownMenuItem(value: 'Any', child: Text('Any')),
+                  DropdownMenuItem(value: 'XS', child: Text('XS')),
+                  DropdownMenuItem(value: 'S', child: Text('S')),
+                  DropdownMenuItem(value: 'M', child: Text('M')),
+                  DropdownMenuItem(value: 'L', child: Text('L')),
+                  DropdownMenuItem(value: 'XL', child: Text('XL')),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    selectedSize = value;
+                  });
+                },
               ),
               const SizedBox(height: 16),
               TextField(
