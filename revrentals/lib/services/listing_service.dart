@@ -328,13 +328,41 @@ class ListingService {
       throw Exception("Failed to delete reservation");
     }
   }
+
+// Future<Map<String,dynamic>> fetchTransaction(int reservation_no) async {
+//   final url = Uri.parse("$_baseUrl/view-transaction/$reservation_no/");
+
+// }
+
+// Future<Map<String,dynamic>> fetchAgreement(int reservation_no) async {
+//   final url = Uri.parse("$_baseUrl/view-agreement/$reservation_no/");
+// }
+
+  Future<bool> updateRentalPrice({required String itemType, required String itemId, required double newPrice,}) async {
+    final url = Uri.parse("$_baseUrl/update-rental-price/");
+    final body = {
+      "item_type": itemType,
+      "id": itemId,
+      "new_price": newPrice,
+    };
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(body),
+      );
+
+      if (response.statusCode == 200) {
+        print("Rental price updated successfully!");
+        return true;
+      } else {
+        print("Failed to update rental price: ${response.body}");
+        return false;
+      }
+    } catch (e) {
+      print("Error during API call: $e");
+      return false;
+    }
+  }
 }
-
-  // Future<Map<String,dynamic>> fetchTransaction(int reservation_no) async {
-  //   final url = Uri.parse("$_baseUrl/view-transaction/$reservation_no/");
-
-  // }
-
-  // Future<Map<String,dynamic>> fetchAgreement(int reservation_no) async {
-  //   final url = Uri.parse("$_baseUrl/view-agreement/$reservation_no/");
-  // }
