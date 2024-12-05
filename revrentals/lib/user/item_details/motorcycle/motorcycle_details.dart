@@ -172,7 +172,7 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) =>
-                                DisplayMaintenanceRecordsPage(vin: vin)));
+                                DisplayMaintenanceRecordsPage(vin: vin, profileId: widget.profileId)));
                   },
                   child: const Text('View Maintenance Records'),
                 ),
