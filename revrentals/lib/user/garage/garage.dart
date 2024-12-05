@@ -6,6 +6,7 @@ import 'package:revrentals/user/garage/maint_records.dart';
 import 'package:revrentals/user/notifications/notifications.dart';
 import 'package:revrentals/user/profile_detail.dart';
 import 'package:revrentals/services/listing_service.dart';
+import 'package:revrentals/user/garage/rental_details.dart';
 
 class GaragePage extends StatefulWidget {
   final int profileId; // Accept profileId as a parameter
@@ -115,8 +116,10 @@ class _GaragePageState extends State<GaragePage> {
                           garageItemsFuture: _garageItemsFuture,
                           profileId: widget.profileId, // Pass profileId here
                         ),
-                        // TODO: Update to display rented items
-                        const RentedTab(), // No changes needed
+                        RentedTab(
+                          profileId:
+                              widget.profileId, // Pass profileId to RentedTab
+                        ),
                       ],
                     ),
                   ),
@@ -365,104 +368,57 @@ class _GarageGearPageState extends State<GarageGearPage> {
   }
 }
 
-// class ListedTab extends StatefulWidget {
-//   final Future<Map<String, dynamic>> garageItemsFuture;
-//   final int profileId; // Accept profileId
-
-//   const ListedTab(
-//       {super.key, required this.garageItemsFuture, required this.profileId});
-
-//   @override
-//   _ListedTabState createState() => _ListedTabState();
-// }
-
-// class _ListedTabState extends State<ListedTab> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Stack(
-//       children: [
-//         FutureBuilder<Map<String, dynamic>>(
-//           future: widget.garageItemsFuture,
-//           builder: (context, snapshot) {
-//             if (snapshot.connectionState == ConnectionState.waiting) {
-//               return const Center(child: CircularProgressIndicator());
-//             } else if (snapshot.hasError) {
-//               return Center(child: Text("Error: ${snapshot.error}"));
-//             } else if (snapshot.hasData) {
-//               final data = snapshot.data!;
-//               final motorizedVehicles = data['motorized_vehicles'] as List;
-//               final gearItems = data['gear'] as List;
-
-//               return ListView(
-//                 padding: const EdgeInsets.all(16.0),
-//                 children: [
-//                   const Text(
-//                     "Motorized Vehicles",
-//                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-//                   ),
-//                   ...motorizedVehicles.map((vehicle) => ListTile(
-//                         title: Text(vehicle['Model']),
-//                         subtitle:
-//                             Text("Rental Price: \$${vehicle['Rental_Price']}"),
-//                         trailing: const Icon(Icons.motorcycle),
-//                       )),
-//                   const SizedBox(height: 20),
-//                   const Text(
-//                     "Gear Items",
-//                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-//                   ),
-//                   ...gearItems.map((gear) => ListTile(
-//                         title: Text(gear['Gear_Name']),
-//                         subtitle:
-//                             Text("Rental Price: \$${gear['Rental_Price']}"),
-//                         trailing: const Icon(Icons.checkroom),
-//                       )),
-//                 ],
-//               );
-//             } else {
-//               return const Center(child: Text("No items in your garage."));
-//             }
-//           },
-//         ),
-//         Positioned(
-//           bottom: 16,
-//           right: 16,
-//           child: FloatingActionButton(
-//             onPressed: () {
-//               Navigator.push(
-//                 context,
-//                 MaterialPageRoute(
-//                   builder: (context) =>
-//                       AddListingPage(profileId: widget.profileId),
-//                 ),
-//               );
-//             },
-//             backgroundColor: Colors.blueGrey,
-//             child: const Icon(Icons.add, color: Colors.white),
-//           ),
-//         ),
-//       ],
-//     );
-//   }
-// }
-
+// showing rented tab for vehicles/gear/lots that are rented
 class RentedTab extends StatelessWidget {
-  const RentedTab({super.key});
+  final int profileId; // Profile ID for fetching rental history
+
+  const RentedTab({super.key, required this.profileId});
+
+  Future<List<dynamic>> fetchRentalHistory() async {
+    final ListingService listingService = ListingService();
+    return await listingService.fetchBuyerRentalHistory(profileId);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: ListView(
-        scrollDirection: Axis.vertical,
-        children: const [
-          ListTile(
-            title: Text('Kawasaki Ninja ZX-4R'),
-            subtitle: Text('Rental Price: \$150'),
-            trailing: Icon(Icons.motorcycle),
-          ),
-        ],
-      ),
+    return FutureBuilder<List<dynamic>>(
+      future: fetchRentalHistory(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text("Error: ${snapshot.error}"));
+        } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+          final rentals = snapshot.data!;
+          return ListView.builder(
+            itemCount: rentals.length,
+            itemBuilder: (context, index) {
+              final rental = rentals[index];
+              return ListTile(
+                leading: const Icon(Icons.motorcycle, color: Colors.blueGrey),
+                title: Text(rental['item_name']),
+                subtitle: Text(
+                  "Rental Period: ${rental['start_date']} to ${rental['end_date']}\n"
+                  "Transaction Date: ${rental['transaction_date'] ?? 'N/A'}",
+                ),
+                trailing: const Icon(Icons.arrow_forward_ios),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RentalDetailPage(
+                        rentalDetails: rental,
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          );
+        } else {
+          return const Center(child: Text("No rentals found."));
+        }
+      },
     );
   }
 }

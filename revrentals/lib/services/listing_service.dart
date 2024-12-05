@@ -329,16 +329,34 @@ class ListingService {
     }
   }
 
-// Future<Map<String,dynamic>> fetchTransaction(int reservation_no) async {
-//   final url = Uri.parse("$_baseUrl/view-transaction/$reservation_no/");
+  // showing rented items to user
+  Future<List<dynamic>> fetchBuyerRentalHistory(int profileId) async {
+    final url = Uri.parse("$_baseUrl/rentals/buyer/$profileId/");
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        if (jsonResponse['success'] == true &&
+            jsonResponse['rental_history'] is List) {
+          return jsonResponse['rental_history'] as List<dynamic>;
+        } else {
+          return [];
+        }
+      } else {
+        throw Exception(
+            "Failed to fetch rental history. Status code: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error in fetchBuyerRentalHistory: $e");
+      return [];
+    }
+  }
 
-// }
-
-// Future<Map<String,dynamic>> fetchAgreement(int reservation_no) async {
-//   final url = Uri.parse("$_baseUrl/view-agreement/$reservation_no/");
-// }
-
-  Future<bool> updateRentalPrice({required String itemType, required String itemId, required double newPrice,}) async {
+  Future<bool> updateRentalPrice({
+    required String itemType,
+    required String itemId,
+    required double newPrice,
+  }) async {
     final url = Uri.parse("$_baseUrl/update-rental-price/");
     final body = {
       "item_type": itemType,
