@@ -82,6 +82,7 @@ class _AddListingPageState extends State<AddListingPage> {
             builder: (context) => MaintenanceRecordsPage(
               vin: vinController.text,
               profileId: widget.profileId,
+              garageId: garageId,
             ),
           ),
         );
