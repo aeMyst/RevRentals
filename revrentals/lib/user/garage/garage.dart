@@ -177,8 +177,8 @@ class _ListedTabState extends State<ListedTab> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => GarageVehiclePage(
-                                  
-                                    vin: vehicle['VIN'],
+                                    vehicleData: vehicle,
+                                    // vin: vehicle['VIN'],
                                     profileId: widget.profileId)),
                           );
                         },
@@ -231,16 +231,33 @@ class _ListedTabState extends State<ListedTab> {
 }
 
 class GarageVehiclePage extends StatefulWidget {
-  final String vin;
+  final Map<String, dynamic>? vehicleData;
   final int profileId;
   const GarageVehiclePage(
-      {super.key, required this.profileId, required this.vin});
+      {super.key, required this.vehicleData, required this.profileId});
 
   @override
   State<GarageVehiclePage> createState() => _GarageVehiclePageState();
 }
 
 class _GarageVehiclePageState extends State<GarageVehiclePage> {
+  final ListingService _listingService = ListingService();
+  final TextEditingController _rentalPriceController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    // Set the initial text for the rental price controller
+    _rentalPriceController.text =
+        widget.vehicleData?['Rental_Price']?.toString() ?? '';
+  }
+
+  @override
+  void dispose() {
+    // Dispose of the controller when the widget is disposed
+    _rentalPriceController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -256,6 +273,55 @@ class _GarageVehiclePageState extends State<GarageVehiclePage> {
               "Vehicle Information",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
+            Text(
+              "Model: " + widget.vehicleData?['Model'],
+            ),
+            Text(
+              "Mileage: ${widget.vehicleData?['Mileage']?.toString() ?? 'N/A'}",
+            ),
+            Text(
+              "Color: " + widget.vehicleData?['Color'],
+            ),
+            Text(
+              "VIN: " + widget.vehicleData?['VIN'],
+            ),
+            Text(
+              "Registration: " + widget.vehicleData?['Registration'],
+            ),
+            Text(
+              "Insurance: " + widget.vehicleData?['Insurance'],
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              "Update Rental Price",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            TextFormField(
+              controller: _rentalPriceController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: "Rental Price",
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Center(
+              child: ElevatedButton.icon(
+                onPressed: () async {
+                  bool success = await _listingService.updateRentalPrice(
+                    itemType: 'vehicle',
+                    itemId: widget.vehicleData?['VIN'],
+                    newPrice: double.parse(_rentalPriceController.text),
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text("Rental price updated successfully!")),
+                  );
+                },
+                label: const Text("Save Rental Price"),
+              ),
+            ),
             const SizedBox(height: 20),
             Center(
               child: ElevatedButton.icon(
@@ -264,7 +330,8 @@ class _GarageVehiclePageState extends State<GarageVehiclePage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => DisplayMaintenanceRecordsPage(
-                          vin: widget.vin, profileId: widget.profileId),
+                          vin: widget.vehicleData?['VIN'],
+                          profileId: widget.profileId),
                     ),
                   );
                 },
