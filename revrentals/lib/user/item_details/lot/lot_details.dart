@@ -23,6 +23,7 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
   DateTime? selectedStartDate;
   DateTime? selectedEndDate;
   final ListingService _listingService = ListingService();
+  bool _isLoading = false;
 
   // Sign out function
   void signUserOut(BuildContext context) {
@@ -67,6 +68,11 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
       );
       return;
     }
+
+      setState(() {
+        _isLoading = true; // Start loading
+      });
+
 
     try {
       // Step 1: Check for active lot rental
@@ -141,11 +147,14 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
       );
 
     } catch (e) {
-      if (!mounted) return; // Check if widget is still mounted
       print('Error occurred trying to rent storage lot: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -181,6 +190,17 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Center(
+              child: Text(
+                "Rental Price: \$${lot['LRentalPrice'].toStringAsFixed(2)}/day",
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueGrey,
                 ),
               ),
             ),
@@ -239,21 +259,29 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
             const SizedBox(height: 20),
             // Rent button
             Center(
-              child: ElevatedButton(
-                onPressed: _rentLot,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueGrey,
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 12, horizontal: 30),
-                  textStyle: const TextStyle(fontSize: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _rentLot, // Disable button while loading
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueGrey,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 30),
+                    textStyle: const TextStyle(fontSize: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
+                  child: _isLoading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text('Rent Lot'),
                 ),
-                child: const Text('Rent Lot'),
               ),
-            ),
           ],
         ),
       ),
