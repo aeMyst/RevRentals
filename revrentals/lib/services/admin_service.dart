@@ -48,8 +48,22 @@ class AdminService {
     }
   }
 
-  Future<Map<String, dynamic>> fetchTransactions(int reservationNo) async {
-    final url = Uri.parse("$_baseUrl/view-transaction/$reservationNo");
+  Future<Map<String, dynamic>> fetchReservationDetails(int reservationNo) async {
+    final url = Uri.parse("$_baseUrl/view-reservation-details/$reservationNo/");
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data;
+      } else {
+        throw Exception("Failed to fetch reservation details: ${response.body}");
+      }
+    } catch (e) {
+      throw Exception("An error occurred trying to fetch reservation details: $e");
+    }
+  }
+  Future<Map<String, dynamic>> fetchTransaction(int reservationNo) async {
+    final url = Uri.parse("$_baseUrl/get-transaction/$reservationNo/");
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {
@@ -62,6 +76,36 @@ class AdminService {
       throw Exception("An error occurred trying to fetch transaction: $e");
     }
   }
+
+  Future<Map<String, dynamic>> fetchAgreement(int reservationNo) async {
+    final url = Uri.parse("$_baseUrl/get-agreement/$reservationNo/");
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['agreement'];
+      } else {
+        throw Exception("Failed to fetch agreement: ${response.body}");
+      }
+    } catch (e) {
+      throw Exception("An error occurred trying to fetch agreement: $e");
+    }
+  }
+
+  // Future<Map<String, dynamic>> fetchAgreement(int reservationNo) async {
+  //   final url = Uri.parse("$_baseUrl/view-agreement/$reservationNo/");
+  //   try {
+  //     final response = await http.get(url);
+  //     if (response.statusCode == 200) {
+  //       final data = jsonDecode(response.body);
+  //       return data['agreement'];
+  //     } else {
+  //       throw Exception("Failed to fetch agreement: ${response.body}");
+  //     }
+  //   } catch (e) {
+  //     throw Exception("An error occurred trying to fetch agreement: $e");
+  //   }
+  // }
 
   Future<Map<String, dynamic>> addLotListing(
       Map<String, dynamic> lotData) async {
@@ -82,7 +126,7 @@ class AdminService {
   }
 
   Future<Map<String, dynamic>> updateLotListing(
-    Map<String, dynamic> updatedLotData) async {
+      Map<String, dynamic> updatedLotData) async {
     final url = Uri.parse("$_baseUrl/edit-lot-listing/");
     final response = await http.put(
       url,
