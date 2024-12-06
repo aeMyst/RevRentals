@@ -8,18 +8,20 @@ import 'package:revrentals/user/profile_detail.dart';
 import 'package:revrentals/services/listing_service.dart';
 import 'package:revrentals/user/garage/rental_details.dart';
 
+final ListingService _listingService = ListingService();
+
 class GaragePage extends StatefulWidget {
   final int profileId; // Accept profileId as a parameter
   final Map<String, dynamic>? userData;
-
-  const GaragePage({super.key, required this.profileId, this.userData});
+// Add a callback to refresh the data
+  // final VoidCallback onPriceUpdated;
+  const GaragePage({super.key, required this.profileId, this.userData,});
 
   @override
   State<GaragePage> createState() => _GaragePageState();
 }
 
 class _GaragePageState extends State<GaragePage> {
-  final ListingService _listingService = ListingService();
   late Future<int> _garageIdFuture; // Future to fetch garage ID
   late Future<Map<String, dynamic>>
       _garageItemsFuture; // Future for fetching garage items
@@ -43,6 +45,18 @@ class _GaragePageState extends State<GaragePage> {
   Future<Map<String, dynamic>> _fetchGarageItems(int garageId) {
     return _listingService.viewGarageItems(garageId);
   }
+
+  // Future<Map<String,dynamic>> updateGarageItems() {
+  //   setState(() async {
+  //     try {
+  //       final garageId = await _listingService.fetchGarageId(widget.profileId);
+  //       _garageItemsFuture = _fetchGarageItems(garageId);
+  //       return _garageItemsFuture;
+  //     } catch (e) {
+  //       throw Exception("Error updating garage items.");
+  //     }
+  //   });
+  // }
 
   void signUserOut(BuildContext context) {
     FirebaseAuth.instance.signOut();
@@ -145,14 +159,29 @@ class ListedTab extends StatefulWidget {
   @override
   _ListedTabState createState() => _ListedTabState();
 }
-
 class _ListedTabState extends State<ListedTab> {
+  late Future<Map<String, dynamic>> _garageItemsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _garageItemsFuture = widget.garageItemsFuture;
+  }
+
+  // This method refreshes the garage items after a price update
+  void _refreshGarageItems() {
+    setState(() {
+      // Update the future that fetches the garage items
+      _garageItemsFuture = _listingService.viewGarageItems(widget.profileId);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         FutureBuilder<Map<String, dynamic>>(
-          future: widget.garageItemsFuture,
+          future: _garageItemsFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -180,9 +209,10 @@ class _ListedTabState extends State<ListedTab> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => GarageVehiclePage(
-                                    vehicleData: vehicle,
-                                    // vin: vehicle['VIN'],
-                                    profileId: widget.profileId)),
+                                      vehicleData: vehicle,
+                                      profileId: widget.profileId,
+                                      onPriceUpdated: _refreshGarageItems,
+                                    )),
                           );
                         },
                       )),
@@ -200,7 +230,12 @@ class _ListedTabState extends State<ListedTab> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => GarageGearPage()),
+                              builder: (context) => GarageGearPage(
+                                gearData: gear,
+                                profileId: widget.profileId,
+                                onPriceUpdated: _refreshGarageItems,
+                              ),
+                            ),
                           );
                         },
                       )),
@@ -233,18 +268,132 @@ class _ListedTabState extends State<ListedTab> {
   }
 }
 
+
+// class _ListedTabState extends State<ListedTab> {
+//   late Future<Map<String, dynamic>> _garageItemsFuture;
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     _garageItemsFuture = widget.garageItemsFuture;
+//   }
+
+//   // This method refreshes the garage items after a price update
+//   void _refreshGarageItems() {
+//     setState(() {
+//       _garageItemsFuture = _listingService.viewGarageItems(widget.profileId);
+//     });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Stack(
+//       children: [
+//         FutureBuilder<Map<String, dynamic>>(
+//           future: widget.garageItemsFuture,
+//           builder: (context, snapshot) {
+//             if (snapshot.connectionState == ConnectionState.waiting) {
+//               return const Center(child: CircularProgressIndicator());
+//             } else if (snapshot.hasError) {
+//               return Center(child: Text("Error: ${snapshot.error}"));
+//             } else if (snapshot.hasData) {
+//               final data = snapshot.data!;
+//               final motorizedVehicles = data['motorized_vehicles'] as List;
+//               final gearItems = data['gear'] as List;
+
+//               return ListView(
+//                 padding: const EdgeInsets.all(16.0),
+//                 children: [
+//                   const Text(
+//                     "Motorized Vehicles",
+//                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+//                   ),
+//                   ...motorizedVehicles.map((vehicle) => ListTile(
+//                         title: Text(vehicle['Model']),
+//                         subtitle:
+//                             Text("Rental Price: \$${vehicle['Rental_Price']}"),
+//                         trailing: const Icon(Icons.motorcycle),
+//                         onTap: () {
+//                           Navigator.push(
+//                             context,
+//                             MaterialPageRoute(
+//                                 builder: (context) => GarageVehiclePage(
+//                                       vehicleData: vehicle,
+//                                       // vin: vehicle['VIN'],
+//                                       profileId: widget.profileId,
+//                                       onPriceUpdated: _refreshGarageItems,
+//                                     )),
+//                           );
+//                         },
+//                       )),
+//                   const SizedBox(height: 20),
+//                   const Text(
+//                     "Gear Items",
+//                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+//                   ),
+//                   ...gearItems.map((gear) => ListTile(
+//                         title: Text(gear['Gear_Name']),
+//                         subtitle:
+//                             Text("Rental Price: \$${gear['Rental_Price']}"),
+//                         trailing: const Icon(Icons.checkroom),
+//                         onTap: () {
+//                           Navigator.push(
+//                             context,
+//                             MaterialPageRoute(
+//                               builder: (context) => GarageGearPage(
+//                                 gearData: gear,
+//                                 profileId: widget.profileId,
+//                                 onPriceUpdated: _refreshGarageItems,
+//                               ),
+//                             ),
+//                           );
+//                         },
+//                       )),
+//                 ],
+//               );
+//             } else {
+//               return const Center(child: Text("No items in your garage."));
+//             }
+//           },
+//         ),
+//         Positioned(
+//           bottom: 16,
+//           right: 16,
+//           child: FloatingActionButton(
+//             onPressed: () {
+//               Navigator.push(
+//                 context,
+//                 MaterialPageRoute(
+//                   builder: (context) =>
+//                       AddListingPage(profileId: widget.profileId),
+//                 ),
+//               );
+//             },
+//             backgroundColor: Colors.blueGrey,
+//             child: const Icon(Icons.add, color: Colors.white),
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+// }
+
 class GarageVehiclePage extends StatefulWidget {
   final Map<String, dynamic>? vehicleData;
   final int profileId;
+  final Function? onPriceUpdated; // Callback function to refresh the list
+
   const GarageVehiclePage(
-      {super.key, required this.vehicleData, required this.profileId});
+      {super.key,
+      required this.vehicleData,
+      required this.profileId,
+      this.onPriceUpdated});
 
   @override
   State<GarageVehiclePage> createState() => _GarageVehiclePageState();
 }
 
 class _GarageVehiclePageState extends State<GarageVehiclePage> {
-  final ListingService _listingService = ListingService();
   final TextEditingController _rentalPriceController = TextEditingController();
   @override
   void initState() {
@@ -276,9 +425,7 @@ class _GarageVehiclePageState extends State<GarageVehiclePage> {
               "Vehicle Information",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            Text(
-              "Model: " + widget.vehicleData?['Model'],
-            ),
+            Text("Model: " + widget.vehicleData?['Model']),
             Text(
               "Mileage: ${widget.vehicleData?['Mileage']?.toString() ?? 'N/A'}",
             ),
@@ -295,11 +442,13 @@ class _GarageVehiclePageState extends State<GarageVehiclePage> {
               "Insurance: " + widget.vehicleData?['Insurance'],
             ),
             const SizedBox(height: 10),
-            const Text(
-              "Update Rental Price",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            const Center(
+              child: Text(
+                "Update Rental Price",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 16),
             TextFormField(
               controller: _rentalPriceController,
               keyboardType: TextInputType.number,
@@ -308,19 +457,34 @@ class _GarageVehiclePageState extends State<GarageVehiclePage> {
                 border: OutlineInputBorder(),
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 16),
             Center(
               child: ElevatedButton.icon(
                 onPressed: () async {
-                  bool success = await _listingService.updateRentalPrice(
+                  bool request = await _listingService.updateRentalPrice(
                     itemType: 'vehicle',
                     itemId: widget.vehicleData?['VIN'],
                     newPrice: double.parse(_rentalPriceController.text),
                   );
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text("Rental price updated successfully!")),
-                  );
+                  if (!request) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content:
+                              Text("Rental price update was unsuccessful.")),
+                    );
+                  } else {
+                    if (widget.onPriceUpdated != null) {
+                      widget.onPriceUpdated!();
+                    }
+                    // Navigator.pop(context);
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => GaragePage(profileId: widget.profileId)));
+
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text("Rental price updated successfully!")),
+                    );
+                  }
                 },
                 label: const Text("Save Rental Price"),
               ),
@@ -351,18 +515,106 @@ class _GarageVehiclePageState extends State<GarageVehiclePage> {
 
 // TODO: Make gear page
 class GarageGearPage extends StatefulWidget {
-  const GarageGearPage({super.key});
+  final Map<String, dynamic>? gearData;
+  final int profileId;
+  final Function? onPriceUpdated; // Callback function to refresh the list
+
+  const GarageGearPage(
+      {super.key,
+      required this.gearData,
+      required this.profileId,
+      this.onPriceUpdated});
 
   @override
   State<GarageGearPage> createState() => _GarageGearPageState();
 }
 
 class _GarageGearPageState extends State<GarageGearPage> {
+  final TextEditingController _rentalPriceController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    // Set the initial text for the rental price controller
+    _rentalPriceController.text =
+        widget.gearData?['Rental_Price']?.toString() ?? '';
+  }
+
+  @override
+  void dispose() {
+    // Dispose of the controller when the widget is disposed
+    _rentalPriceController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Gear Details"),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Gear Information",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            Text("Brand: " + widget.gearData?['Brand']),
+            Text("Material: " + widget.gearData?['Material']),
+            Text("Type: " + widget.gearData?['Type']),
+            Text("Size: " + widget.gearData?['Size']),
+            // Text("Rental Price: " + widget.gearData?['Rental_Price']),
+            const SizedBox(height: 16),
+            const Center(
+              child: Text(
+                "Update Rental Price",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _rentalPriceController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: "Rental Price",
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Center(
+              child: ElevatedButton.icon(
+                onPressed: () async {
+                  bool request = await _listingService.updateRentalPrice(
+                    itemType: 'gear',
+                    itemId: widget.gearData?['Product_No'],
+                    newPrice: double.parse(_rentalPriceController.text),
+                  );
+                  print(request);
+                  if (!request) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content:
+                              Text("Rental price update was unsuccessful.")),
+                    );
+                  } else {
+                    if (widget.onPriceUpdated != null) {
+                      widget.onPriceUpdated!();
+                    }
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text("Rental price updated successfully!")),
+                    );
+                    // Navigator.push(context, MaterialPageRoute(builder: (context) => GaragePage(profileId: widget.profileId)));
+                  }
+                },
+                label: const Text("Save Rental Price"),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -383,7 +383,7 @@ class ListingService {
 
   Future<bool> updateRentalPrice({
     required String itemType,
-    required String itemId,
+    required dynamic itemId,
     required double newPrice,
   }) async {
     final url = Uri.parse("$_baseUrl/update-rental-price/");
@@ -399,6 +399,7 @@ class ListingService {
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(body),
       );
+      print(response.statusCode);
 
       if (response.statusCode == 200) {
         print("Rental price updated successfully!");
