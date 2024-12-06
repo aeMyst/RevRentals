@@ -31,7 +31,7 @@ class _GearTabState extends State<GearTab> {
   void initState() {
     super.initState();
     gearFuture = widget.gearFuture;
-    
+    profileId = widget.profileId;
     _filteredGear = [];
   }
 
