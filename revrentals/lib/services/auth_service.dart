@@ -22,18 +22,34 @@ class AuthService {
   }
 
   // Register method
+  // Register method in AuthService
   Future<Map<String, dynamic>> register(Map<String, dynamic> userData) async {
     final url = Uri.parse("$_baseUrl/register/");
-    final response = await http.post(
-      url,
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode(userData),
-    );
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(userData),
+      );
 
-    if (response.statusCode == 201) {
-      return jsonDecode(response.body);
-    } else {
-      throw Exception(jsonDecode(response.body)['error']);
+      print("Response status: ${response.statusCode}"); // Debug print
+      print("Response body: ${response.body}"); // Debug print
+
+      if (response.statusCode == 201) {
+        return jsonDecode(response.body);
+      } else {
+        final errorData = jsonDecode(response.body);
+        return {
+          "success": false,
+          "error": errorData["error"] ?? "Registration failed"
+        };
+      }
+    } catch (e) {
+      print("Registration service error: $e"); // Debug print
+      return {
+        "success": false,
+        "error": e.toString()
+      };
     }
   }
 

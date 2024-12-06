@@ -432,4 +432,22 @@ class ListingService {
       return false;
     }
   }
+
+  Future<Map<String, dynamic>> checkActiveLotRental(int profileId) async {
+    final url = Uri.parse("$_baseUrl/lot-rental/check/$profileId/");
+    
+    try {
+      final response = await http.get(url);
+      
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data;
+      } else {
+        throw Exception("Failed to check active lot rentals");
+      }
+    } catch (e) {
+      throw Exception("Error checking active lot rentals: $e");
+    }
+  }
 }
+

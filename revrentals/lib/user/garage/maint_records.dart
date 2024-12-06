@@ -5,6 +5,9 @@ import 'package:revrentals/services/listing_service.dart';
 import 'package:revrentals/user/garage/garage.dart';
 import 'package:revrentals/user/user_home.dart'; // For formatting dates
 
+final ListingService _listingService = ListingService();
+final AuthService _authService = AuthService();
+
 class MaintenanceRecordsPage extends StatefulWidget {
   final String vin;
   final int profileId;
@@ -22,8 +25,6 @@ class MaintenanceRecordsPage extends StatefulWidget {
 
 class _MaintenanceRecordsPageState extends State<MaintenanceRecordsPage> {
   List<Map<String, dynamic>> maintenanceRecords = [];
-  ListingService _listingService = ListingService();
-  AuthService _authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -296,8 +297,8 @@ class DisplayMaintenanceRecordsPage extends StatefulWidget {
 
 class _DisplayMaintenanceRecordsPageState
     extends State<DisplayMaintenanceRecordsPage> {
-  final ListingService _listingService =
-      ListingService(); // Initialize ListingService
+  // final ListingService _listingService =
+  //     ListingService(); // Initialize ListingService
   late Future<List<dynamic>> _maintRecordsFuture;
 
   @override
@@ -319,14 +320,9 @@ class _DisplayMaintenanceRecordsPageState
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(
-                    child: Text(
-                      "Error fetching records: ${snapshot.error}",
-                      style: const TextStyle(color: Colors.red),
-                    ),
-                  );
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                } else if (snapshot.hasError ||
+                    !snapshot.hasData ||
+                    snapshot.data!.isEmpty) {
                   return const Center(
                     child: Text("No maintenance records found."),
                   );
@@ -383,6 +379,85 @@ class _DisplayMaintenanceRecordsPageState
                 icon: const Icon(Icons.build),
                 label: const Text("Update Maintenance Records"),
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ViewMaintenanceRecordsPage extends StatefulWidget {
+  String vin;
+  ViewMaintenanceRecordsPage({super.key, required this.vin});
+
+  @override
+  State<ViewMaintenanceRecordsPage> createState() =>
+      _ViewMaintenanceRecordsPageState();
+}
+
+class _ViewMaintenanceRecordsPageState
+    extends State<ViewMaintenanceRecordsPage> {
+  @override
+  late Future<List<dynamic>> _maintRecordsFuture;
+  @override
+  void initState() {
+    super.initState();
+    // Fetch maintenance records
+    _maintRecordsFuture = _listingService.fetchMaintRecords(vin: widget.vin);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Maintenance Records")),
+      body: Column(
+        children: [
+          Expanded(
+            child: FutureBuilder<List<dynamic>>(
+              future: _maintRecordsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError ||
+                    !snapshot.hasData ||
+                    snapshot.data!.isEmpty) {
+                  return const Center(
+                    child: Text("No maintenance records found."),
+                  );
+                } else {
+                  final records = snapshot.data!;
+                  return ListView.builder(
+                    padding: const EdgeInsets.all(16.0),
+                    itemCount: records.length,
+                    itemBuilder: (context, index) {
+                      final record = records[index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Date: ${record['date'] != null ? DateFormat('yyyy-MM-dd').format(DateTime.parse(record['date'])) : 'Unknown'}",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                  "Serviced By: ${record['serviced_by'] ?? 'Unknown'}"),
+                              const SizedBox(height: 8),
+                              Text(
+                                  "Service Details: ${record['service_details'] ?? 'N/A'}"),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                }
+              },
             ),
           ),
         ],
