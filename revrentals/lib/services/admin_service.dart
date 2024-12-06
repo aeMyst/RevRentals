@@ -33,7 +33,6 @@ class AdminService {
     }
   }
 
-
   Future<List<dynamic>> fetchReservations() async {
     final url = Uri.parse("$_baseUrl/reservations/");
     try {
@@ -45,7 +44,22 @@ class AdminService {
         throw Exception("Failed to fetch reservations: ${response.body}");
       }
     } catch (e) {
-      throw Exception("An error occurred: $e");
+      throw Exception("An error occurred trying to fetch reservations: $e");
+    }
+  }
+
+  Future<Map<String, dynamic>> fetchTransactions(int reservationNo) async {
+    final url = Uri.parse("$_baseUrl/view-transaction/$reservationNo");
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['transaction'];
+      } else {
+        throw Exception("Failed to fetch transaction: ${response.body}");
+      }
+    } catch (e) {
+      throw Exception("An error occurred trying to fetch transaction: $e");
     }
   }
 
@@ -67,7 +81,8 @@ class AdminService {
     }
   }
 
-  Future<Map<String,dynamic>> updateLotListing(Map<String, dynamic> updatedLotData) async {
+  Future<Map<String, dynamic>> updateLotListing(
+    Map<String, dynamic> updatedLotData) async {
     final url = Uri.parse("$_baseUrl/edit-lot-listing/");
     final response = await http.put(
       url,
@@ -83,7 +98,5 @@ class AdminService {
       final error = jsonDecode(response.body);
       throw Exception(error["error"] ?? "Failed to update listing");
     }
-
-
   }
 }
