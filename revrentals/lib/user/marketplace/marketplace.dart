@@ -5,8 +5,7 @@ import 'package:revrentals/user/notifications/notifications.dart';
 import 'package:revrentals/user/profile_detail.dart';
 import 'package:revrentals/user/item_details/motorcycle/motorcycle.dart';
 import 'package:revrentals/user/item_details/lot/lot.dart';
-import 'package:revrentals/services/listing_service.dart'; // Import ListingService
-
+import 'package:revrentals/services/listing_service.dart';
 
 class MarketplacePage extends StatefulWidget {
   final int profileId;
@@ -19,19 +18,43 @@ class MarketplacePage extends StatefulWidget {
 }
 
 class _MarketplacePageState extends State<MarketplacePage> {
-  final ListingService _listingService =
-      ListingService(); // Initialize ListingService
+  final ListingService _listingService = ListingService();
   late Future<List<dynamic>> _motorcyclesFuture;
   late Future<List<dynamic>> _gearFuture;
   late Future<List<dynamic>> _storageLotsFuture;
+
+  bool hasUnreadNotifications = false; // Track unread notifications
 
   @override
   void initState() {
     super.initState();
     _motorcyclesFuture = _listingService.fetchMotorizedVehicles();
-    _gearFuture = _listingService.fetchGearItems(); // Fetch gear items
-    _storageLotsFuture =
-        _listingService.fetchStorageLots(); // Fetch storage lots
+    _gearFuture = _listingService.fetchGearItems();
+    _storageLotsFuture = _listingService.fetchStorageLots();
+    _checkNotifications();
+  }
+
+  Future<void> _checkNotifications() async {
+    try {
+      final hasNotifications =
+          await _listingService.checkNotifications(widget.profileId);
+      setState(() {
+        hasUnreadNotifications = hasNotifications;
+      });
+    } catch (e) {
+      print("Error checking notifications: $e");
+    }
+  }
+
+  void _onNotificationsOpened() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => NotificationsPage(profileId: widget.profileId),
+      ),
+    );
+
+    _checkNotifications(); // Refresh notifications after page visit
   }
 
   void signUserOut(BuildContext context) {
@@ -48,14 +71,25 @@ class _MarketplacePageState extends State<MarketplacePage> {
         backgroundColor: Colors.white,
         appBar: AppBar(
           leading: IconButton(
-            icon: const Icon(Icons.notifications),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => NotificationsPage(
-                    profileId: widget.profileId,  // pass the profileId to the notifications page
-                  )),
+            icon: Stack(
+              children: [
+                const Icon(Icons.notifications),
+                if (hasUnreadNotifications)
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+              ],
             ),
+            onPressed: _onNotificationsOpened,
           ),
           actions: [
             IconButton(
@@ -67,8 +101,8 @@ class _MarketplacePageState extends State<MarketplacePage> {
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>   DisplayProfileDetailsPage(
-                    userData: widget.userData, // Pass from UserHomePage
+                  builder: (context) => DisplayProfileDetailsPage(
+                    userData: widget.userData,
                   ),
                 ),
               ),
@@ -94,15 +128,17 @@ class _MarketplacePageState extends State<MarketplacePage> {
                 child: TabBarView(
                   children: [
                     MotorcycleTab(
-                        profileId: widget.profileId,
-                        motorcyclesFuture: _motorcyclesFuture),
+                      profileId: widget.profileId,
+                      motorcyclesFuture: _motorcyclesFuture,
+                    ),
                     GearTab(
-                        profileId: widget.profileId,
-                        gearFuture: _gearFuture), // Pass gearFuture
+                      profileId: widget.profileId,
+                      gearFuture: _gearFuture,
+                    ),
                     LotTab(
                       profileId: widget.profileId,
-                        storageLotsFuture:
-                            _storageLotsFuture), // Pass storageLotsFuture
+                      storageLotsFuture: _storageLotsFuture,
+                    ),
                   ],
                 ),
               ),

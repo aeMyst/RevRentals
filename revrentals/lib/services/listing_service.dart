@@ -412,4 +412,23 @@ class ListingService {
       return false;
     }
   }
+
+  Future<bool> checkNotifications(int profileId) async {
+    final url = Uri.parse("$_baseUrl/notifications/check/$profileId/");
+
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        if (jsonResponse['success'] == true &&
+            jsonResponse['has_notifications'] is bool) {
+          return jsonResponse['has_notifications'];
+        }
+      }
+      return false; // Default to no notifications
+    } catch (e) {
+      print("Error in checkNotifications: $e");
+      return false;
+    }
+  }
 }
