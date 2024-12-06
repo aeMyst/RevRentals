@@ -260,7 +260,7 @@ class _EditLotPageState extends State<EditLotPage> {
     };
 
     // Call the service to update the lot
-    final response = await _adminService.updateLotListing(updatedData);
+    final response = await _adminService.updateLotListing(updatedAddress, widget.lotData['Lot_No']);
 
     if (response['success'] == true) {
       // Show a success message and return to the previous screen

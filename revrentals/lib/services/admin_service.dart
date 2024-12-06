@@ -48,7 +48,8 @@ class AdminService {
     }
   }
 
-  Future<Map<String, dynamic>> fetchReservationDetails(int reservationNo) async {
+  Future<Map<String, dynamic>> fetchReservationDetails(
+      int reservationNo) async {
     final url = Uri.parse("$_baseUrl/view-reservation-details/$reservationNo/");
     try {
       final response = await http.get(url);
@@ -56,12 +57,15 @@ class AdminService {
         final data = jsonDecode(response.body);
         return data;
       } else {
-        throw Exception("Failed to fetch reservation details: ${response.body}");
+        throw Exception(
+            "Failed to fetch reservation details: ${response.body}");
       }
     } catch (e) {
-      throw Exception("An error occurred trying to fetch reservation details: $e");
+      throw Exception(
+          "An error occurred trying to fetch reservation details: $e");
     }
   }
+
   Future<Map<String, dynamic>> fetchTransaction(int reservationNo) async {
     final url = Uri.parse("$_baseUrl/get-transaction/$reservationNo/");
     try {
@@ -126,20 +130,26 @@ class AdminService {
   }
 
   Future<Map<String, dynamic>> updateLotListing(
-      Map<String, dynamic> updatedLotData) async {
-    final url = Uri.parse("$_baseUrl/edit-lot-listing/");
+      String laddress, int lot_no) async {
+    final url = Uri.parse(
+        "$_baseUrl/edit-lot-listing/$lot_no/"); // Include lot_no in the URL
+
     final response = await http.put(
       url,
       headers: {
         "Content-Type": "application/json",
       },
-      body: jsonEncode(updatedLotData),
+      body: jsonEncode({
+        'laddress': laddress, // Send the new address in the body
+      }),
     );
 
     if (response.statusCode == 200) {
       return {"success": true, "message": "Listing updated successfully"};
     } else {
       final error = jsonDecode(response.body);
+      print("Error response: ${response.body}");
+
       throw Exception(error["error"] ?? "Failed to update listing");
     }
   }
