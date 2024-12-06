@@ -6,38 +6,67 @@ class ListingService {
       "http://10.0.2.2:8000/api"; // Update with your backend URL
 
   /// Adds a motorized vehicle listing to the garage.
+  // Future<Map<String, dynamic>> addListing(
+  //     Map<String, dynamic> listingData) async {
+  //   final url = Uri.parse("$_baseUrl/add-listing/");
+  //   final response = await http.post(
+  //     url,
+  //     headers: {"Content-Type": "application/json"},
+  //     body: jsonEncode(listingData),
+  //   );
+
+  //   if (response.statusCode == 201) {
+  //     return {"success": true, "message": "Listing added successfully"};
+  //   } else {
+  //     final error = jsonDecode(response.body);
+  //     throw Exception(error["error"] ?? "Failed to add listing");
+  //   }
+  // }
+
   Future<Map<String, dynamic>> addListing(
       Map<String, dynamic> listingData) async {
-    final url = Uri.parse("$_baseUrl/add-listing/");
     final response = await http.post(
-      url,
+      Uri.parse("$_baseUrl/add-listing/"),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode(listingData),
     );
 
     if (response.statusCode == 201) {
-      return {"success": true, "message": "Listing added successfully"};
+      return jsonDecode(response.body);
     } else {
-      final error = jsonDecode(response.body);
-      throw Exception(error["error"] ?? "Failed to add listing");
+      return {"error": jsonDecode(response.body)['error']};
     }
   }
 
   /// Adds a motorized vehicle listing to the garage.
+  // Future<Map<String, dynamic>> addGearListing(
+  //     Map<String, dynamic> listingData) async {
+  //   final url = Uri.parse("$_baseUrl/add-gear-listing/");
+  //   final response = await http.post(
+  //     url,
+  //     headers: {"Content-Type": "application/json"},
+  //     body: jsonEncode(listingData),
+  //   );
+
+  //   if (response.statusCode == 201) {
+  //     return {"success": true, "message": "Gear listing added successfully"};
+  //   } else {
+  //     final error = jsonDecode(response.body);
+  //     throw Exception(error["error"] ?? "Failed to add gear listing");
+  //   }
+  // }
   Future<Map<String, dynamic>> addGearListing(
       Map<String, dynamic> listingData) async {
-    final url = Uri.parse("$_baseUrl/add-gear-listing/");
     final response = await http.post(
-      url,
+      Uri.parse("$_baseUrl/add-gear-listing/"),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode(listingData),
     );
 
     if (response.statusCode == 201) {
-      return {"success": true, "message": "Gear listing added successfully"};
+      return jsonDecode(response.body);
     } else {
-      final error = jsonDecode(response.body);
-      throw Exception(error["error"] ?? "Failed to add gear listing");
+      return {"error": jsonDecode(response.body)['error']};
     }
   }
 

@@ -65,7 +65,7 @@ class _AddListingPageState extends State<AddListingPage> {
           "vin": vinController.text,
           "registration": registrationController.text,
           "rental_price": double.parse(rentalPriceController.text),
-          "color": colorController.text,
+          "color": selectedColor,
           "mileage": int.parse(mileageController.text),
           "insurance": selectedInsuranceType,
           "model": modelController.text,
@@ -73,7 +73,14 @@ class _AddListingPageState extends State<AddListingPage> {
         };
 
         // Add motorized vehicle listing
-        await _listingService.addListing(listingData);
+        final Map<String, dynamic> response =
+            await _listingService.addListing(listingData);
+
+        if (response.containsKey('error')) {
+          Navigator.pop(context); // Close loading dialog
+          _showErrorDialog(response['error']); // Show error message
+          return;
+        }
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Listing added successfully!')),
@@ -103,7 +110,14 @@ class _AddListingPageState extends State<AddListingPage> {
         };
 
         // Add gear listing
-        await _listingService.addGearListing(listingData);
+        final Map<String, dynamic> response =
+            await _listingService.addGearListing(listingData);
+
+        if (response.containsKey('error')) {
+          Navigator.pop(context); // Close loading dialog
+          _showErrorDialog(response['error']); // Show error message
+          return;
+        }
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Listing added successfully!')),
@@ -204,8 +218,8 @@ class _AddListingPageState extends State<AddListingPage> {
                 controller: modelController,
                 decoration: const InputDecoration(labelText: 'Model'),
               ),
-              const SizedBox(height: 16),
 
+              const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 value: selectedColor,
                 decoration: const InputDecoration(labelText: 'Color'),
@@ -364,6 +378,26 @@ class _AddListingPageState extends State<AddListingPage> {
           ],
         ),
       ),
+    );
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
