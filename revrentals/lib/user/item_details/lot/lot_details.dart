@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:revrentals/main_pages/auth_page.dart';
 import 'package:revrentals/services/listing_service.dart';
+import 'package:revrentals/user/garage/garage.dart';
+import 'package:revrentals/user/notifications/agreement_transaction.dart';
 
 class LotDetailsPage extends StatefulWidget {
   final int profileId;
@@ -57,45 +59,92 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
       });
     }
   }
-
   // Function to handle renting the lot
   Future<void> _rentLot() async {
-    if (selectedStartDate != null && selectedEndDate != null) {
-      try {
-        // Convert DateTime objects to strings in the format yyyy-MM-dd
-        String formattedStartDate =
-            DateFormat('yyyy-MM-dd').format(selectedStartDate!);
-        String formattedEndDate =
-            DateFormat('yyyy-MM-dd').format(selectedEndDate!);
+    if (selectedStartDate == null || selectedEndDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select both start and end dates.')),
+      );
+      return;
+    }
 
-        Map<String, dynamic> listingData = {
-          "profile_id": widget.profileId,
-          "lot_no": widget.lotData['Lot_No'],
-          "start_date": formattedStartDate,
-          "end_date": formattedEndDate,
-        };
+    try {
+      // Step 1: Check for active lot rental
+      final activeRental = await _listingService.checkActiveLotRental(widget.profileId);
 
-        await _listingService.addReservation(listingData);
-
-        final String rentalPeriod = '$formattedStartDate to $formattedEndDate';
-        
+      if (activeRental['has_active_rental'] == true) {
+        final endDate = activeRental['rental_details']['end_date'];
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Storage lot rented for $rentalPeriod'),
-            duration: const Duration(seconds: 3),
+            content: Text(
+              'You already have a lot rented until $endDate. You cannot rent another lot.',
+            ),
           ),
         );
-        Navigator.pop(context);
-      } catch (e) {
-        print('Error occurred trying to rent storage lot: $e');
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('An error occurred. Please try again.')),
-        );
+        return;
       }
-    } else {
+
+      // Step 2: Format dates for reservation
+      String formattedStartDate = DateFormat('yyyy-MM-dd').format(selectedStartDate!);
+      String formattedEndDate = DateFormat('yyyy-MM-dd').format(selectedEndDate!);
+      print('Full lot data: ${widget.lotData}');
+      // Debug prices
+      print('Rental price from lot data: ${widget.lotData['LRentalPrice']}');
+      final duration = selectedEndDate!.difference(selectedStartDate!).inDays + 1;
+      final totalPrice = (widget.lotData['LRentalPrice'] ?? 0.0) * duration;
+      print('Calculated total price: $totalPrice');
+
+      // Step 3: Add reservation
+      Map<String, dynamic> listingData = {
+        "profile_id": widget.profileId,
+        "lot_no": widget.lotData['Lot_No'],
+        "start_date": formattedStartDate,
+        "end_date": formattedEndDate,
+      };
+
+      print('Sending listing data: $listingData'); // Debug print
+
+      final response = await _listingService.addReservation(listingData);
+      print('Received response: $response'); // Debug print
+
+      if (response['success'] != true || response['reservation_no'] == null) {
+        throw Exception('Failed to create reservation. Invalid response: $response');
+      }
+
+      final reservationNo = response['reservation_no'] as int;
+      print('Reservation number: $reservationNo'); // Debug print
+
+      // Step 4: Fetch reservation details
+      final reservationDetails = await _listingService.fetchReservationDetails(reservationNo);
+      print('Reservation details: $reservationDetails'); // Debug print
+
+      // Step 5: Navigate to transaction page
+      if (!mounted) return; // Check if widget is still mounted
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AgreementTransactionPage(
+            itemName: widget.lotData['LAddress'],
+            renterName: "${reservationDetails['renter_first_name']} ${reservationDetails['renter_last_name']}",
+            rentalPeriod: '$formattedStartDate to $formattedEndDate',
+            rentalPrice: widget.lotData['LRentalPrice'] ?? 0.0,
+            totalPrice: totalPrice,
+            onActionCompleted: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Transaction completed successfully.')),
+              );
+            },
+            agreementId: reservationNo,
+          ),
+        ),
+      );
+
+    } catch (e) {
+      if (!mounted) return; // Check if widget is still mounted
+      print('Error occurred trying to rent storage lot: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Please select both start and end dates.')),
+        SnackBar(content: Text('Error: $e')),
       );
     }
   }
