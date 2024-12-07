@@ -150,10 +150,11 @@ class _MaintenanceRecordsPageState extends State<MaintenanceRecordsPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Maintenance records saved.")),
         );
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => GaragePage(profileId: widget.profileId)));
+        Navigator.pop(context);
+        // Navigator.push(
+        //     context,
+        //     MaterialPageRoute(
+        //         builder: (context) => GaragePage(profileId: widget.profileId)));
       } catch (e) {
         errorMessage(context, e.toString());
       }

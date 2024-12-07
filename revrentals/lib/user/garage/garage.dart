@@ -15,7 +15,7 @@ class GaragePage extends StatefulWidget {
   final Map<String, dynamic>? userData;
 // Add a callback to refresh the data
   // final VoidCallback onPriceUpdated;
-  const GaragePage({super.key, required this.profileId, this.userData,});
+  const GaragePage({super.key, required this.profileId, this.userData});
 
   @override
   State<GaragePage> createState() => _GaragePageState();
@@ -476,10 +476,7 @@ class _GarageVehiclePageState extends State<GarageVehiclePage> {
                     if (widget.onPriceUpdated != null) {
                       widget.onPriceUpdated!();
                     }
-                    // Navigator.pop(context);
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => GaragePage(profileId: widget.profileId)));
-
-
+                    Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                           content: Text("Rental price updated successfully!")),
