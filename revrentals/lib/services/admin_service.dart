@@ -125,6 +125,7 @@ class AdminService {
       return {"success": true, "message": "Listing added successfully"};
     } else {
       final error = jsonDecode(response.body);
+      print("Error response: ${response.body}");
       throw Exception(error["error"] ?? "Failed to add listing");
     }
   }
