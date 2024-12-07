@@ -374,19 +374,33 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                 onPressed: () => Navigator.pop(context),
                 child: const Text('Cancel'),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  _applyFilter(
-                    context: context,
-                    selectedVehicle: selectedVehicle,
-                    selectedColor: selectedColor,
-                    selectedPriceRange: selectedPriceRange,
-                    selectedMileage: selectedMileage,
-                    selectedInsurance: selectedInsurance,
-                    );
-                  Navigator.pop(context);
-                },
-                child: const Text('Apply Filters'),
+              const SizedBox(width: 8),
+              Row (
+                mainAxisSize: MainAxisSize.min,
+                children: [   
+                  ElevatedButton(
+                    onPressed: () {
+                      //to-do
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Reset Filters'),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                  onPressed: () {
+                    _applyFilter(
+                      context: context,
+                      selectedVehicle: selectedVehicle,
+                      selectedColor: selectedColor,
+                      selectedPriceRange: selectedPriceRange,
+                      selectedMileage: selectedMileage,
+                      selectedInsurance: selectedInsurance,
+                      );
+                    Navigator.pop(context);
+                    },
+                    child: const Text('Apply Filters'),
+                  ),
+                ],
               ),
             ],
           );
