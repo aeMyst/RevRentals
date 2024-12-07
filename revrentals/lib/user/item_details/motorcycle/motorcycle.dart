@@ -22,6 +22,12 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   late List<dynamic> _originalMotorcycles = [];
   late final int profileId;
   bool filterApplied = false;
+  String _currentSort = 'None';
+  String selectedColor = 'Any';
+  String selectedMileage = 'Any';
+  String selectedPriceRange = 'Any';
+  String selectedVehicle = 'All';
+  String selectedInsurance = 'Any';
   Map<String, String?> _currentFilters = {
     'vehicle': "All",
     'color': "Any",
@@ -32,13 +38,6 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     'engine': "Any",
     'dirtbikeType': "Any",
   };
-  String _currentSort = 'None';
-
-  String selectedColor = 'Any';
-  String selectedMileage = 'Any';
-  String selectedPriceRange = 'Any';
-  String selectedVehicle = 'All';
-  String selectedInsurance = 'Any';
 
   @override
   void initState() {
@@ -46,6 +45,8 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     motorcyclesFuture = widget.motorcyclesFuture;
     
     _filteredMotorcycles = [];
+    _originalMotorcycles = [];
+    filterApplied = false;
   }
 
   // Save original list for when user resets to 'None' sort option.
@@ -109,38 +110,38 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
       _currentSort = selectedSortOption;
       print("Current sort: $_currentSort");
 
-     // if (_originalMotorcycles.isEmpty) return; 
-      if (filterApplied) {
-          switch (selectedSortOption) {
-          case 'None':
-            // revert back to unfiltered data (unsorted)
-            _filteredMotorcycles = List.from(_originalMotorcycles);
-            break;
-          case 'Price: Low to High':
-            _filteredMotorcycles = List.from(_originalMotorcycles)
-              ..sort((a, b) => double.parse(a['Rental_Price']).compareTo(double.parse(b['Rental_Price'])));
-            break;
-          case 'Price: High to Low':
-            _filteredMotorcycles = List.from(_originalMotorcycles)
-              ..sort((a, b) => double.parse(b['Rental_Price']).compareTo(double.parse(a['Rental_Price'])));
-            break;
-          default:
-            _filteredMotorcycles = List.from(_originalMotorcycles);
-        }
-      } else {
+      // Ensure _originalMotorcycles is used as the source when no filters are applied
+      if (!filterApplied) {
+        // Sorting original motorcycles
         switch (selectedSortOption) {
           case 'None':
-            // revert back to unfiltered data (unsorted)
-            _filteredMotorcycles = List.from(_originalMotorcycles);
+            _filteredMotorcycles = List.from(_originalMotorcycles); // Reset to original unsorted data
             break;
           case 'Price: Low to High':
-            _originalMotorcycles.sort((a, b) => a['Rental_Price'].compareTo(b['Rental_Price']));
+            _filteredMotorcycles = List.from(_originalMotorcycles)
+             ..sort((a, b) => (a['Rental_Price'] as double).compareTo(b['Rental_Price'] as double));
             break;
           case 'Price: High to Low':
-            _originalMotorcycles.sort((a, b) => b['Rental_Price'].compareTo(a['Rental_Price']));
+            _filteredMotorcycles = List.from(_originalMotorcycles)
+             ..sort((a, b) => (b['Rental_Price'] as double).compareTo(a['Rental_Price'] as double));
             break;
           default:
-            _filteredMotorcycles = List.from(_originalMotorcycles);
+            _filteredMotorcycles = List.from(_originalMotorcycles); // Default behavior
+        }
+      } else {
+        // Sorting filtered motorcycles
+        switch (selectedSortOption) {
+          case 'None':
+            _filteredMotorcycles = List.from(_filteredMotorcycles); // Reset to filtered unsorted data
+            break;
+          case 'Price: Low to High':
+            _filteredMotorcycles.sort((a, b) => double.parse(a['Rental_Price']).compareTo(double.parse(b['Rental_Price'])));
+            break;
+          case 'Price: High to Low':
+            _filteredMotorcycles.sort((a, b) => double.parse(b['Rental_Price']).compareTo(double.parse(a['Rental_Price'])));
+            break;
+          default:
+            _filteredMotorcycles = List.from(_filteredMotorcycles); // Default behavior
         }
       }
     });
@@ -1121,7 +1122,9 @@ Future<List<dynamic>> _applyMultipleFilters({
                       return Center(child: Text("Error: ${snapshot.error}"));
                     } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                       print("Displaying original motorcycles list");
+                      print(_originalMotorcycles);
                       final vehicles = snapshot.data!;
+                      _originalMotorcycles = vehicles;
 
                       return ListView.builder(
                         itemCount: vehicles.length,
