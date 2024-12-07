@@ -410,6 +410,90 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   );
 }
 
+void _applyFilter({
+  required BuildContext context,
+    String? selectedVehicle = "All",
+    String? selectedColor = "Any",
+    String? selectedPriceRange = "Any",
+    String? selectedMileage = "Any",
+    String? selectedInsurance = "Any",
+    String? selectedCargoRacks = "Any",
+    String? selectedEngine = "Any",
+    String? selectedDirtbikeType = "Any",
+  }) async {
+    try {
+      final Map<String, String?> filters = {
+        "vehicle": selectedVehicle,
+        "color": selectedColor,
+        "priceRange": selectedPriceRange != "Any"
+          ? RegExp(r'[^0-9]').hasMatch(selectedPriceRange!)
+              ? "Any"
+              : selectedPriceRange
+          : "Any",
+        "mileage": selectedMileage != "Any"
+            ? RegExp(r'[^0-9]').hasMatch(selectedMileage!)
+                ? "Any"
+                : selectedMileage
+            : "Any",
+        "insurance": selectedInsurance,
+        "cargoRacks": selectedCargoRacks,
+        "engine": selectedEngine,
+        "dirtbikeType": selectedDirtbikeType,
+      };
+
+      final query = filters.entries
+        .where((entry) => entry.value != "Any" && entry.value != "All")
+        .map((entry) => '${entry.key}=${Uri.encodeComponent(entry.value!)}')
+        .join('&');
+
+      final requestUrl = 'http://10.0.2.2:8000/filter-by-multiple-conditions/?$query';
+      print("Request URL: $requestUrl");
+
+      final response = await fetchMotorcycles(requestUrl);
+
+      if (response != null && response.isNotEmpty) {
+        setState(() {
+          _filteredMotorcycles = response;
+          filterApplied = true;
+        });
+      } else {
+        setState(() {
+          _filteredMotorcycles = [];
+          filterApplied = true;
+        });
+      }
+    } catch (error) {
+      print("Error applying filters: $error");
+      setState((){
+        _filteredMotorcycles = [];
+        filterApplied = true;
+      });   
+    }
+  }
+
+  Future<List<dynamic>?> fetchMotorcycles(String url) async {
+  try {
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      if (responseData.containsKey('vehicles') && responseData['vehicles'] is List) {
+          return responseData['vehicles'];
+        } else {
+          return [];
+        }
+    } else {
+      print("Server responded with status code: ${response.statusCode}");
+      return null;
+    }
+  } catch (error) {
+    print("Error fetching motorcycles: $error");
+    return null;
+  }
+}
+
+
+/*
  void _applyFilter({
     required BuildContext context,
     String? selectedVehicle,
@@ -487,12 +571,6 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
             cargoRacks: selectedCargoRacks,
             dirtbikeType: selectedDirtbikeType,
           );
-
-         /* print("multipleFilterResults type: ${multipleFilterResults.runtimeType}");
-          print("multipleFilterResults length: ${multipleFilterResults.length}");
-          print("Multiple filter results: $multipleFilterResults");
-          print("_filteredMotorcycles + $_filteredMotorcycles"); */
-
 
           for (var item in multipleFilterResults) {
             if (!uniqueVINs.contains(item['VIN'])) {
@@ -586,8 +664,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
         });
       }
     }
-  }
-
+  } */
 
   Future<List<dynamic>> _applyVehicleFilter(String selectedVehicle) async {
     final url = Uri.parse('http://10.0.2.2:8000/filter-by-vehicle/');
