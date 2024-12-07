@@ -423,21 +423,20 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
       String? selectedCargoRacks = "Any",
       String? selectedEngineType = "Any",
       String? selectedDirtbikeType = "Any",
+      final numericPrice, numericMileage,
+
     }) async {
       try {
+        
         final Map<String, String?> filters = {
           "vehicle": selectedVehicle,
           "color": selectedColor,
           "rental_price": selectedPriceRange != "Any"
-            ? RegExp(r'[^0-9]').hasMatch(selectedPriceRange!)
-                ? "Any"
-                : selectedPriceRange
+            ? parsePrice(selectedPriceRange)?.toString()
             : "Any",
           "mileage": selectedMileage != "Any"
-              ? RegExp(r'[^0-9]').hasMatch(selectedMileage!)
-                  ? "Any"
-                  : selectedMileage
-              : "Any",
+              ? parseMileage(selectedMileage)?.toString()
+            : "Any",
           "insurance": selectedInsurance,
           "cargo_rack": selectedCargoRacks,
           "engine_type": selectedEngineType,
@@ -495,6 +494,22 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   }
 }
 
+  double? parseMileage(String? input) {
+  if (input == null) return null;
+
+  final match = RegExp(r'[\d]+\.?\d*').firstMatch(input);
+
+  return match != null ? double.tryParse(match.group(0)!) : null;
+}
+
+int? parsePrice(String? input) {
+  if (input == null) return null;
+
+  final match = RegExp(r'\d+').firstMatch(input);
+
+  return match != null ? int.tryParse(match.group(0)!) : null;
+}
+
   Future<void> resetFilters() async {
   try {
     final requestUrl = 'http://10.0.2.2:8000/api/motorized-vehicles/';
@@ -518,6 +533,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   }
 }
 
+// old methods for filtering
 /*
  void _applyFilter({
     required BuildContext context,
@@ -886,7 +902,6 @@ Future<List<dynamic>> _applyMultipleFilters({
     return [];
   }
 } */
-
 
   @override
   Widget build(BuildContext context) {
