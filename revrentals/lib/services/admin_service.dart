@@ -130,7 +130,7 @@ class AdminService {
   }
 
   Future<Map<String, dynamic>> updateLotListing(
-      String laddress, int lot_no) async {
+      String laddress, int lot_no, double lrentalprice) async {
     final url = Uri.parse(
         "$_baseUrl/edit-lot-listing/$lot_no/"); // Include lot_no in the URL
 
@@ -139,9 +139,12 @@ class AdminService {
       headers: {
         "Content-Type": "application/json",
       },
-      body: jsonEncode({
-        'laddress': laddress, // Send the new address in the body
-      }),
+      body: jsonEncode(
+        {
+          'laddress': laddress, // Send the new address in the body
+          'lrentalprice': lrentalprice,
+        },
+      ),
     );
 
     if (response.statusCode == 200) {
