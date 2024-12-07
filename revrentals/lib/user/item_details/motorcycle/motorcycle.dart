@@ -127,7 +127,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                 TextButton(
                   onPressed: () => Navigator.pop(context),
                   child: const Text('Cancel'),
-                ),
+                ), 
                 ElevatedButton(
                   onPressed: () {
                     print('Applying Sort Option: $selectedSortOption');
@@ -449,10 +449,10 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
               ],
             ),
             actions: [
-              TextButton(
+              /* TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: const Text('Cancel'),
-              ),
+              ), */
               const SizedBox(width: 8),
               Row (
                 mainAxisSize: MainAxisSize.min,

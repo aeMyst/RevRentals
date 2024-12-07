@@ -359,10 +359,10 @@ class _GearTabState extends State<GearTab> {
                 ],
               ),
               actions: [
-                TextButton(
+                /* TextButton(
                   onPressed: () => Navigator.pop(context),
                   child: const Text('Cancel'),
-                ),
+                ), */
                 const SizedBox(width: 8),
                 Row (
                   mainAxisSize: MainAxisSize.min,
