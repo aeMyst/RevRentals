@@ -19,8 +19,19 @@ class MotorcycleTab extends StatefulWidget {
 class _MotorcycleTabState extends State<MotorcycleTab> {
   late Future<List<dynamic>> motorcyclesFuture;
   late List<dynamic> _filteredMotorcycles = [];  // local storage of filtered vehicles
+  late List<dynamic> _originalMotorcycles = [];
   late final int profileId;
   bool filterApplied = false;
+  Map<String, String?> _currentFilters = {
+    'vehicle': "All",
+    'color': "Any",
+    'priceRange': "Any",
+    'mileage': "Any",
+    'insurance': "Any",
+    'cargoRacks': "Any",
+    'engine': "Any",
+    'dirtbikeType': "Any",
+  };
 
   String selectedColor = 'Any';
   String selectedMileage = 'Any';
@@ -36,29 +47,82 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     _filteredMotorcycles = [];
   }
 
-
+  void getOriginalList() async {
+  try {
+    final response = await fetchMotorcycles('http://10.0.2.2:8000/get-all-vehicles');
+    if (response != null && response.isNotEmpty) {
+      setState(() {
+        _originalMotorcycles = response; // Save full unfiltered data here.
+        _filteredMotorcycles = List.from(response); // Make a copy for filtered data.
+      });
+    }
+  } catch (error) {
+    print("Error fetching motorcycles: $error");
+  }
+}
+/*
   void _applySort(String selectedSortOption) {
+
     motorcyclesFuture.then((motorcycles) {
-      switch (selectedSortOption) {
+      if (filterApplied) {
+        switch (selectedSortOption) {
+        case 'None':
+          _filteredMotorcycles = List.from(_originalMotorcycles);
+          break;
+        case 'Price: Low to High':
+          _filteredMotorcycles.sort((a, b) => a['Rental_Price'].compareTo(b['Rental_Price']));
+          break;
+        case 'Price: High to Low':
+          _filteredMotorcycles.sort((a, b) => b['Rental_Price'].compareTo(a['Rental_Price']));
+          break;
+        default:
+          break;
+        }
+      } else {
+        switch (selectedSortOption) {
+        case 'None':
+          _filteredMotorcycles = List.from(_originalMotorcycles);
+          break;
         case 'Price: Low to High':
           motorcycles.sort((a, b) => a['Rental_Price'].compareTo(b['Rental_Price']));
           break;
         case 'Price: High to Low':
           motorcycles.sort((a, b) => b['Rental_Price'].compareTo(a['Rental_Price']));
           break;
-        case 'Newest First':
-          motorcycles.sort((a, b) => b['dateAdded'].compareTo(a['dateAdded'])); // TO FIX
-          break;
         default:
           break;
+        }
       }
-
       // Update the motorcycles list
       setState(() {
         motorcyclesFuture = Future.value(motorcycles);
       });
     });
+  } */
+
+  void _applySort(String selectedSortOption) {
+  setState(() {
+    if (_originalMotorcycles.isEmpty) return; // Ensure we only sort if original list is not empty
+
+    switch (selectedSortOption) {
+      case 'None':
+        // Revert back to unfiltered data (unsorted)
+        _filteredMotorcycles = List.from(_originalMotorcycles);
+        break;
+      case 'Price: Low to High':
+        _filteredMotorcycles = List.from(_originalMotorcycles)
+          ..sort((a, b) => double.parse(a['Rental_Price']).compareTo(double.parse(b['Rental_Price'])));
+        break;
+      case 'Price: High to Low':
+        _filteredMotorcycles = List.from(_originalMotorcycles)
+          ..sort((a, b) => double.parse(b['Rental_Price']).compareTo(double.parse(a['Rental_Price'])));
+        break;
+      default:
+        _filteredMotorcycles = List.from(_originalMotorcycles);
+      }
+    });
   }
+
 
   void _showSortDialog(BuildContext context) {
     String selectedSortOption = 'None';
@@ -119,15 +183,15 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     );
   }
   
-  void _showFilterDialog(BuildContext context) {
-  String selectedVehicle = 'All';
-  String selectedPriceRange = 'Any';
-  String selectedInsurance = 'Any';
-  String selectedMileage = 'Any';
-  String selectedColor = 'Any';
-  String selectedEngineType = 'Any';
-  String selectedCargoRacks = 'Any';
-  String selectedDirtbikeType = 'Any';
+  void _showFilterDialog(BuildContext context, {required Map<String, String?> currentFilters}) {
+  String selectedVehicle = currentFilters['vehicle'] ?? 'All';
+  String selectedPriceRange = currentFilters['priceRange'] ?? 'Any';
+  String selectedInsurance = currentFilters['insurance'] ?? 'Any';
+  String selectedMileage = currentFilters['mileage'] ?? 'Any';
+  String selectedColor = currentFilters['color'] ?? 'Any';
+  String selectedEngineType = currentFilters['engine'] ??'Any';
+  String selectedCargoRacks = currentFilters['cargoRacks'] ??'Any';
+  String selectedDirtbikeType = currentFilters['dirtbikeType'] ??'Any';
 
   final List<String> vehicleType = [
     'All',
@@ -211,6 +275,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                   onChanged: (String? newValue) {
                     setState(() {
                       selectedVehicle = newValue!;
+                      _currentFilters['vehicle'] = newValue;
                     });
                   },
                 ),
@@ -233,6 +298,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                     onChanged: (String? newValue) {
                       setState(() {
                         selectedEngineType = newValue!;
+                        _currentFilters['engine'] = newValue;
                       });
                     },
                   ),
@@ -256,6 +322,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                     onChanged: (String? newValue) {
                       setState(() {
                         selectedCargoRacks = newValue!;
+                        _currentFilters['cargoRacks'] = newValue;
                       });
                     },
                   ),
@@ -279,6 +346,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                     onChanged: (String? newValue) {
                       setState(() {
                         selectedDirtbikeType = newValue!;
+                        _currentFilters['dirtbikeType'] = newValue;
                       });
                     },
                   ),
@@ -301,6 +369,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                   onChanged: (String? newValue) {
                     setState(() {
                       selectedPriceRange = newValue!;
+                      _currentFilters['priceRange'] = newValue;
                     });
                   },
                 ),
@@ -322,6 +391,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                   onChanged: (String? newValue) {
                     setState(() {
                       selectedColor = newValue!;
+                      _currentFilters['color'] = newValue;
                     });
                   },
                 ),
@@ -343,9 +413,13 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                   onChanged: (String? newValue) {
                     setState(() {
                       selectedMileage = newValue!;
+                      _currentFilters['mileage'] = newValue;
+                      print('Current selected mileage value: $_currentFilters');
+
                     });
                   },
                 ),
+                
                 const SizedBox(height: 16),
 
                 // Dropdown for Insurance
@@ -364,6 +438,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                   onChanged: (String? newValue) {
                     setState(() {
                       selectedInsurance = newValue!;
+                      _currentFilters['insurance'] = newValue;
                     });
                   },
                 ),
@@ -374,19 +449,36 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                 onPressed: () => Navigator.pop(context),
                 child: const Text('Cancel'),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  _applyFilter(
-                    context: context,
-                    selectedVehicle: selectedVehicle,
-                    selectedColor: selectedColor,
-                    selectedPriceRange: selectedPriceRange,
-                    selectedMileage: selectedMileage,
-                    selectedInsurance: selectedInsurance,
-                    );
-                  Navigator.pop(context);
-                },
-                child: const Text('Apply Filters'),
+              const SizedBox(width: 8),
+              Row (
+                mainAxisSize: MainAxisSize.min,
+                children: [   
+                  ElevatedButton(
+                    onPressed: () {
+                      resetFilters();
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Reset Filters'),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                  onPressed: () {
+                    _applyFilter(
+                      context: context,
+                      selectedVehicle: selectedVehicle,
+                      selectedColor: selectedColor,
+                      selectedPriceRange: selectedPriceRange,
+                      selectedMileage: selectedMileage,
+                      selectedInsurance: selectedInsurance,
+                      selectedCargoRacks: selectedCargoRacks,
+                      selectedDirtbikeType: selectedDirtbikeType,
+                      selectedEngineType: selectedEngineType,
+                      );
+                    Navigator.pop(context);
+                    },
+                    child: const Text('Apply Filters'),
+                  ),
+                ],
               ),
             ],
           );
@@ -396,6 +488,160 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   );
 }
 
+  void _applyFilter({
+    required BuildContext context,
+      String? selectedVehicle = "All",
+      String? selectedColor = "Any",
+      String? selectedPriceRange = "Any",
+      String? selectedMileage = "Any",
+      String? selectedInsurance = "Any",
+      String? selectedCargoRacks = "Any",
+      String? selectedEngineType = "Any",
+      String? selectedDirtbikeType = "Any",
+     // final numericPrice, numericMileage,
+
+    }) async {
+      try {
+        // keeping track of filters used.
+        setState(() {
+          _currentFilters = {
+            'vehicle': selectedVehicle,
+            'color': selectedColor,
+            'priceRange': selectedPriceRange,
+            'mileage': selectedMileage,
+            'insurance': selectedInsurance,
+            'cargoRacks': selectedCargoRacks,
+            'engine': selectedEngineType,
+            'dirtbikeType': selectedDirtbikeType,
+          };
+
+          print(_currentFilters);
+        });
+
+        final Map<String, String?> filters = {
+          "vehicle": selectedVehicle,
+          "color": selectedColor,
+          "rental_price": selectedPriceRange != "Any"
+            ? parsePrice(selectedPriceRange)?.toString()
+            : "Any",
+          "mileage": selectedMileage != "Any"
+              ? parseMileage(selectedMileage)?.toString()
+            : "Any",
+          "insurance": selectedInsurance,
+          "cargo_rack": selectedCargoRacks,
+          "engine_type": selectedEngineType,
+          "dirt_bike_type": selectedDirtbikeType,
+        };
+
+        final query = filters.entries
+          .where((entry) => entry.value != "Any" && entry.value != "All")
+          .map((entry) => '${entry.key}=${Uri.encodeComponent(entry.value!)}')
+          .join('&');
+
+        final requestUrl = 'http://10.0.2.2:8000/filter-by-multiple-conditions/?$query';
+        print("Request URL: $requestUrl");
+
+        final response = await fetchMotorcycles(requestUrl);
+
+        if (response != null && response.isNotEmpty) {
+          setState(() {
+            _filteredMotorcycles = response;
+            _originalMotorcycles = response; // save original list
+            filterApplied = true;
+          });
+        } else {
+          setState(() {
+            _filteredMotorcycles = [];
+            _originalMotorcycles = [];
+            filterApplied = true;
+          });
+        }
+      } catch (error) {
+        print("Error applying filters: $error");
+        setState((){
+          _filteredMotorcycles = [];
+          _originalMotorcycles = [];
+          filterApplied = false;
+        });   
+      }
+    }
+
+  Future<List<dynamic>?> fetchMotorcycles(String url) async {
+  try {
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      if (responseData.containsKey('vehicles') && responseData['vehicles'] is List) {
+          return responseData['vehicles'];
+        } else {
+          return [];
+        }
+    } else {
+      print("Server responded with status code: ${response.statusCode}");
+      return null;
+    }
+  } catch (error) {
+    print("Error fetching motorcycles: $error");
+    return null;
+  }
+}
+
+  double? parseMileage(String? input) {
+  if (input == null) return null;
+
+  final match = RegExp(r'[\d]+\.?\d*').firstMatch(input);
+
+  return match != null ? double.tryParse(match.group(0)!) : null;
+}
+
+  int? parsePrice(String? input) {
+  if (input == null) return null;
+
+  final match = RegExp(r'\d+').firstMatch(input);
+
+  return match != null ? int.tryParse(match.group(0)!) : null;
+}
+
+  Future<void> resetFilters() async {
+  try {
+    final requestUrl = 'http://10.0.2.2:8000/api/motorized-vehicles/';
+    print("Request URL: $requestUrl");
+
+    final response = await fetchMotorcycles(requestUrl);
+
+    if (response != null && response.isNotEmpty) {
+      setState(() {
+        _filteredMotorcycles = response;
+        filterApplied = false; // Indicate filters are cleared
+      });
+    } else {
+      setState(() {
+        _filteredMotorcycles = [];
+        filterApplied = false;
+      });
+    }
+
+    setState(() {
+            _currentFilters = {
+              'vehicle': "All",
+              'color': "Any",
+              'priceRange': "Any",
+              'mileage': "Any",
+              'insurance': "Any",
+              'cargoRacks': "Any",
+              'engine': "Any",
+              'dirtbikeType': "Any",
+            };
+          });
+  } catch (error) {
+    print("Error resetting filters and fetching all vehicles: $error");
+  }
+  
+}
+
+// old methods for filtering
+/*
  void _applyFilter({
     required BuildContext context,
     String? selectedVehicle,
@@ -473,12 +719,6 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
             cargoRacks: selectedCargoRacks,
             dirtbikeType: selectedDirtbikeType,
           );
-
-         /* print("multipleFilterResults type: ${multipleFilterResults.runtimeType}");
-          print("multipleFilterResults length: ${multipleFilterResults.length}");
-          print("Multiple filter results: $multipleFilterResults");
-          print("_filteredMotorcycles + $_filteredMotorcycles"); */
-
 
           for (var item in multipleFilterResults) {
             if (!uniqueVINs.contains(item['VIN'])) {
@@ -572,9 +812,9 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
         });
       }
     }
-  }
+  } */
 
-
+/*
   Future<List<dynamic>> _applyVehicleFilter(String selectedVehicle) async {
     final url = Uri.parse('http://10.0.2.2:8000/filter-by-vehicle/');
     final body = {'vehicle': selectedVehicle};
@@ -768,8 +1008,7 @@ Future<List<dynamic>> _applyMultipleFilters({
     print('Error: $error');
     return [];
   }
-} 
-
+} */
 
   @override
   Widget build(BuildContext context) {
@@ -789,7 +1028,7 @@ Future<List<dynamic>> _applyMultipleFilters({
                 'Filter',
               ),
               onPressed: () {
-                _showFilterDialog(context);
+                _showFilterDialog(context, currentFilters: _currentFilters);
               },
             ),
             const SizedBox(width: 16),
