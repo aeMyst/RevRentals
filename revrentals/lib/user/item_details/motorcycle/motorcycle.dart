@@ -64,6 +64,88 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   }
 }
 
+  // Function to fetch motorcyles
+  Future<List<dynamic>?> fetchMotorcycles(String url) async {
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        if (responseData.containsKey('vehicles') && responseData['vehicles'] is List) {
+            return responseData['vehicles'];
+          } else {
+            return [];
+          }
+      } else {
+        print("Server responded with status code: ${response.statusCode}");
+        return null;
+      }
+    } catch (error) {
+      print("Error fetching motorcycles: $error");
+      return null;
+   } 
+  }
+
+
+  // Show sort options when Sort button pressed
+  void _showSortDialog(BuildContext context, {required String currentSort}) {
+    String selectedSortOption = _currentSort;
+    final List<String> sortOptions = [
+      'None',
+      'Price: Low to High',
+      'Price: High to Low',
+    ];
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: const Text('Sort Options'),
+              content: DropdownButtonFormField<String>(
+                dropdownColor: Colors.white,
+                value: selectedSortOption,
+                decoration: const InputDecoration(
+                  labelText: 'Sort By',
+                  border: OutlineInputBorder(),
+                ),
+                items: sortOptions.map((String option) {
+                  return DropdownMenuItem<String>(
+                    value: option,
+                    child: Text(option),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedSortOption = newValue!;
+                    _currentSort = newValue;
+                  });
+                },
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    print('Applying Sort Option: $selectedSortOption');
+                    _applySort(selectedSortOption);
+                    _currentSort = selectedSortOption;
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Apply'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  // Function to apply sorting
   void _applySort(String selectedSortOption) {
     setState(() {
       _currentSort = selectedSortOption;
@@ -105,68 +187,8 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
       }
     });
   }
-
-
-  void _showSortDialog(BuildContext context, {required String currentSort}) {
-    String selectedSortOption = _currentSort;
-    final List<String> sortOptions = [
-      'None',
-      'Price: Low to High',
-      'Price: High to Low',
-      //'Newest First'
-    ];
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            return AlertDialog(
-              title: const Text('Sort Options'),
-              content: DropdownButtonFormField<String>(
-                dropdownColor: Colors.white,
-                value: selectedSortOption,
-                decoration: const InputDecoration(
-                  labelText: 'Sort By',
-                  border: OutlineInputBorder(),
-                ),
-                items: sortOptions.map((String option) {
-                  return DropdownMenuItem<String>(
-                    value: option,
-                    child: Text(option),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedSortOption = newValue!;
-                    _currentSort = newValue;
-                  });
-                },
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    print('Applying Sort Option: $selectedSortOption');
-                  
-                    _applySort(selectedSortOption);
-                    _currentSort = selectedSortOption;
-
-                    Navigator.pop(context);
-                  },
-                  child: const Text('Apply'),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
   
+  // Show filter options when 'Filter' pressed
   void _showFilterDialog(BuildContext context, {required Map<String, String?> currentFilters}) {
   String selectedVehicle = currentFilters['vehicle'] ?? 'All';
   String selectedPriceRange = currentFilters['priceRange'] ?? 'Any';
@@ -226,7 +248,6 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     'Any',
     '0',
     '1',
-    '2'
   ];
   final List<String> dirtbikeType = [
     'Any',
@@ -471,6 +492,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   );
 }
 
+  // Function to apply filtering
   void _applyFilter({
     required BuildContext context,
       String? selectedVehicle = "All",
@@ -485,7 +507,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
 
     }) async {
       try {
-        // keeping track of filters used.
+        // Keeping track of filters used.
         setState(() {
           _currentFilters = {
             'vehicle': selectedVehicle,
@@ -549,79 +571,60 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
       }
     }
 
-  Future<List<dynamic>?> fetchMotorcycles(String url) async {
-    try {
-      final response = await http.get(Uri.parse(url));
+  // Helper method to parse Price
+  int? parsePrice(String? input) {
+    if (input == null) return null;
 
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        if (responseData.containsKey('vehicles') && responseData['vehicles'] is List) {
-            return responseData['vehicles'];
-          } else {
-            return [];
-          }
-      } else {
-        print("Server responded with status code: ${response.statusCode}");
-        return null;
-      }
-    } catch (error) {
-      print("Error fetching motorcycles: $error");
-      return null;
-    }
+    final match = RegExp(r'\d+').firstMatch(input);
+
+    return match != null ? int.tryParse(match.group(0)!) : null;
   }
 
+  // Helper method to parse Mileage
   double? parseMileage(String? input) {
   if (input == null) return null;
 
   final match = RegExp(r'[\d]+\.?\d*').firstMatch(input);
 
   return match != null ? double.tryParse(match.group(0)!) : null;
-}
-
-  int? parsePrice(String? input) {
-  if (input == null) return null;
-
-  final match = RegExp(r'\d+').firstMatch(input);
-
-  return match != null ? int.tryParse(match.group(0)!) : null;
-}
-
-  Future<void> resetFilters() async {
-  try {
-    final requestUrl = 'http://10.0.2.2:8000/api/motorized-vehicles/';
-    print("Request URL: $requestUrl");
-
-    final response = await fetchMotorcycles(requestUrl);
-
-    if (response != null && response.isNotEmpty) {
-      setState(() {
-        _filteredMotorcycles = response;
-        filterApplied = false; // Indicate filters are cleared
-      });
-    } else {
-      setState(() {
-        _filteredMotorcycles = [];
-        filterApplied = false;
-      });
-    }
-
-    setState(() {
-            _currentFilters = {
-              'vehicle': "All",
-              'color': "Any",
-              'priceRange': "Any",
-              'mileage': "Any",
-              'insurance': "Any",
-              'cargoRacks': "Any",
-              'engine': "Any",
-              'dirtbikeType': "Any",
-            };
-          });
-  } catch (error) {
-    print("Error resetting filters and fetching all vehicles: $error");
   }
-  
-}
+
+  // Helper method to reset filtiner
+  Future<void> resetFilters() async {
+    try {
+      final requestUrl = 'http://10.0.2.2:8000/api/motorized-vehicles/';
+      print("Request URL: $requestUrl");
+
+      final response = await fetchMotorcycles(requestUrl);
+
+      if (response != null && response.isNotEmpty) {
+        setState(() {
+          _filteredMotorcycles = response;
+          filterApplied = false; // Indicate filters are cleared
+        });
+      } else {
+        setState(() {
+          _filteredMotorcycles = [];
+          filterApplied = false;
+        });
+      }
+
+      setState(() {
+              _currentFilters = {
+                'vehicle': "All",
+                'color': "Any",
+                'priceRange': "Any",
+                'mileage': "Any",
+                'insurance': "Any",
+                'cargoRacks': "Any",
+                'engine': "Any",
+                'dirtbikeType': "Any",
+              };
+            });
+    } catch (error) {
+      print("Error resetting filters and fetching all vehicles: $error");
+    }
+  }
 
 // old methods for filtering
 /*
