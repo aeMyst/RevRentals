@@ -32,6 +32,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     'engine': "Any",
     'dirtbikeType': "Any",
   };
+  String _currentSort = 'None';
 
   String selectedColor = 'Any';
   String selectedMileage = 'Any';
@@ -47,6 +48,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     _filteredMotorcycles = [];
   }
 
+  // Save original list for when user resets to 'None' sort option.
   void getOriginalList() async {
   try {
     final response = await fetchMotorcycles('http://10.0.2.2:8000/get-all-vehicles');
@@ -60,6 +62,8 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     print("Error fetching motorcycles: $error");
   }
 }
+
+// old sort func.
 /*
   void _applySort(String selectedSortOption) {
 
@@ -101,31 +105,50 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   } */
 
   void _applySort(String selectedSortOption) {
-  setState(() {
-    if (_originalMotorcycles.isEmpty) return; // Ensure we only sort if original list is not empty
+    setState(() {
+      _currentSort = selectedSortOption;
+      print("Current sort: $_currentSort");
 
-    switch (selectedSortOption) {
-      case 'None':
-        // Revert back to unfiltered data (unsorted)
-        _filteredMotorcycles = List.from(_originalMotorcycles);
-        break;
-      case 'Price: Low to High':
-        _filteredMotorcycles = List.from(_originalMotorcycles)
-          ..sort((a, b) => double.parse(a['Rental_Price']).compareTo(double.parse(b['Rental_Price'])));
-        break;
-      case 'Price: High to Low':
-        _filteredMotorcycles = List.from(_originalMotorcycles)
-          ..sort((a, b) => double.parse(b['Rental_Price']).compareTo(double.parse(a['Rental_Price'])));
-        break;
-      default:
-        _filteredMotorcycles = List.from(_originalMotorcycles);
+     // if (_originalMotorcycles.isEmpty) return; 
+      if (filterApplied) {
+          switch (selectedSortOption) {
+          case 'None':
+            // revert back to unfiltered data (unsorted)
+            _filteredMotorcycles = List.from(_originalMotorcycles);
+            break;
+          case 'Price: Low to High':
+            _filteredMotorcycles = List.from(_originalMotorcycles)
+              ..sort((a, b) => double.parse(a['Rental_Price']).compareTo(double.parse(b['Rental_Price'])));
+            break;
+          case 'Price: High to Low':
+            _filteredMotorcycles = List.from(_originalMotorcycles)
+              ..sort((a, b) => double.parse(b['Rental_Price']).compareTo(double.parse(a['Rental_Price'])));
+            break;
+          default:
+            _filteredMotorcycles = List.from(_originalMotorcycles);
+        }
+      } else {
+        switch (selectedSortOption) {
+          case 'None':
+            // revert back to unfiltered data (unsorted)
+            _filteredMotorcycles = List.from(_originalMotorcycles);
+            break;
+          case 'Price: Low to High':
+            _originalMotorcycles.sort((a, b) => a['Rental_Price'].compareTo(b['Rental_Price']));
+            break;
+          case 'Price: High to Low':
+            _originalMotorcycles.sort((a, b) => b['Rental_Price'].compareTo(a['Rental_Price']));
+            break;
+          default:
+            _filteredMotorcycles = List.from(_originalMotorcycles);
+        }
       }
     });
   }
 
 
-  void _showSortDialog(BuildContext context) {
-    String selectedSortOption = 'None';
+  void _showSortDialog(BuildContext context, {required String currentSort}) {
+    String selectedSortOption = _currentSort;
     final List<String> sortOptions = [
       'None',
       'Price: Low to High',
@@ -156,6 +179,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                 onChanged: (String? newValue) {
                   setState(() {
                     selectedSortOption = newValue!;
+                    _currentSort = newValue;
                   });
                 },
               ),
@@ -166,10 +190,10 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    print('Sort Option: $selectedSortOption');
-
-                    _applySort(selectedSortOption);
                     print('Applying Sort Option: $selectedSortOption');
+                  
+                    _applySort(selectedSortOption);
+                    _currentSort = selectedSortOption;
 
                     Navigator.pop(context);
                   },
@@ -240,6 +264,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   ];
   final List<String> cargoRacks = [
     'Any',
+    '0',
     '1',
     '2'
   ];
@@ -414,8 +439,6 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                     setState(() {
                       selectedMileage = newValue!;
                       _currentFilters['mileage'] = newValue;
-                      print('Current selected mileage value: $_currentFilters');
-
                     });
                   },
                 ),
@@ -1038,7 +1061,7 @@ Future<List<dynamic>> _applyMultipleFilters({
                 'Sort',
               ),
               onPressed: () {
-                  _showSortDialog(context);
+                  _showSortDialog(context, currentSort: _currentSort);
               },
             ),
           ],
@@ -1115,7 +1138,7 @@ Future<List<dynamic>> _applyMultipleFilters({
                                 MaterialPageRoute(
                                   builder: (context) => MotorcycleDetailPage(
                                     profileId: widget.profileId, 
-                                    motorcycleData: motorcycle, // GRRRAHHHHH??!?@?#?!@?
+                                    motorcycleData: motorcycle, 
                                     ),
                                   ),
                               );
