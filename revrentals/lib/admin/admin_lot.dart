@@ -119,6 +119,7 @@ class _AddLotPageState extends State<AddLotPage> {
   final AdminService _adminService = AdminService();
 
   final TextEditingController addressController = TextEditingController();
+  final TextEditingController rentalPriceController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -149,6 +150,20 @@ class _AddLotPageState extends State<AddLotPage> {
                   ),
                 ),
                 const SizedBox(height: 16),
+                const Text(
+                  "Price:",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: rentalPriceController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: "Enter the lot price",
+                  ),
+                ),
+                const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () {
                     _validateAndAddLot(context);
@@ -169,13 +184,14 @@ class _AddLotPageState extends State<AddLotPage> {
   /// Method to validate the lot address and show an error dialog if empty
   Future<void> _validateAndAddLot(BuildContext context) async {
     final lotAddress = addressController.text.trim();
-
+    final rentalPrice = double.parse(rentalPriceController.text.trim());
     if (lotAddress.isEmpty) {
       _showErrorDialog(context, "Lot address cannot be empty!");
     } else {
       Map<String, dynamic> lotListingData = {
         "admin_id": widget.adminId,
         "laddress": lotAddress,
+        "lrentalprice": rentalPrice,
       };
       try {
         await _adminService.addLotListing(lotListingData);
