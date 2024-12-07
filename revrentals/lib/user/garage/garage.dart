@@ -46,18 +46,6 @@ class _GaragePageState extends State<GaragePage> {
     return _listingService.viewGarageItems(garageId);
   }
 
-  // Future<Map<String,dynamic>> updateGarageItems() {
-  //   setState(() async {
-  //     try {
-  //       final garageId = await _listingService.fetchGarageId(widget.profileId);
-  //       _garageItemsFuture = _fetchGarageItems(garageId);
-  //       return _garageItemsFuture;
-  //     } catch (e) {
-  //       throw Exception("Error updating garage items.");
-  //     }
-  //   });
-  // }
-
   void signUserOut(BuildContext context) {
     FirebaseAuth.instance.signOut();
     Navigator.pushReplacement(
@@ -128,7 +116,8 @@ class _GaragePageState extends State<GaragePage> {
                       children: [
                         ListedTab(
                           garageItemsFuture: _garageItemsFuture,
-                          profileId: widget.profileId, // Pass profileId here
+                          profileId: widget.profileId,
+                          garageId: garageId,
                         ),
                         RentedTab(
                           profileId:
@@ -152,13 +141,18 @@ class _GaragePageState extends State<GaragePage> {
 class ListedTab extends StatefulWidget {
   final Future<Map<String, dynamic>> garageItemsFuture;
   final int profileId; // Accept profileId
+  final int garageId;
 
   const ListedTab(
-      {super.key, required this.garageItemsFuture, required this.profileId});
+      {super.key,
+      required this.garageItemsFuture,
+      required this.profileId,
+      required this.garageId});
 
   @override
   _ListedTabState createState() => _ListedTabState();
 }
+
 class _ListedTabState extends State<ListedTab> {
   late Future<Map<String, dynamic>> _garageItemsFuture;
 
@@ -172,7 +166,8 @@ class _ListedTabState extends State<ListedTab> {
   void _refreshGarageItems() {
     setState(() {
       // Update the future that fetches the garage items
-      _garageItemsFuture = _listingService.viewGarageItems(widget.profileId);
+      _garageItemsFuture = _listingService.viewGarageItems(widget.garageId);
+      print("Refresh garage...");
     });
   }
 
@@ -189,8 +184,8 @@ class _ListedTabState extends State<ListedTab> {
               return Center(child: Text("Error: ${snapshot.error}"));
             } else if (snapshot.hasData) {
               final data = snapshot.data!;
-              final motorizedVehicles = data['motorized_vehicles'] as List;
-              final gearItems = data['gear'] as List;
+              final motorizedVehicles = data["motorized_vehicles"] as List;
+              final gearItems = data["gear"] as List;
 
               return ListView(
                 padding: const EdgeInsets.all(16.0),
@@ -199,23 +194,26 @@ class _ListedTabState extends State<ListedTab> {
                     "Motorized Vehicles",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  ...motorizedVehicles.map((vehicle) => ListTile(
-                        title: Text(vehicle['Model']),
-                        subtitle:
-                            Text("Rental Price: \$${vehicle['Rental_Price']}"),
-                        trailing: const Icon(Icons.motorcycle),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => GarageVehiclePage(
-                                      vehicleData: vehicle,
-                                      profileId: widget.profileId,
-                                      onPriceUpdated: _refreshGarageItems,
-                                    )),
-                          );
-                        },
-                      )),
+                  ...motorizedVehicles.map(
+                    (vehicle) => ListTile(
+                      title: Text(vehicle['Model']),
+                      subtitle:
+                          Text("Rental Price: \$${vehicle['Rental_Price']}"),
+                      trailing: const Icon(Icons.motorcycle),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => GarageVehiclePage(
+                              vehicleData: vehicle,
+                              profileId: widget.profileId,
+                              onPriceUpdated: _refreshGarageItems,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                   const SizedBox(height: 20),
                   const Text(
                     "Gear Items",
@@ -268,126 +266,16 @@ class _ListedTabState extends State<ListedTab> {
   }
 }
 
-
-// class _ListedTabState extends State<ListedTab> {
-//   late Future<Map<String, dynamic>> _garageItemsFuture;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     _garageItemsFuture = widget.garageItemsFuture;
-//   }
-
-//   // This method refreshes the garage items after a price update
-//   void _refreshGarageItems() {
-//     setState(() {
-//       _garageItemsFuture = _listingService.viewGarageItems(widget.profileId);
-//     });
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Stack(
-//       children: [
-//         FutureBuilder<Map<String, dynamic>>(
-//           future: widget.garageItemsFuture,
-//           builder: (context, snapshot) {
-//             if (snapshot.connectionState == ConnectionState.waiting) {
-//               return const Center(child: CircularProgressIndicator());
-//             } else if (snapshot.hasError) {
-//               return Center(child: Text("Error: ${snapshot.error}"));
-//             } else if (snapshot.hasData) {
-//               final data = snapshot.data!;
-//               final motorizedVehicles = data['motorized_vehicles'] as List;
-//               final gearItems = data['gear'] as List;
-
-//               return ListView(
-//                 padding: const EdgeInsets.all(16.0),
-//                 children: [
-//                   const Text(
-//                     "Motorized Vehicles",
-//                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-//                   ),
-//                   ...motorizedVehicles.map((vehicle) => ListTile(
-//                         title: Text(vehicle['Model']),
-//                         subtitle:
-//                             Text("Rental Price: \$${vehicle['Rental_Price']}"),
-//                         trailing: const Icon(Icons.motorcycle),
-//                         onTap: () {
-//                           Navigator.push(
-//                             context,
-//                             MaterialPageRoute(
-//                                 builder: (context) => GarageVehiclePage(
-//                                       vehicleData: vehicle,
-//                                       // vin: vehicle['VIN'],
-//                                       profileId: widget.profileId,
-//                                       onPriceUpdated: _refreshGarageItems,
-//                                     )),
-//                           );
-//                         },
-//                       )),
-//                   const SizedBox(height: 20),
-//                   const Text(
-//                     "Gear Items",
-//                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-//                   ),
-//                   ...gearItems.map((gear) => ListTile(
-//                         title: Text(gear['Gear_Name']),
-//                         subtitle:
-//                             Text("Rental Price: \$${gear['Rental_Price']}"),
-//                         trailing: const Icon(Icons.checkroom),
-//                         onTap: () {
-//                           Navigator.push(
-//                             context,
-//                             MaterialPageRoute(
-//                               builder: (context) => GarageGearPage(
-//                                 gearData: gear,
-//                                 profileId: widget.profileId,
-//                                 onPriceUpdated: _refreshGarageItems,
-//                               ),
-//                             ),
-//                           );
-//                         },
-//                       )),
-//                 ],
-//               );
-//             } else {
-//               return const Center(child: Text("No items in your garage."));
-//             }
-//           },
-//         ),
-//         Positioned(
-//           bottom: 16,
-//           right: 16,
-//           child: FloatingActionButton(
-//             onPressed: () {
-//               Navigator.push(
-//                 context,
-//                 MaterialPageRoute(
-//                   builder: (context) =>
-//                       AddListingPage(profileId: widget.profileId),
-//                 ),
-//               );
-//             },
-//             backgroundColor: Colors.blueGrey,
-//             child: const Icon(Icons.add, color: Colors.white),
-//           ),
-//         ),
-//       ],
-//     );
-//   }
-// }
-
 class GarageVehiclePage extends StatefulWidget {
   final Map<String, dynamic>? vehicleData;
   final int profileId;
-  final Function? onPriceUpdated; // Callback function to refresh the list
+  final VoidCallback onPriceUpdated; // Callback function to refresh the list
 
   const GarageVehiclePage(
       {super.key,
       required this.vehicleData,
       required this.profileId,
-      this.onPriceUpdated});
+      required this.onPriceUpdated});
 
   @override
   State<GarageVehiclePage> createState() => _GarageVehiclePageState();
@@ -401,6 +289,25 @@ class _GarageVehiclePageState extends State<GarageVehiclePage> {
     // Set the initial text for the rental price controller
     _rentalPriceController.text =
         widget.vehicleData?['Rental_Price']?.toString() ?? '';
+  }
+
+  void updateRentalPrice() async {
+    bool request = await _listingService.updateRentalPrice(
+      itemType: 'vehicle',
+      itemId: widget.vehicleData?['VIN'],
+      newPrice: double.parse(_rentalPriceController.text),
+    );
+    if (!request) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Rental price update was unsuccessful.")),
+      );
+    } else {
+      widget.onPriceUpdated();
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Rental price updated successfully!")),
+      );
+    }
   }
 
   @override
@@ -460,29 +367,7 @@ class _GarageVehiclePageState extends State<GarageVehiclePage> {
             const SizedBox(height: 16),
             Center(
               child: ElevatedButton.icon(
-                onPressed: () async {
-                  bool request = await _listingService.updateRentalPrice(
-                    itemType: 'vehicle',
-                    itemId: widget.vehicleData?['VIN'],
-                    newPrice: double.parse(_rentalPriceController.text),
-                  );
-                  if (!request) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content:
-                              Text("Rental price update was unsuccessful.")),
-                    );
-                  } else {
-                    if (widget.onPriceUpdated != null) {
-                      widget.onPriceUpdated!();
-                    }
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text("Rental price updated successfully!")),
-                    );
-                  }
-                },
+                onPressed: updateRentalPrice,
                 label: const Text("Save Rental Price"),
               ),
             ),
@@ -514,13 +399,13 @@ class _GarageVehiclePageState extends State<GarageVehiclePage> {
 class GarageGearPage extends StatefulWidget {
   final Map<String, dynamic>? gearData;
   final int profileId;
-  final Function? onPriceUpdated; // Callback function to refresh the list
+  final VoidCallback onPriceUpdated; // Callback function to refresh the list
 
   const GarageGearPage(
       {super.key,
       required this.gearData,
       required this.profileId,
-      this.onPriceUpdated});
+      required this.onPriceUpdated});
 
   @override
   State<GarageGearPage> createState() => _GarageGearPageState();
@@ -541,6 +426,26 @@ class _GarageGearPageState extends State<GarageGearPage> {
     // Dispose of the controller when the widget is disposed
     _rentalPriceController.dispose();
     super.dispose();
+  }
+
+  void updateRentalPrice() async {
+    bool request = await _listingService.updateRentalPrice(
+      itemType: 'gear',
+      itemId: widget.gearData?['Product_No'],
+      newPrice: double.parse(_rentalPriceController.text),
+    );
+    print(request);
+    if (!request) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Rental price update was unsuccessful.")),
+      );
+    } else {
+      Navigator.pop(context);
+      widget.onPriceUpdated();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Rental price updated successfully!")),
+      );
+    }
   }
 
   @override
@@ -582,31 +487,7 @@ class _GarageGearPageState extends State<GarageGearPage> {
             const SizedBox(height: 16),
             Center(
               child: ElevatedButton.icon(
-                onPressed: () async {
-                  bool request = await _listingService.updateRentalPrice(
-                    itemType: 'gear',
-                    itemId: widget.gearData?['Product_No'],
-                    newPrice: double.parse(_rentalPriceController.text),
-                  );
-                  print(request);
-                  if (!request) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content:
-                              Text("Rental price update was unsuccessful.")),
-                    );
-                  } else {
-                    if (widget.onPriceUpdated != null) {
-                      widget.onPriceUpdated!();
-                    }
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text("Rental price updated successfully!")),
-                    );
-                    // Navigator.push(context, MaterialPageRoute(builder: (context) => GaragePage(profileId: widget.profileId)));
-                  }
-                },
+                onPressed: updateRentalPrice,
                 label: const Text("Save Rental Price"),
               ),
             ),
