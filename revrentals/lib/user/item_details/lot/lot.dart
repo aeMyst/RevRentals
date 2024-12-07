@@ -30,6 +30,7 @@ class LotTab extends StatelessWidget {
                 subtitle: Text("Address: ${lot['LAddress']}"),
                 trailing: const Icon(Icons.warehouse),
                 onTap: () {
+                  print('Lot data before navigation: $lot'); // FOR SOME REASON RENTAL PRICE IS NOT BEING PASSED
                   Navigator.push(
                     context,
                     MaterialPageRoute(

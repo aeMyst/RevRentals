@@ -111,7 +111,13 @@ class _LoginPageState extends State<LoginPage> {
           MaterialPageRoute(builder: (context) => ProfileDetailsPage(profileId: profileId)),
         );
       } else {
-        showError(context, response['error'] ?? "Registration failed");
+        if (response['error']?.toLowerCase().contains('email already exists')) {
+          showError(context, "This email is already registered. Please use a different email.");
+        } else if (response['error']?.toLowerCase().contains('username already exists')) {
+          showError(context, "This username is already taken. Please choose a different username.");
+        } else {
+          showError(context, response['error'] ?? "Registration failed");
+        }
       }
     } catch (e) {
       showError(context, "An error occurred. Please try again.");

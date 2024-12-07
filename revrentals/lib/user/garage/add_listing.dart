@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:revrentals/services/listing_service.dart';
 import 'package:revrentals/user/garage/maint_records.dart';
@@ -34,11 +36,15 @@ class _AddListingPageState extends State<AddListingPage> {
   String? selectedMotorcycleType = 'Motorcycle';
   String? selectedGearType = 'Helmet';
   String? selectedInsuranceType = 'Basic';
-  String vehicleAttributeLabel = 'Engine Type';
+  //String vehicleAttributeLabel = 'Engine Type';
   String? selectedColor = 'Other';
   String? selectedSize = 'Any';
   String? selectedBrand = 'Any';
   String? selectedMaterial = 'Any';
+
+  String? selectedSpecificAttribute;
+  String? vehicleAttributeLabel = 'Vehicle Type First';
+  List<String> specificAttributeOptions = [];
 
   Future<void> _addListing() async {
     try {
@@ -118,12 +124,11 @@ class _AddListingPageState extends State<AddListingPage> {
           _showErrorDialog(response['error']); // Show error message
           return;
         }
-
+      Navigator.pop(context); // Pop the current page
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Listing added successfully!')),
         );
       }
-      Navigator.pop(context); // Pop the current page
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error adding listing: $e')),
@@ -190,19 +195,59 @@ class _AddListingPageState extends State<AddListingPage> {
                 onChanged: (value) {
                   setState(() {
                     selectedMotorcycleType = value;
-                    vehicleAttributeLabel = value == 'Motorcycle'
+                    /*vehicleAttributeLabel = value == 'Motorcycle'
                         ? 'Engine Type'
                         : value == 'Moped'
                             ? 'Cargo Rack'
-                            : 'Terrain Type';
+                            : 'Terrain Type';*/
+                            
+                    if (value == 'Motorcycle') {
+                      vehicleAttributeLabel = 'Engine Type';
+                      specificAttributeOptions = ['V-Twin', 'Inline-4', 'Single Cylinder'];
+                    } else if (value == 'Moped') {
+                      vehicleAttributeLabel = '# of Cargo Racks';
+                      specificAttributeOptions = ['1', '2'];
+                    } else if (value == 'Dirtbike') {
+                      vehicleAttributeLabel = 'Dirtbike Type';
+                      specificAttributeOptions = ['Off-Road', 'Trail', 'Motocross'];
+                    } else {
+                      specificAttributeOptions = [];
+                      vehicleAttributeLabel = null;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Please select a valid option!'),
+                        ),
+                      );
+                    }
+                    selectedSpecificAttribute = null;
                   });
                 },
               ),
-              const SizedBox(height: 16),
-              TextField(
+
+             /* TextField(
                 controller: specificAttributeController,
                 decoration: InputDecoration(labelText: vehicleAttributeLabel),
+              ),*/
+
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: selectedSpecificAttribute,
+                decoration: InputDecoration(
+                  labelText: 'Select ${vehicleAttributeLabel}'
+                ),
+                items: specificAttributeOptions
+                    .map((attribute) => DropdownMenuItem(
+                          value: attribute,
+                          child: Text(attribute),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    selectedSpecificAttribute = value;
+                  });
+                },
               ),
+
               const SizedBox(height: 16),
               TextField(
                 controller: vinController,
@@ -301,6 +346,14 @@ class _AddListingPageState extends State<AddListingPage> {
                 onChanged: (value) {
                   setState(() {
                     selectedGearType = value;
+                    // If Helmet or Boots are selected, set material to Kevlar and disable material selection
+                    if (selectedGearType == 'Helmet' ||
+                        selectedGearType == 'Boots') {
+                      selectedMaterial = 'Kevlar';
+                    } else {
+                      selectedMaterial =
+                          'Any'; // Reset to default material selection
+                    }
                   });
                 },
               ),
@@ -331,19 +384,22 @@ class _AddListingPageState extends State<AddListingPage> {
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 value: selectedMaterial,
-                decoration: const InputDecoration(labelText: 'Brand'),
+                decoration: const InputDecoration(labelText: 'Material'),
                 items: const [
                   DropdownMenuItem(value: 'Any', child: Text('Any')),
                   DropdownMenuItem(value: 'Leather', child: Text('Leather')),
                   DropdownMenuItem(value: 'Plastic', child: Text('Plastic')),
                   DropdownMenuItem(value: 'Textile', child: Text('Textile')),
-                  DropdownMenuItem(value: 'Kevlar', child: Text('HJC')),
+                  DropdownMenuItem(value: 'Kevlar', child: Text('Kevlar')),
                 ],
-                onChanged: (value) {
-                  setState(() {
-                    selectedMaterial = value;
-                  });
-                },
+                onChanged: (selectedGearType == 'Helmet' ||
+                        selectedGearType == 'Boots')
+                    ? null // Disable the dropdown if the gear is Helmet or Boots
+                    : (value) {
+                        setState(() {
+                          selectedMaterial = value;
+                        });
+                      },
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(

@@ -129,7 +129,6 @@ class _GaragePageState extends State<GaragePage> {
                         ListedTab(
                           garageItemsFuture: _garageItemsFuture,
                           profileId: widget.profileId, // Pass profileId here
-                          // onPriceUpdated:
                         ),
                         RentedTab(
                           profileId:
