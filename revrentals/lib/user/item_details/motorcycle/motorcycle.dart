@@ -395,6 +395,9 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                       selectedPriceRange: selectedPriceRange,
                       selectedMileage: selectedMileage,
                       selectedInsurance: selectedInsurance,
+                      selectedCargoRacks: selectedCargoRacks,
+                      selectedDirtbikeType: selectedDirtbikeType,
+                      selectedEngineType: selectedEngineType,
                       );
                     Navigator.pop(context);
                     },
@@ -418,14 +421,14 @@ void _applyFilter({
     String? selectedMileage = "Any",
     String? selectedInsurance = "Any",
     String? selectedCargoRacks = "Any",
-    String? selectedEngine = "Any",
+    String? selectedEngineType = "Any",
     String? selectedDirtbikeType = "Any",
   }) async {
     try {
       final Map<String, String?> filters = {
         "vehicle": selectedVehicle,
         "color": selectedColor,
-        "priceRange": selectedPriceRange != "Any"
+        "rental_price": selectedPriceRange != "Any"
           ? RegExp(r'[^0-9]').hasMatch(selectedPriceRange!)
               ? "Any"
               : selectedPriceRange
@@ -436,9 +439,9 @@ void _applyFilter({
                 : selectedMileage
             : "Any",
         "insurance": selectedInsurance,
-        "cargoRacks": selectedCargoRacks,
-        "engine": selectedEngine,
-        "dirtbikeType": selectedDirtbikeType,
+        "cargo_rack": selectedCargoRacks,
+        "engine_type": selectedEngineType,
+        "dirt_bike_type": selectedDirtbikeType,
       };
 
       final query = filters.entries
@@ -666,6 +669,7 @@ void _applyFilter({
     }
   } */
 
+/*
   Future<List<dynamic>> _applyVehicleFilter(String selectedVehicle) async {
     final url = Uri.parse('http://10.0.2.2:8000/filter-by-vehicle/');
     final body = {'vehicle': selectedVehicle};
@@ -859,7 +863,7 @@ Future<List<dynamic>> _applyMultipleFilters({
     print('Error: $error');
     return [];
   }
-} 
+} */
 
 
   @override
