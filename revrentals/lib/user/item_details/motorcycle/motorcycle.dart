@@ -47,14 +47,27 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     _filteredMotorcycles = [];
   }
 
+  void getOriginalList() async {
+  try {
+    final response = await fetchMotorcycles('http://10.0.2.2:8000/get-all-vehicles');
+    if (response != null && response.isNotEmpty) {
+      setState(() {
+        _originalMotorcycles = response; // Save full unfiltered data here.
+        _filteredMotorcycles = List.from(response); // Make a copy for filtered data.
+      });
+    }
+  } catch (error) {
+    print("Error fetching motorcycles: $error");
+  }
+}
+/*
   void _applySort(String selectedSortOption) {
-    _originalMotorcycles = _filteredMotorcycles; // save original list.
 
     motorcyclesFuture.then((motorcycles) {
       if (filterApplied) {
         switch (selectedSortOption) {
         case 'None':
-          _filteredMotorcycles = _originalMotorcycles;
+          _filteredMotorcycles = List.from(_originalMotorcycles);
           break;
         case 'Price: Low to High':
           _filteredMotorcycles.sort((a, b) => a['Rental_Price'].compareTo(b['Rental_Price']));
@@ -68,7 +81,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
       } else {
         switch (selectedSortOption) {
         case 'None':
-          _filteredMotorcycles = _originalMotorcycles;
+          _filteredMotorcycles = List.from(_originalMotorcycles);
           break;
         case 'Price: Low to High':
           motorcycles.sort((a, b) => a['Rental_Price'].compareTo(b['Rental_Price']));
@@ -85,7 +98,31 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
         motorcyclesFuture = Future.value(motorcycles);
       });
     });
+  } */
+
+  void _applySort(String selectedSortOption) {
+  setState(() {
+    if (_originalMotorcycles.isEmpty) return; // Ensure we only sort if original list is not empty
+
+    switch (selectedSortOption) {
+      case 'None':
+        // Revert back to unfiltered data (unsorted)
+        _filteredMotorcycles = List.from(_originalMotorcycles);
+        break;
+      case 'Price: Low to High':
+        _filteredMotorcycles = List.from(_originalMotorcycles)
+          ..sort((a, b) => double.parse(a['Rental_Price']).compareTo(double.parse(b['Rental_Price'])));
+        break;
+      case 'Price: High to Low':
+        _filteredMotorcycles = List.from(_originalMotorcycles)
+          ..sort((a, b) => double.parse(b['Rental_Price']).compareTo(double.parse(a['Rental_Price'])));
+        break;
+      default:
+        _filteredMotorcycles = List.from(_originalMotorcycles);
+      }
+    });
   }
+
 
   void _showSortDialog(BuildContext context) {
     String selectedSortOption = 'None';
@@ -509,11 +546,13 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
         if (response != null && response.isNotEmpty) {
           setState(() {
             _filteredMotorcycles = response;
+            _originalMotorcycles = response; // save original list
             filterApplied = true;
           });
         } else {
           setState(() {
             _filteredMotorcycles = [];
+            _originalMotorcycles = [];
             filterApplied = true;
           });
         }
@@ -521,7 +560,8 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
         print("Error applying filters: $error");
         setState((){
           _filteredMotorcycles = [];
-          filterApplied = true;
+          _originalMotorcycles = [];
+          filterApplied = false;
         });   
       }
     }
