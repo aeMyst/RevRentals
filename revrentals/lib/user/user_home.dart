@@ -14,8 +14,6 @@ class UserHomePage extends StatefulWidget {
 
 class _UserHomePageState extends State<UserHomePage> {
   int _currentIndex = 0;
-
-  final ListingService _listingService = ListingService();
   int? profileId;
   bool isLoading = true; // State to track if data is loading
 

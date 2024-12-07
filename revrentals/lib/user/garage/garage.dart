@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:revrentals/main_pages/auth_page.dart';
 import 'package:revrentals/user/garage/add_listing.dart';
@@ -47,7 +46,6 @@ class _GaragePageState extends State<GaragePage> {
   }
 
   void signUserOut(BuildContext context) {
-    FirebaseAuth.instance.signOut();
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => const AuthPage()));
   }

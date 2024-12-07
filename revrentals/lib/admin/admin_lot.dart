@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:revrentals/services/admin_service.dart';
 import 'package:revrentals/services/listing_service.dart';
-import 'package:revrentals/user/item_details/lot/lot_details.dart';
 
 class AdminLotPage extends StatefulWidget {
   final Future<List<dynamic>> storageLotsFuture;
@@ -109,7 +108,7 @@ class AddLotPage extends StatefulWidget {
   final int adminId;
   final VoidCallback onLotAdded; // Callback to notify the parent of changes
 
-  AddLotPage({super.key, required this.adminId, required this.onLotAdded});
+  const AddLotPage({super.key, required this.adminId, required this.onLotAdded});
 
   @override
   State<AddLotPage> createState() => _AddLotPageState();
@@ -274,12 +273,6 @@ class _EditLotPageState extends State<EditLotPage> {
       _showErrorDialog("Address cannot be empty!");
       return;
     }
-
-    final updatedData = {
-      "Lot_No": widget.lotData['Lot_No'], // Include the Lot ID here
-      "LAddress": updatedAddress,
-      "LRentalPrice": updatedPrice,
-    };
 
     // Call the service to update the lot
     final response = await _adminService.updateLotListing(

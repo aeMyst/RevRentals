@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:revrentals/services/listing_service.dart';
-import 'package:revrentals/user/notifications/agreement_transaction.dart';
 import 'package:intl/intl.dart';
 
 class RentalApprovalPage extends StatefulWidget {

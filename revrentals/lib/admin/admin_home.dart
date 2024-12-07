@@ -1,6 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:revrentals/admin/admin_login.dart';
 import 'package:revrentals/admin/admin_agreement.dart';
 import 'package:revrentals/admin/admin_lot.dart';
 import 'package:revrentals/main_pages/auth_page.dart';
