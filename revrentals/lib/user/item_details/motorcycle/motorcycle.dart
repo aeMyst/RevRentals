@@ -19,6 +19,7 @@ class MotorcycleTab extends StatefulWidget {
 class _MotorcycleTabState extends State<MotorcycleTab> {
   late Future<List<dynamic>> motorcyclesFuture;
   late List<dynamic> _filteredMotorcycles = [];  // local storage of filtered vehicles
+  late List<dynamic> _originalMotorcycles = [];
   late final int profileId;
   bool filterApplied = false;
   Map<String, String?> _currentFilters = {
@@ -46,23 +47,39 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     _filteredMotorcycles = [];
   }
 
-
   void _applySort(String selectedSortOption) {
+    _originalMotorcycles = _filteredMotorcycles; // save original list.
+
     motorcyclesFuture.then((motorcycles) {
-      switch (selectedSortOption) {
+      if (filterApplied) {
+        switch (selectedSortOption) {
+        case 'None':
+          _filteredMotorcycles = _originalMotorcycles;
+          break;
+        case 'Price: Low to High':
+          _filteredMotorcycles.sort((a, b) => a['Rental_Price'].compareTo(b['Rental_Price']));
+          break;
+        case 'Price: High to Low':
+          _filteredMotorcycles.sort((a, b) => b['Rental_Price'].compareTo(a['Rental_Price']));
+          break;
+        default:
+          break;
+        }
+      } else {
+        switch (selectedSortOption) {
+        case 'None':
+          _filteredMotorcycles = _originalMotorcycles;
+          break;
         case 'Price: Low to High':
           motorcycles.sort((a, b) => a['Rental_Price'].compareTo(b['Rental_Price']));
           break;
         case 'Price: High to Low':
           motorcycles.sort((a, b) => b['Rental_Price'].compareTo(a['Rental_Price']));
           break;
-        case 'Newest First':
-          motorcycles.sort((a, b) => b['dateAdded'].compareTo(a['dateAdded'])); // TO FIX
-          break;
         default:
           break;
+        }
       }
-
       // Update the motorcycles list
       setState(() {
         motorcyclesFuture = Future.value(motorcycles);
@@ -409,7 +426,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                   const SizedBox(width: 8),
                   ElevatedButton(
                   onPressed: () {
-                    applyFilter(
+                    _applyFilter(
                       context: context,
                       selectedVehicle: selectedVehicle,
                       selectedColor: selectedColor,
@@ -434,7 +451,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   );
 }
 
-  void applyFilter({
+  void _applyFilter({
     required BuildContext context,
       String? selectedVehicle = "All",
       String? selectedColor = "Any",
@@ -444,7 +461,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
       String? selectedCargoRacks = "Any",
       String? selectedEngineType = "Any",
       String? selectedDirtbikeType = "Any",
-      final numericPrice, numericMileage,
+     // final numericPrice, numericMileage,
 
     }) async {
       try {
