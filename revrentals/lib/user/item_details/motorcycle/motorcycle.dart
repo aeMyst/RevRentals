@@ -21,6 +21,16 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   late List<dynamic> _filteredMotorcycles = [];  // local storage of filtered vehicles
   late final int profileId;
   bool filterApplied = false;
+  Map<String, String?> _currentFilters = {
+    'vehicle': "All",
+    'color': "Any",
+    'priceRange': "Any",
+    'mileage': "Any",
+    'insurance': "Any",
+    'cargoRacks': "Any",
+    'engine': "Any",
+    'dirtbikeType': "Any",
+  };
 
   String selectedColor = 'Any';
   String selectedMileage = 'Any';
@@ -119,15 +129,15 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     );
   }
   
-  void _showFilterDialog(BuildContext context) {
-  String selectedVehicle = 'All';
-  String selectedPriceRange = 'Any';
-  String selectedInsurance = 'Any';
-  String selectedMileage = 'Any';
-  String selectedColor = 'Any';
-  String selectedEngineType = 'Any';
-  String selectedCargoRacks = 'Any';
-  String selectedDirtbikeType = 'Any';
+  void _showFilterDialog(BuildContext context, {required Map<String, String?> currentFilters}) {
+  String selectedVehicle = currentFilters['vehicle'] ?? 'All';
+  String selectedPriceRange = currentFilters['priceRange'] ?? 'Any';
+  String selectedInsurance = currentFilters['insurance'] ?? 'Any';
+  String selectedMileage = currentFilters['mileage'] ?? 'Any';
+  String selectedColor = currentFilters['color'] ?? 'Any';
+  String selectedEngineType = currentFilters['engine'] ??'Any';
+  String selectedCargoRacks = currentFilters['cargoRacks'] ??'Any';
+  String selectedDirtbikeType = currentFilters['dirtbikeType'] ??'Any';
 
   final List<String> vehicleType = [
     'All',
@@ -211,6 +221,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                   onChanged: (String? newValue) {
                     setState(() {
                       selectedVehicle = newValue!;
+                      _currentFilters['vehicle'] = newValue;
                     });
                   },
                 ),
@@ -233,6 +244,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                     onChanged: (String? newValue) {
                       setState(() {
                         selectedEngineType = newValue!;
+                        _currentFilters['engine'] = newValue;
                       });
                     },
                   ),
@@ -256,6 +268,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                     onChanged: (String? newValue) {
                       setState(() {
                         selectedCargoRacks = newValue!;
+                        _currentFilters['cargoRacks'] = newValue;
                       });
                     },
                   ),
@@ -279,6 +292,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                     onChanged: (String? newValue) {
                       setState(() {
                         selectedDirtbikeType = newValue!;
+                        _currentFilters['dirtbikeType'] = newValue;
                       });
                     },
                   ),
@@ -301,6 +315,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                   onChanged: (String? newValue) {
                     setState(() {
                       selectedPriceRange = newValue!;
+                      _currentFilters['priceRange'] = newValue;
                     });
                   },
                 ),
@@ -322,6 +337,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                   onChanged: (String? newValue) {
                     setState(() {
                       selectedColor = newValue!;
+                      _currentFilters['color'] = newValue;
                     });
                   },
                 ),
@@ -343,9 +359,13 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                   onChanged: (String? newValue) {
                     setState(() {
                       selectedMileage = newValue!;
+                      _currentFilters['mileage'] = newValue;
+                      print('Current selected mileage value: $_currentFilters');
+
                     });
                   },
                 ),
+                
                 const SizedBox(height: 16),
 
                 // Dropdown for Insurance
@@ -364,6 +384,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                   onChanged: (String? newValue) {
                     setState(() {
                       selectedInsurance = newValue!;
+                      _currentFilters['insurance'] = newValue;
                     });
                   },
                 ),
@@ -427,7 +448,22 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
 
     }) async {
       try {
-        
+        // keeping track of filters used.
+        setState(() {
+          _currentFilters = {
+            'vehicle': selectedVehicle,
+            'color': selectedColor,
+            'priceRange': selectedPriceRange,
+            'mileage': selectedMileage,
+            'insurance': selectedInsurance,
+            'cargoRacks': selectedCargoRacks,
+            'engine': selectedEngineType,
+            'dirtbikeType': selectedDirtbikeType,
+          };
+
+          print(_currentFilters);
+        });
+
         final Map<String, String?> filters = {
           "vehicle": selectedVehicle,
           "color": selectedColor,
@@ -502,7 +538,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   return match != null ? double.tryParse(match.group(0)!) : null;
 }
 
-int? parsePrice(String? input) {
+  int? parsePrice(String? input) {
   if (input == null) return null;
 
   final match = RegExp(r'\d+').firstMatch(input);
@@ -528,9 +564,23 @@ int? parsePrice(String? input) {
         filterApplied = false;
       });
     }
+
+    setState(() {
+            _currentFilters = {
+              'vehicle': "All",
+              'color': "Any",
+              'priceRange': "Any",
+              'mileage': "Any",
+              'insurance': "Any",
+              'cargoRacks': "Any",
+              'engine': "Any",
+              'dirtbikeType': "Any",
+            };
+          });
   } catch (error) {
     print("Error resetting filters and fetching all vehicles: $error");
   }
+  
 }
 
 // old methods for filtering
@@ -921,7 +971,7 @@ Future<List<dynamic>> _applyMultipleFilters({
                 'Filter',
               ),
               onPressed: () {
-                _showFilterDialog(context);
+                _showFilterDialog(context, currentFilters: _currentFilters);
               },
             ),
             const SizedBox(width: 16),
