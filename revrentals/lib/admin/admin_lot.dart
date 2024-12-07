@@ -222,7 +222,8 @@ class EditLotPage extends StatefulWidget {
   final Map<String, dynamic> lotData; // Accept the full lot data as a Map
   final VoidCallback onLotUpdated; // Add callback
 
-  const EditLotPage({super.key, required this.lotData, required this.onLotUpdated});
+  const EditLotPage(
+      {super.key, required this.lotData, required this.onLotUpdated});
 
   @override
   State<EditLotPage> createState() => _EditLotPageState();
@@ -232,12 +233,15 @@ class _EditLotPageState extends State<EditLotPage> {
   final AdminService _adminService = AdminService();
 
   late TextEditingController addressController;
+  late TextEditingController rentalPriceController;
 
   @override
   void initState() {
     super.initState();
     // Initialize the text controller with the current lot address
     addressController = TextEditingController(text: widget.lotData['LAddress']);
+    rentalPriceController =
+        TextEditingController(text: widget.lotData['LRentalPrice'].toString());
   }
 
   @override
@@ -248,6 +252,7 @@ class _EditLotPageState extends State<EditLotPage> {
 
   Future<void> _updateLot() async {
     final updatedAddress = addressController.text.trim();
+    final updatedPrice = double.parse(rentalPriceController.text.trim());
 
     if (updatedAddress.isEmpty) {
       _showErrorDialog("Address cannot be empty!");
@@ -257,10 +262,12 @@ class _EditLotPageState extends State<EditLotPage> {
     final updatedData = {
       "Lot_No": widget.lotData['Lot_No'], // Include the Lot ID here
       "LAddress": updatedAddress,
+      "LRentalPrice": updatedPrice,
     };
 
     // Call the service to update the lot
-    final response = await _adminService.updateLotListing(updatedAddress, widget.lotData['Lot_No']);
+    final response = await _adminService.updateLotListing(
+        updatedAddress, widget.lotData['Lot_No'], updatedPrice);
 
     if (response['success'] == true) {
       // Show a success message and return to the previous screen
@@ -329,6 +336,21 @@ class _EditLotPageState extends State<EditLotPage> {
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   hintText: "Enter new address",
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Editable price field
+              const Text(
+                "Price:",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: rentalPriceController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: "Enter a new price",
                 ),
               ),
               const SizedBox(height: 20),
