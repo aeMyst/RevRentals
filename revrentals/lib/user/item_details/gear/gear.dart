@@ -263,7 +263,7 @@ class _GearTabState extends State<GearTab> {
                     onChanged: (String? newValue) {
                       setState(() {
                         selectedGear = newValue!;
-                        _currentFilters['gear'] = newValue;
+                        _currentFilters['type'] = newValue;
                       });
                     },
                   ),
@@ -423,11 +423,11 @@ class _GearTabState extends State<GearTab> {
         });
 
         final Map<String, String?> filters = {
-          "gear": selectedGear,
+          "type": selectedGear,
           "brand": selectedBrand,
           "size": selectedSize,
           "material": selectedMaterial,
-          "rental_price": selectedPriceRange != "Any"
+          "grental_price": selectedPriceRange != "Any"
             ? parsePrice(selectedPriceRange)?.toString()
             : "Any",
         };
@@ -436,6 +436,7 @@ class _GearTabState extends State<GearTab> {
           .where((entry) => entry.value != "Any" && entry.value != "All")
           .map((entry) => '${entry.key}=${Uri.encodeComponent(entry.value!)}')
           .join('&');
+        print("QUERY: $query");
 
         final requestUrl = 'http://10.0.2.2:8000/filter-gear-by-multiple-conditions/?$query';
         print("Request URL: $requestUrl");
