@@ -380,7 +380,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                 children: [   
                   ElevatedButton(
                     onPressed: () {
-                      //to-do
+                      resetFilters();
                       Navigator.pop(context);
                     },
                     child: const Text('Reset Filters'),
@@ -388,7 +388,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
                   const SizedBox(width: 8),
                   ElevatedButton(
                   onPressed: () {
-                    _applyFilter(
+                    applyFilter(
                       context: context,
                       selectedVehicle: selectedVehicle,
                       selectedColor: selectedColor,
@@ -413,66 +413,66 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   );
 }
 
-void _applyFilter({
-  required BuildContext context,
-    String? selectedVehicle = "All",
-    String? selectedColor = "Any",
-    String? selectedPriceRange = "Any",
-    String? selectedMileage = "Any",
-    String? selectedInsurance = "Any",
-    String? selectedCargoRacks = "Any",
-    String? selectedEngineType = "Any",
-    String? selectedDirtbikeType = "Any",
-  }) async {
-    try {
-      final Map<String, String?> filters = {
-        "vehicle": selectedVehicle,
-        "color": selectedColor,
-        "rental_price": selectedPriceRange != "Any"
-          ? RegExp(r'[^0-9]').hasMatch(selectedPriceRange!)
-              ? "Any"
-              : selectedPriceRange
-          : "Any",
-        "mileage": selectedMileage != "Any"
-            ? RegExp(r'[^0-9]').hasMatch(selectedMileage!)
+  void applyFilter({
+    required BuildContext context,
+      String? selectedVehicle = "All",
+      String? selectedColor = "Any",
+      String? selectedPriceRange = "Any",
+      String? selectedMileage = "Any",
+      String? selectedInsurance = "Any",
+      String? selectedCargoRacks = "Any",
+      String? selectedEngineType = "Any",
+      String? selectedDirtbikeType = "Any",
+    }) async {
+      try {
+        final Map<String, String?> filters = {
+          "vehicle": selectedVehicle,
+          "color": selectedColor,
+          "rental_price": selectedPriceRange != "Any"
+            ? RegExp(r'[^0-9]').hasMatch(selectedPriceRange!)
                 ? "Any"
-                : selectedMileage
+                : selectedPriceRange
             : "Any",
-        "insurance": selectedInsurance,
-        "cargo_rack": selectedCargoRacks,
-        "engine_type": selectedEngineType,
-        "dirt_bike_type": selectedDirtbikeType,
-      };
+          "mileage": selectedMileage != "Any"
+              ? RegExp(r'[^0-9]').hasMatch(selectedMileage!)
+                  ? "Any"
+                  : selectedMileage
+              : "Any",
+          "insurance": selectedInsurance,
+          "cargo_rack": selectedCargoRacks,
+          "engine_type": selectedEngineType,
+          "dirt_bike_type": selectedDirtbikeType,
+        };
 
-      final query = filters.entries
-        .where((entry) => entry.value != "Any" && entry.value != "All")
-        .map((entry) => '${entry.key}=${Uri.encodeComponent(entry.value!)}')
-        .join('&');
+        final query = filters.entries
+          .where((entry) => entry.value != "Any" && entry.value != "All")
+          .map((entry) => '${entry.key}=${Uri.encodeComponent(entry.value!)}')
+          .join('&');
 
-      final requestUrl = 'http://10.0.2.2:8000/filter-by-multiple-conditions/?$query';
-      print("Request URL: $requestUrl");
+        final requestUrl = 'http://10.0.2.2:8000/filter-by-multiple-conditions/?$query';
+        print("Request URL: $requestUrl");
 
-      final response = await fetchMotorcycles(requestUrl);
+        final response = await fetchMotorcycles(requestUrl);
 
-      if (response != null && response.isNotEmpty) {
-        setState(() {
-          _filteredMotorcycles = response;
-          filterApplied = true;
-        });
-      } else {
-        setState(() {
+        if (response != null && response.isNotEmpty) {
+          setState(() {
+            _filteredMotorcycles = response;
+            filterApplied = true;
+          });
+        } else {
+          setState(() {
+            _filteredMotorcycles = [];
+            filterApplied = true;
+          });
+        }
+      } catch (error) {
+        print("Error applying filters: $error");
+        setState((){
           _filteredMotorcycles = [];
           filterApplied = true;
-        });
+        });   
       }
-    } catch (error) {
-      print("Error applying filters: $error");
-      setState((){
-        _filteredMotorcycles = [];
-        filterApplied = true;
-      });   
     }
-  }
 
   Future<List<dynamic>?> fetchMotorcycles(String url) async {
   try {
@@ -495,6 +495,28 @@ void _applyFilter({
   }
 }
 
+  Future<void> resetFilters() async {
+  try {
+    final requestUrl = 'http://10.0.2.2:8000/api/motorized-vehicles/';
+    print("Request URL: $requestUrl");
+
+    final response = await fetchMotorcycles(requestUrl);
+
+    if (response != null && response.isNotEmpty) {
+      setState(() {
+        _filteredMotorcycles = response;
+        filterApplied = false; // Indicate filters are cleared
+      });
+    } else {
+      setState(() {
+        _filteredMotorcycles = [];
+        filterApplied = false;
+      });
+    }
+  } catch (error) {
+    print("Error resetting filters and fetching all vehicles: $error");
+  }
+}
 
 /*
  void _applyFilter({
