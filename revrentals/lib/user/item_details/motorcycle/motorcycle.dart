@@ -1044,20 +1044,20 @@ Future<List<dynamic>> _applyMultipleFilters({
                     final motorcycle = _filteredMotorcycles[index];
 
                     return ListTile(
-                       title: Text(motorcycle['Model'] ?? 'Unknown Model'),
-                            subtitle: Text("Rental Price: \$${motorcycle['Rental_Price']}"),
-                            trailing: const Icon(Icons.motorcycle),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => MotorcycleDetailPage(
-                                    profileId: widget.profileId, 
-                                    motorcycleData: motorcycle, 
-                                    ),
-                                  ),
-                              );
-                            }
+                      title: Text(motorcycle['Model'] ?? 'Unknown Model'),
+                      subtitle: Text("Rental Price: \$${motorcycle['Rental_Price']}"),
+                      trailing: const Icon(Icons.motorcycle),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MotorcycleDetailPage(
+                              profileId: widget.profileId, 
+                              motorcycleData: motorcycle, 
+                              ),
+                            ),
+                        );
+                      }
                     );
                   },
                 );

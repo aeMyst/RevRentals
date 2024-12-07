@@ -554,28 +554,28 @@ class _GearTabState extends State<GearTab> {
                 return ListView.builder(
                   itemCount: _filteredGear.length,
                   itemBuilder: (context, index) {
-                    final gear = _filteredGear[index];
+                    final gearItems = _filteredGear[index];
 
-                    return ListTile(
-                        title: Text(gear['Gear_Name'] ?? 'Unknown Gear'),
-                            subtitle: Text("Rental Price: \$${gear['GRentalPrice']}"),
-                            trailing: const Icon(Icons.settings),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => GearDetailPage(
-                                    profileId: widget.profileId, 
-                                    gearData: gear, 
-                                    ),
-                                  ),
-                              );
-                            }
+                    return ListTile (
+                      title: Text(gearItems['Gear_Name'] ?? 'Unknown Gear'),
+                      subtitle: Text("Rental Price: \$${gearItems['GRentalPrice']}"),
+                      trailing: const Icon(Icons.settings),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => GearDetailPage(
+                              profileId: widget.profileId, 
+                              gearData: gearItems, 
+                              ),
+                            ),
+                        );
+                      }
                     );
                   },
                 );
               } else if (filterApplied) {
-                // If a filter was applied and no motorcycles match, show a message
+                // If a filter was applied and no gear match, show a message
                 return const Center(
                   child: Padding(
                     padding: EdgeInsets.all(16.0),
@@ -597,16 +597,18 @@ class _GearTabState extends State<GearTab> {
                       return Center(child: Text("Error: ${snapshot.error}"));
                     } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                       print("Displaying original gears list");
-                      final vehicles = snapshot.data!;
+                      print(_originalGear);
+                      final gear = snapshot.data!;
+                      _originalGear = gear;
 
                       return ListView.builder(
-                        itemCount: vehicles.length,
+                        itemCount: gear.length,
                         itemBuilder: (context, index) {
-                          final gear = vehicles[index];
+                          final gearItems = gear[index];
 
                           return ListTile(
-                            title: Text(gear['Gear_Name'] ?? 'Unknown Gear'),
-                            subtitle: Text("Rental Price: \$${gear['GRentalPrice']}"),
+                            title: Text(gearItems['Gear_Name'] ?? 'Unknown Gear'),
+                            subtitle: Text("Rental Price: \$${gearItems['GRentalPrice']}"),
                             trailing: const Icon(Icons.settings),
                             onTap: () {
                               Navigator.push(
@@ -614,7 +616,7 @@ class _GearTabState extends State<GearTab> {
                                 MaterialPageRoute(
                                   builder: (context) => GearDetailPage(
                                     profileId: profileId, 
-                                    gearData: gear,
+                                    gearData: gearItems,
                                     ),
                                   ),
                               );
