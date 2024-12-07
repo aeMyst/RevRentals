@@ -550,25 +550,25 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
     }
 
   Future<List<dynamic>?> fetchMotorcycles(String url) async {
-  try {
-    final response = await http.get(Uri.parse(url));
+    try {
+      final response = await http.get(Uri.parse(url));
 
-    if (response.statusCode == 200) {
-      final responseData = jsonDecode(response.body);
-      if (responseData.containsKey('vehicles') && responseData['vehicles'] is List) {
-          return responseData['vehicles'];
-        } else {
-          return [];
-        }
-    } else {
-      print("Server responded with status code: ${response.statusCode}");
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        if (responseData.containsKey('vehicles') && responseData['vehicles'] is List) {
+            return responseData['vehicles'];
+          } else {
+            return [];
+          }
+      } else {
+        print("Server responded with status code: ${response.statusCode}");
+        return null;
+      }
+    } catch (error) {
+      print("Error fetching motorcycles: $error");
       return null;
     }
-  } catch (error) {
-    print("Error fetching motorcycles: $error");
-    return null;
   }
-}
 
   double? parseMileage(String? input) {
   if (input == null) return null;

@@ -19,13 +19,22 @@ class _GearTabState extends State<GearTab> {
   late Future<List<dynamic>> gearFuture;
   late final int profileId;
   late List<dynamic> _filteredGear = [];
+  late List<dynamic> _originalGear = [];
   bool filterApplied = false;
-
   String selectedGear = 'All';
   String selectedBrand = 'Any';
   String selectedSize = 'Any';
   String selectedMaterial = 'Any';
   String selectedPriceRange = 'Any';
+  String _currentSort = 'None';
+  Map<String, String?> _currentFilters = {
+    'type': "All",
+    'priceRange': "Any",
+    'brand': "Any",
+    'size': "Any",
+    'material': "Any",
+  };
+
 
   @override
   void initState() {
@@ -33,14 +42,94 @@ class _GearTabState extends State<GearTab> {
     gearFuture = widget.gearFuture;
     profileId = widget.profileId;
     _filteredGear = [];
+    _originalGear = [];
+    filterApplied = false;
   }
 
-  void _showFilterDialog(BuildContext context) {
-    String selectedGear = 'All';
-    String selectedPriceRange = 'Any';
-    String selectedBrand = 'Any';
-    String selectedSize = 'Any';
-    String selectedMaterial = 'Any';
+  // Save original list for when user resets to 'None' sort option.
+  void getOriginalList() async {
+    try {
+      final response = await fetchGear('http://10.0.2.2:8000/get-all-gear');
+      if (response != null && response.isNotEmpty) {
+        setState(() {
+          _originalGear = response; 
+          _filteredGear = List.from(response); 
+        });
+      }
+    } catch (error) {
+      print("Error fetching gear: $error");
+    }
+  }
+
+  Future<List<dynamic>?> fetchGear(String url) async {
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        if (responseData.containsKey('gear') && responseData['gear'] is List) {
+            return responseData['gear'];
+          } else {
+            return [];
+          }
+      } else {
+        print("Server responded with status code: ${response.statusCode}");
+        return null;
+      }
+    } catch (error) {
+      print("Error fetching gear: $error");
+      return null;
+    }
+  }
+
+  void _applySort(String selectedSortOption) {
+    setState(() {
+      _currentSort = selectedSortOption;
+      print("Current sort: $_currentSort");
+
+      // Ensure _originalMotorcycles is used as the source when no filters are applied
+      if (!filterApplied) {
+        // Sorting original motorcycles
+        switch (selectedSortOption) {
+          case 'None':
+            _filteredGear = List.from(_originalGear); // Reset to original unsorted data
+            break;
+          case 'Price: Low to High':
+            _filteredGear = List.from(_originalGear)
+             ..sort((a, b) => (a['GRentalPrice'] as double).compareTo(b['GRentalPrice'] as double));
+            break;
+          case 'Price: High to Low':
+            _filteredGear = List.from(_originalGear)
+             ..sort((a, b) => (b['GRentalPrice'] as double).compareTo(a['GRentalPrice'] as double));
+            break;
+          default:
+            _filteredGear = List.from(_originalGear); // Default behavior
+        }
+      } else {
+        // Sorting filtered motorcycles
+        switch (selectedSortOption) {
+          case 'None':
+            _filteredGear = List.from(_filteredGear); // Reset to filtered unsorted data
+            break;
+          case 'Price: Low to High':
+            _filteredGear.sort((a, b) => double.parse(a['GRentalPrice']).compareTo(double.parse(b['GRentalPrice'])));
+            break;
+          case 'Price: High to Low':
+            _filteredGear.sort((a, b) => double.parse(b['GRentalPrice']).compareTo(double.parse(a['GRentalPrice'])));
+            break;
+          default:
+            _filteredGear = List.from(_filteredGear); // Default behavior
+        }
+      }
+    });
+  }
+
+  void _showFilterDialog(BuildContext context, {required Map<String, String?> currentFilters}) {
+    String selectedGear = currentFilters['type'] ?? 'All';
+    String selectedPriceRange = currentFilters['priceRange'] ?? 'Any';
+    String selectedBrand = currentFilters['brand'] ?? 'Any';
+    String selectedSize = currentFilters['size'] ?? 'Any';
+    String selectedMaterial = currentFilters['material'] ?? 'Any';
 
     final List<String> gearType = [
       'All',
@@ -114,6 +203,7 @@ class _GearTabState extends State<GearTab> {
                     onChanged: (String? newValue) {
                       setState(() {
                         selectedGear = newValue!;
+                        _currentFilters['gear'] = newValue;
                       });
                     },
                   ),
@@ -136,6 +226,7 @@ class _GearTabState extends State<GearTab> {
                     onChanged: (String? newValue) {
                       setState(() {
                         selectedPriceRange = newValue!;
+                        _currentFilters['priceRange'] = newValue;
                       });
                     },
                   ),
@@ -158,6 +249,7 @@ class _GearTabState extends State<GearTab> {
                     onChanged: (String? newValue) {
                       setState(() {
                         selectedBrand = newValue!;
+                        _currentFilters['brand'] = newValue;
                       });
                     },
                   ),
@@ -178,6 +270,7 @@ class _GearTabState extends State<GearTab> {
                     onChanged: (String? newValue) {
                       setState(() {
                         selectedSize = newValue!;
+                        _currentFilters['size'] = newValue;
                       });
                     },
                   ),
@@ -199,6 +292,7 @@ class _GearTabState extends State<GearTab> {
                     onChanged: (String? newValue) {
                       setState(() {
                         selectedMaterial = newValue!;
+                        _currentFilters['material'] = newValue;
                       });
                     },
                   ),
@@ -240,6 +334,246 @@ class _GearTabState extends State<GearTab> {
     String? selectedSize,
 
     }) async {
+      try {
+         setState(() {
+          _currentFilters = {
+            'type': selectedGear,
+            'brand': selectedBrand,
+            'priceRange': selectedPriceRange,
+            'size': selectedSize,
+            'material': selectedMaterial,
+          };
+
+          print(_currentFilters);
+        });
+
+        final Map<String, String?> filters = {
+          "gear": selectedGear,
+          "brand": selectedBrand,
+          "size": selectedSize,
+          "material": selectedMaterial,
+          "rental_price": selectedPriceRange != "Any"
+            ? parsePrice(selectedPriceRange)?.toString()
+            : "Any",
+        };
+
+        final query = filters.entries
+          .where((entry) => entry.value != "Any" && entry.value != "All")
+          .map((entry) => '${entry.key}=${Uri.encodeComponent(entry.value!)}')
+          .join('&');
+
+        final requestUrl = 'http://10.0.2.2:8000/filter-gear-by-multiple-conditions/?$query';
+        print("Request URL: $requestUrl");
+
+        final response = await fetchGear(requestUrl);
+
+        if (response != null && response.isNotEmpty) {
+          setState(() {
+            _filteredGear = response;
+            _originalGear = response; // save original list
+            filterApplied = true;
+          });
+        } else {
+          setState(() {
+            _filteredGear = [];
+            _originalGear = [];
+            filterApplied = true;
+          });
+        }
+      } catch (error) {
+        print("Error applying filters: $error");
+        setState((){
+          _filteredGear = [];
+          _originalGear = [];
+          filterApplied = false;
+        });
+      }
+    }
+
+  void _showSortDialog(BuildContext context) {
+  String selectedSortOption = 'None';
+  final List<String> sortOptions = [
+    'None',
+    'Price: Low to High',
+    'Price: High to Low',
+  ];
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return AlertDialog(
+            title: const Text('Sort Options'),
+            content: DropdownButtonFormField<String>(
+              dropdownColor: Colors.white,
+              value: selectedSortOption,
+              decoration: const InputDecoration(
+                labelText: 'Sort By',
+                border: OutlineInputBorder(),
+              ),
+              items: sortOptions.map((String option) {
+                return DropdownMenuItem<String>(
+                  value: option,
+                  child: Text(option),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  selectedSortOption = newValue!;
+                  _currentSort = newValue;
+                });
+              },
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  print('Applying Sort Option: $selectedSortOption');
+                  _applySort(selectedSortOption);
+                  _currentSort = selectedSortOption;
+                  Navigator.pop(context);
+                },
+                child: const Text('Apply'),
+              ),
+            ],
+          );
+        },
+      );
+    },
+  );
+}
+
+@override
+Widget build(BuildContext context) {
+  List<dynamic> displayGear;
+
+  return Column(
+    children: [
+      const SizedBox(height: 16),
+
+      // Filter and Sort Buttons Row
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ElevatedButton.icon(
+            icon: const Icon(Icons.filter_list),
+            label: const Text(
+              'Filter',
+            ),
+            onPressed: () {
+              _showFilterDialog(context);
+            },
+          ),
+          const SizedBox(width: 16),
+          ElevatedButton.icon(
+            icon: const Icon(Icons.sort),
+            label: const Text(
+              'Sort',
+            ),
+            onPressed: () {
+                _showSortDialog(context);
+            },
+          ),
+        ],
+      ),
+      const SizedBox(height: 16),
+
+      Expanded(
+        child: Builder(
+          builder: (context) {
+            if (_filteredGear.isNotEmpty) {
+
+              // SHOW FILTERED GEAR
+              print("Displaying filtered GEAR");
+              return ListView.builder(
+                itemCount: _filteredGear.length,
+                itemBuilder: (context, index) {
+                  final gear = _filteredGear[index];
+
+                  return ListTile(
+                      title: Text(gear['Gear_Name'] ?? 'Unknown Gear'),
+                          subtitle: Text("Rental Price: \$${gear['GRentalPrice']}"),
+                          trailing: const Icon(Icons.settings),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => GearDetailPage(
+                                  profileId: widget.profileId, 
+                                  gearData: gear, 
+                                  ),
+                                ),
+                            );
+                          }
+                  );
+                },
+              );
+            } else if (filterApplied) {
+              // If a filter was applied and no motorcycles match, show a message
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text(
+                    "No gear available. Please select other filter option(s).",
+                    style: TextStyle(fontSize: 14),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              );
+            } else {
+              // Use FutureBuilder only for the initial fetch
+              return FutureBuilder<List<dynamic>>(
+                future: gearFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text("Error: ${snapshot.error}"));
+                  } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                    print("Displaying original gears list");
+                    final vehicles = snapshot.data!;
+
+                    return ListView.builder(
+                      itemCount: vehicles.length,
+                      itemBuilder: (context, index) {
+                        final gear = vehicles[index];
+
+                        return ListTile(
+                          title: Text(gear['Gear_Name'] ?? 'Unknown Gear'),
+                          subtitle: Text("Rental Price: \$${gear['GRentalPrice']}"),
+                          trailing: const Icon(Icons.settings),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => GearDetailPage(
+                                  profileId: profileId, 
+                                  gearData: gear,
+                                  ),
+                                ),
+                            );
+                          }
+                        );
+                      },
+                    );
+                  } else {
+                    return const Center(child: Text("No vehicles available."));
+                  }
+                },
+              );
+            }
+          },
+        ),
+      ),
+    ],
+  );}
+} 
+    
+    /*
       //tracker
       int defaultFilterChanged = 0;
 
@@ -391,8 +725,9 @@ class _GearTabState extends State<GearTab> {
         }  
       }
     }
-  }
+  } */
  
+ /*
   Future<List<dynamic>> _applyGearFilter(String selectedGear) async {
     final url = Uri.parse('http://10.0.2.2:8000/filter-by-gear/');
     final body = {'type': selectedGear};
@@ -579,8 +914,8 @@ class _GearTabState extends State<GearTab> {
     print('Error: $error');
     return [];
   }
-} 
-
+}  */
+/*
   void _applySortGear(String selectedSortOption) {
     gearFuture.then((gear) {
       switch (selectedSortOption) {
@@ -602,190 +937,9 @@ class _GearTabState extends State<GearTab> {
         gearFuture = Future.value(gear);
       });
     });
-  }
+  } */
 
-  void _showSortDialog(BuildContext context) {
-    String selectedSortOption = 'None';
-    final List<String> sortOptions = [
-      'None',
-      'Price: Low to High',
-      'Price: High to Low',
-      //'Newest First'
-    ];
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            return AlertDialog(
-              title: const Text('Sort Options'),
-              content: DropdownButtonFormField<String>(
-                dropdownColor: Colors.white,
-                value: selectedSortOption,
-                decoration: const InputDecoration(
-                  labelText: 'Sort By',
-                  border: OutlineInputBorder(),
-                ),
-                items: sortOptions.map((String option) {
-                  return DropdownMenuItem<String>(
-                    value: option,
-                    child: Text(option),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedSortOption = newValue!;
-                  });
-                },
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    _applySortGear(selectedSortOption);
-
-                    print('Applying Sort Option: $selectedSortOption');
-                    Navigator.pop(context);
-                  },
-                  child: const Text('Apply'),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    List<dynamic> displayGear;
-
-    return Column(
-      children: [
-        const SizedBox(height: 16),
-
-        // Filter and Sort Buttons Row
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton.icon(
-              icon: const Icon(Icons.filter_list),
-              label: const Text(
-                'Filter',
-              ),
-              onPressed: () {
-                _showFilterDialog(context);
-              },
-            ),
-            const SizedBox(width: 16),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.sort),
-              label: const Text(
-                'Sort',
-              ),
-              onPressed: () {
-                  _showSortDialog(context);
-              },
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-
-        Expanded(
-          child: Builder(
-            builder: (context) {
-              if (_filteredGear.isNotEmpty) {
-
-                // SHOW FILTERED GEAR
-                print("Displaying filtered GEAR");
-                return ListView.builder(
-                  itemCount: _filteredGear.length,
-                  itemBuilder: (context, index) {
-                    final gear = _filteredGear[index];
-
-                    return ListTile(
-                       title: Text(gear['Gear_Name'] ?? 'Unknown Gear'),
-                            subtitle: Text("Rental Price: \$${gear['GRentalPrice']}"),
-                            trailing: const Icon(Icons.settings),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => GearDetailPage(
-                                    profileId: widget.profileId, 
-                                    gearData: gear, 
-                                    ),
-                                  ),
-                              );
-                            }
-                    );
-                  },
-                );
-              } else if (filterApplied) {
-                // If a filter was applied and no motorcycles match, show a message
-                return const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Text(
-                      "No gear available. Please select other filter option(s).",
-                      style: TextStyle(fontSize: 14),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                );
-              } else {
-                // Use FutureBuilder only for the initial fetch
-                return FutureBuilder<List<dynamic>>(
-                  future: gearFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text("Error: ${snapshot.error}"));
-                    } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                      print("Displaying original gears list");
-                      final vehicles = snapshot.data!;
-
-                      return ListView.builder(
-                        itemCount: vehicles.length,
-                        itemBuilder: (context, index) {
-                          final gear = vehicles[index];
-
-                          return ListTile(
-                            title: Text(gear['Gear_Name'] ?? 'Unknown Gear'),
-                            subtitle: Text("Rental Price: \$${gear['GRentalPrice']}"),
-                            trailing: const Icon(Icons.settings),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => GearDetailPage(
-                                    profileId: profileId, 
-                                    gearData: gear,
-                                    ),
-                                  ),
-                              );
-                            }
-                          );
-                        },
-                      );
-                    } else {
-                      return const Center(child: Text("No vehicles available."));
-                    }
-                  },
-                );
-              }
-            },
-          ),
-        ),
-      ],
-    );}
-  } 
+  
 
   /*    Expanded (
         child: FutureBuilder<List<dynamic>>(
