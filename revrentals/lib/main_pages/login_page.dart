@@ -116,7 +116,7 @@ class _LoginPageState extends State<LoginPage> {
 
       if (response['success']) {
         final profileId = response['data']['profile_id'];
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) => ProfileDetailsPage(profileId: profileId)),
