@@ -98,23 +98,14 @@ class _MarketplacePageState extends State<MarketplacePage> {
             ),
             IconButton(
               icon: const Icon(Icons.person),
-              onPressed: () async {  // Make the onPressed async
-                final updatedUserData = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DisplayProfileDetailsPage(
-                      userData: widget.userData,
-                    ),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DisplayProfileDetailsPage(
+                    profileId: widget.profileId,
                   ),
-                );
-                
-                // Check if we got updated data back and update the state
-                if (updatedUserData != null && mounted) {
-                  setState(() {
-                    widget.userData?.addAll(updatedUserData);
-                  });
-                }
-              },
+                ),
+              ),
             ),
           ],
         ),

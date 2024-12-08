@@ -118,12 +118,30 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
             icon: const Icon(Icons.logout),
           ),
           IconButton(
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => const DisplayProfileDetailsPage()),
-            ),
             icon: const Icon(Icons.person),
+            onPressed: () async {
+              try {
+                final response = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DisplayProfileDetailsPage(
+                      profileId: widget.profileId,
+                    ),
+                  ),
+                );
+
+                if (response != null) {
+                  // Handle any updates if needed
+                  setState(() {
+                    // Refresh any profile-dependent data here if necessary
+                  });
+                }
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Error loading profile: $e')),
+                );
+              }
+            },
           ),
         ],
       ),

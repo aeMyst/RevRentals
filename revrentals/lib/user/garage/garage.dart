@@ -88,9 +88,10 @@ class _GaragePageState extends State<GaragePage> {
                     onPressed: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => DisplayProfileDetailsPage(
-                                userData: widget.userData,
-                              )),
+                        builder: (context) => DisplayProfileDetailsPage(
+                          profileId: widget.profileId,
+                        ),
+                      ),
                     ),
                   ),
                 ],
