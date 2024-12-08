@@ -5,6 +5,7 @@ import 'package:revrentals/components/my_button.dart';
 import 'package:revrentals/components/my_textfield.dart';
 import 'package:revrentals/user/profile_detail.dart';
 import 'package:revrentals/user/user_home.dart';
+import 'package:revrentals/regex/login_regex.dart';
 
 import '../services/auth_service.dart'; // Import AuthService
 
@@ -75,21 +76,26 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> signUpUser(BuildContext context) async {
-    String username = usernameController.text;
-    String emailOrUsername = emailOrUsernameController.text;
+    String username = usernameController.text.trim();
+    String emailOrUsername = emailOrUsernameController.text.trim();
     String password = passwordController.text;
     String confirmPassword = confirmPasswordController.text;
 
-    if (username.isEmpty ||
-        emailOrUsername.isEmpty ||
-        password.isEmpty ||
-        confirmPassword.isEmpty) {
-      showError(context, "All fields are required.");
-      return;
-    }
+    // validate user input with regex before backend call
+    String? usernameError = Validators.validateUsername(username);
+    String? emailError = Validators.validateEmail(emailOrUsername);
+    String? passwordError = Validators.validatePassword(password);
+    String? confirmPasswordError =
+        Validators.validateConfirmPassword(confirmPassword, password);
 
-    if (password != confirmPassword) {
-      showError(context, "Passwords do not match.");
+    if ([usernameError, emailError, passwordError, confirmPasswordError]
+        .any((error) => error != null)) {
+      showError(
+          context,
+          usernameError ??
+              emailError ??
+              passwordError ??
+              confirmPasswordError!);
       return;
     }
 
@@ -108,16 +114,11 @@ class _LoginPageState extends State<LoginPage> {
         final profileId = response['data']['profile_id'];
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => ProfileDetailsPage(profileId: profileId)),
+          MaterialPageRoute(
+              builder: (context) => ProfileDetailsPage(profileId: profileId)),
         );
       } else {
-        if (response['error']?.toLowerCase().contains('email already exists')) {
-          showError(context, "This email is already registered. Please use a different email.");
-        } else if (response['error']?.toLowerCase().contains('username already exists')) {
-          showError(context, "This username is already taken. Please choose a different username.");
-        } else {
-          showError(context, response['error'] ?? "Registration failed");
-        }
+        showError(context, response['error'] ?? "Registration failed");
       }
     } catch (e) {
       showError(context, "An error occurred. Please try again.");
