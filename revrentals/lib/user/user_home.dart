@@ -58,18 +58,17 @@ class _UserHomePageState extends State<UserHomePage> {
           profileId: profileId!,
           userData: widget.userData, // Add this
         ),
-        
     ];
   }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: null,
         title: Text(
           widget.userData != null
-              ? 'Welcome, ${widget.userData!['username']}'
+              ? 'Welcome, ${widget.userData!['first_name']} ${widget.userData!['last_name']}'
               : 'Welcome to RevRentals',
         ),
       ),
