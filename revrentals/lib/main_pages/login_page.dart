@@ -5,7 +5,7 @@ import 'package:revrentals/components/my_button.dart';
 import 'package:revrentals/components/my_textfield.dart';
 import 'package:revrentals/user/profile_detail.dart';
 import 'package:revrentals/user/user_home.dart';
-import 'package:revrentals/regex/login_regex.dart';
+import 'package:revrentals/regex/signup_regex.dart';
 import '../services/auth_service.dart'; // Import AuthService
 
 class LoginPage extends StatefulWidget {
