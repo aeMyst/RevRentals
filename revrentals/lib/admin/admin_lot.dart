@@ -187,6 +187,8 @@ class _AddLotPageState extends State<AddLotPage> {
     final rentalPrice = double.parse(rentalPriceController.text.trim());
     if (lotAddress.isEmpty) {
       _showErrorDialog(context, "Lot address cannot be empty!");
+    } else if (rentalPrice <= 0) {
+      _showErrorDialog(context, "Rental price cannot be less than 0.");
     } else {
       Map<String, dynamic> lotListingData = {
         "admin_id": widget.adminId,
@@ -273,28 +275,30 @@ class _EditLotPageState extends State<EditLotPage> {
     if (updatedAddress.isEmpty) {
       _showErrorDialog("Address cannot be empty!");
       return;
-    }
-
-    final updatedData = {
-      "Lot_No": widget.lotData['Lot_No'], // Include the Lot ID here
-      "LAddress": updatedAddress,
-      "LRentalPrice": updatedPrice,
-    };
-
-    // Call the service to update the lot
-    final response = await _adminService.updateLotListing(
-        updatedAddress, widget.lotData['Lot_No'], updatedPrice);
-
-    if (response['success'] == true) {
-      // Show a success message and return to the previous screen
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(response['message'])),
-      );
-      widget.onLotUpdated();
-      Navigator.of(context).pop(true); // Pass true to indicate success
+    } else if (updatedPrice <= 0) {
+      _showErrorDialog("Rental priced cannot be less than 0");
     } else {
-      _showErrorDialog(
-          response['error'] ?? "An error occurred while updating.");
+      final updatedData = {
+        "Lot_No": widget.lotData['Lot_No'], // Include the Lot ID here
+        "LAddress": updatedAddress,
+        "LRentalPrice": updatedPrice,
+      };
+
+      // Call the service to update the lot
+      final response = await _adminService.updateLotListing(
+          updatedAddress, widget.lotData['Lot_No'], updatedPrice);
+
+      if (response['success'] == true) {
+        // Show a success message and return to the previous screen
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response['message'])),
+        );
+        widget.onLotUpdated();
+        Navigator.of(context).pop(true); // Pass true to indicate success
+      } else {
+        _showErrorDialog(
+            response['error'] ?? "An error occurred while updating.");
+      }
     }
   }
 
