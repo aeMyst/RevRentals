@@ -59,23 +59,25 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
       });
     }
   }
+
   // Function to handle renting the lot
   Future<void> _rentLot() async {
     if (selectedStartDate == null || selectedEndDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select both start and end dates.')),
+        const SnackBar(
+            content: Text('Please select both start and end dates.')),
       );
       return;
     }
 
-      setState(() {
-        _isLoading = true; // Start loading
-      });
-
+    setState(() {
+      _isLoading = true; // Start loading
+    });
 
     try {
       // Step 1: Check for active lot rental
-      final activeRental = await _listingService.checkActiveLotRental(widget.profileId);
+      final activeRental =
+          await _listingService.checkActiveLotRental(widget.profileId);
 
       if (activeRental['has_active_rental'] == true) {
         final endDate = activeRental['rental_details']['end_date'];
@@ -90,12 +92,15 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
       }
 
       // Step 2: Format dates for reservation
-      String formattedStartDate = DateFormat('yyyy-MM-dd').format(selectedStartDate!);
-      String formattedEndDate = DateFormat('yyyy-MM-dd').format(selectedEndDate!);
+      String formattedStartDate =
+          DateFormat('yyyy-MM-dd').format(selectedStartDate!);
+      String formattedEndDate =
+          DateFormat('yyyy-MM-dd').format(selectedEndDate!);
       print('Full lot data: ${widget.lotData}');
       // Debug prices
       print('Rental price from lot data: ${widget.lotData['LRentalPrice']}');
-      final duration = selectedEndDate!.difference(selectedStartDate!).inDays + 1;
+      final duration =
+          selectedEndDate!.difference(selectedStartDate!).inDays + 1;
       final totalPrice = (widget.lotData['LRentalPrice'] ?? 0.0) * duration;
       print('Calculated total price: $totalPrice');
 
@@ -107,21 +112,18 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
         "end_date": formattedEndDate,
       };
 
-      print('Sending listing data: $listingData'); // Debug print
-
       final response = await _listingService.addReservation(listingData);
-      print('Received response: $response'); // Debug print
 
       if (response['success'] != true || response['reservation_no'] == null) {
-        throw Exception('Failed to create reservation. Invalid response: $response');
+        throw Exception(
+            'Failed to create reservation. Invalid response: $response');
       }
 
       final reservationNo = response['reservation_no'] as int;
-      print('Reservation number: $reservationNo'); // Debug print
 
       // Step 4: Fetch reservation details
-      final reservationDetails = await _listingService.fetchReservationDetails(reservationNo);
-      print('Reservation details: $reservationDetails'); // Debug print
+      final reservationDetails =
+          await _listingService.fetchReservationDetails(reservationNo);
 
       // Step 5: Navigate to transaction page
       if (!mounted) return; // Check if widget is still mounted
@@ -131,20 +133,21 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
         MaterialPageRoute(
           builder: (context) => AgreementTransactionPage(
             itemName: widget.lotData['LAddress'],
-            renterName: "${reservationDetails['renter_first_name']} ${reservationDetails['renter_last_name']}",
+            renterName:
+                "${reservationDetails['renter_first_name']} ${reservationDetails['renter_last_name']}",
             rentalPeriod: '$formattedStartDate to $formattedEndDate',
             rentalPrice: widget.lotData['LRentalPrice'] ?? 0.0,
             totalPrice: totalPrice,
             onActionCompleted: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Transaction completed successfully.')),
+                const SnackBar(
+                    content: Text('Transaction completed successfully.')),
               );
             },
             agreementId: reservationNo,
           ),
         ),
       );
-
     } catch (e) {
       print('Error occurred trying to rent storage lot: $e');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -175,7 +178,7 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
             // Lot image (placeholder as there's no image in the data)
             Center(
               child: Image.asset(
-                'lib/images/placeholder_lot.png', // Replace with actual image path if available
+                'lib/images/lots/storage_units.png',
                 fit: BoxFit.cover,
                 height: 300,
                 width: 300,
@@ -258,18 +261,21 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
             const SizedBox(height: 20),
             // Rent button
             Center(
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _rentLot, // Disable button while loading
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueGrey,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 30),
-                    textStyle: const TextStyle(fontSize: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+              child: ElevatedButton(
+                onPressed: _isLoading
+                    ? null
+                    : _rentLot, // Disable button while loading
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueGrey,
+                  foregroundColor: Colors.white,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 30),
+                  textStyle: const TextStyle(fontSize: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: _isLoading
+                ),
+                child: _isLoading
                     ? const SizedBox(
                         height: 20,
                         width: 20,
@@ -279,8 +285,8 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
                         ),
                       )
                     : const Text('Rent Lot'),
-                ),
               ),
+            ),
           ],
         ),
       ),
