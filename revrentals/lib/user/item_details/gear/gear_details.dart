@@ -118,7 +118,7 @@ class _GearDetailPageState extends State<GearDetailPage> {
             // Gear image (placeholder as there's no image in the data)
             Center(
               child: Image.asset(
-                'lib/images/placeholder_gear.png', // Replace with actual image path if available
+                'lib/images/gear/agv_pista.webp',
                 fit: BoxFit.contain,
                 height: 300,
                 width: 300,
