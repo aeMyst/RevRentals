@@ -7,14 +7,16 @@ import 'package:revrentals/services/auth_service.dart';
 
 class ProfileDetailsPage extends StatefulWidget {
   final int profileId; // Accept profileId as a parameter
-  const ProfileDetailsPage({Key? key, required this.profileId}) : super(key: key);
+  const ProfileDetailsPage({Key? key, required this.profileId})
+      : super(key: key);
 
   @override
   State<ProfileDetailsPage> createState() => _ProfileDetailsPageState();
 }
 
 class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
-  final AuthService _authService = AuthService(); // AuthService for backend calls
+  final AuthService _authService =
+      AuthService(); // AuthService for backend calls
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
   final licenseNumberController = TextEditingController();
@@ -53,7 +55,7 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
           MaterialPageRoute(
             builder: (context) => UserHomePage(userData: response['user']),
           ),
-          (route) => false,  // Remove all previous routes
+          (route) => false, // Remove all previous routes
         );
       } else {
         showError(response["error"] ?? "Failed to save profile details.");
@@ -141,9 +143,9 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
                   decoration: const InputDecoration(labelText: "Address"),
                 ),
                 const SizedBox(height: 20),
-                MyButton(onTap: () =>
-                      saveProfileDetails(context), label: isLoading
-                      ? 'Loading...' : 'Save Details'),
+                MyButton(
+                    onTap: () => saveProfileDetails(context),
+                    label: isLoading ? 'Loading...' : 'Save Details'),
               ],
             ),
           ),
@@ -159,7 +161,8 @@ class DisplayProfileDetailsPage extends StatefulWidget {
   const DisplayProfileDetailsPage({super.key, this.userData});
 
   @override
-  _DisplayProfileDetailsPageState createState() => _DisplayProfileDetailsPageState();
+  _DisplayProfileDetailsPageState createState() =>
+      _DisplayProfileDetailsPageState();
 }
 
 class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
@@ -236,13 +239,15 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
               TextFormField(
                 controller: _firstNameController,
                 decoration: const InputDecoration(labelText: 'First Name'),
-                validator: (value) => value!.isEmpty ? 'Please enter your first name' : null,
+                validator: (value) =>
+                    value!.isEmpty ? 'Please enter your first name' : null,
               ),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _lastNameController,
                 decoration: const InputDecoration(labelText: 'Last Name'),
-                validator: (value) => value!.isEmpty ? 'Please enter your last name' : null,
+                validator: (value) =>
+                    value!.isEmpty ? 'Please enter your last name' : null,
               ),
               const SizedBox(height: 8),
               TextFormField(
@@ -254,13 +259,15 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
               TextFormField(
                 controller: _licenseController,
                 decoration: const InputDecoration(labelText: 'License Number'),
-                validator: (value) => value!.isEmpty ? 'Please enter your license number' : null,
+                validator: (value) =>
+                    value!.isEmpty ? 'Please enter your license number' : null,
               ),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _addressController,
                 decoration: const InputDecoration(labelText: 'Address'),
-                validator: (value) => value!.isEmpty ? 'Please enter your address' : null,
+                validator: (value) =>
+                    value!.isEmpty ? 'Please enter your address' : null,
               ),
               const SizedBox(height: 20),
               SizedBox(
