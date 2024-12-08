@@ -100,6 +100,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
             ),
             IconButton(
               icon: const Icon(Icons.person),
+<<<<<<< HEAD
               onPressed: () async {
                 // Await the result from the DisplayProfileDetailsPage
                 final updatedUserData = await Navigator.push(
@@ -118,6 +119,16 @@ class _MarketplacePageState extends State<MarketplacePage> {
                   });
                 }
               },
+=======
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DisplayProfileDetailsPage(
+                    profileId: widget.profileId,
+                  ),
+                ),
+              ),
+>>>>>>> cb90910b3969293231055f3cb54e9a97cbcbfd2c
             ),
           ],
         ),

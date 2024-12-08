@@ -90,7 +90,11 @@ class _GaragePageState extends State<GaragePage> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => DisplayProfileDetailsPage(
+<<<<<<< HEAD
                           userData: widget.userData,
+=======
+                          profileId: widget.profileId,
+>>>>>>> cb90910b3969293231055f3cb54e9a97cbcbfd2c
                         ),
                       ),
                     ),

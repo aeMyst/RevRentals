@@ -37,9 +37,17 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
     String? postalCodeError = Validators.validatePostalCode(address);
 
     // Show appropriate error messages if validation fails
+    if (firstName.toLowerCase() == 'null') {
+        showError('First name cannot be null');
+        return;
+    }
     if (firstNameError != null) {
       showError(firstNameError);
       return;
+    }
+    if (lastName.toLowerCase() == 'null') {
+        showError('Last name cannot be null');
+        return;
     }
     if (lastNameError != null) {
       showError(lastNameError);
@@ -242,8 +250,13 @@ Widget build(BuildContext context) {
 // Page for displaying and updating existing profile details
 class DisplayProfileDetailsPage extends StatefulWidget {
   final Map<String, dynamic>? userData;
+  final int? profileId;
 
-  const DisplayProfileDetailsPage({super.key, this.userData});
+  const DisplayProfileDetailsPage({
+    super.key, 
+    this.userData,
+    this.profileId,
+  });
 
   @override
   _DisplayProfileDetailsPageState createState() => _DisplayProfileDetailsPageState();
@@ -258,18 +271,53 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
   final TextEditingController _licenseController = TextEditingController();
   final AuthService _authService = AuthService();
   bool isLoading = false;
+  Map<String, dynamic>? _currentUserData;
 
   @override
   void initState() {
     super.initState();
-    // Initialize controllers with existing user data
+    _loadInitialData();
+  }
+
+  Future<void> _loadInitialData() async {
     if (widget.userData != null) {
-      _firstNameController.text = widget.userData!['first_name'] ?? '';
-      _lastNameController.text = widget.userData!['last_name'] ?? '';
-      _addressController.text = widget.userData!['address'] ?? '';
-      _emailController.text = widget.userData!['email'] ?? '';
-      _licenseController.text = widget.userData!['license'] ?? '';
+      // If userData is provided directly, use it
+      _populateFields(widget.userData!);
+      _currentUserData = widget.userData;
+    } else if (widget.profileId != null) {
+      // If only profileId is provided, fetch the data
+      try {
+        setState(() {
+          isLoading = true;
+        });
+        
+        final response = await _authService.fetchProfileDetails(widget.profileId!);
+        if (response['success']) {
+          _populateFields(response['user']);
+          _currentUserData = response['user'];
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error loading profile: $e')),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+          });
+        }
+      }
     }
+  }
+
+  void _populateFields(Map<String, dynamic> data) {
+    _firstNameController.text = data['first_name'] ?? '';
+    _lastNameController.text = data['last_name'] ?? '';
+    _addressController.text = data['address'] ?? '';
+    _emailController.text = data['email'] ?? '';
+    _licenseController.text = data['license'] ?? '';
   }
 
   Future<void> _updateProfile() async {
@@ -279,8 +327,13 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
       });
 
       try {
+        final profileId = _currentUserData?['profile_id'] ?? widget.profileId;
+        if (profileId == null) {
+          throw Exception('Profile ID not available');
+        }
+
         final response = await _authService.saveProfileDetails(
-          widget.userData!['profile_id'],
+          profileId,
           {
             'first_name': _firstNameController.text.trim(),
             'last_name': _lastNameController.text.trim(),
@@ -290,27 +343,37 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
         );
 
         if (response['success']) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Profile updated successfully')),
-          );
-          
-          // Return the updated user data to the previous screen
-          Navigator.pop(context, response['user']);
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Profile updated successfully')),
+            );
+            Navigator.pop(context, response['user']);
+          }
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error updating profile: $e')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error updating profile: $e')),
+          );
+        }
       } finally {
-        setState(() {
-          isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+          });
+        }
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading && _currentUserData == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -323,7 +386,6 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // First Name Field
               TextFormField(
                 controller: _firstNameController,
                 decoration: const InputDecoration(
@@ -339,7 +401,6 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
               ),
               const SizedBox(height: 10),
 
-              // Last Name Field
               TextFormField(
                 controller: _lastNameController,
                 decoration: const InputDecoration(
@@ -355,7 +416,6 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
               ),
               const SizedBox(height: 10),
 
-              // Email Field (disabled)
               TextFormField(
                 controller: _emailController,
                 decoration: const InputDecoration(
@@ -366,7 +426,6 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
               ),
               const SizedBox(height: 10),
 
-              // License Number Field
               TextFormField(
                 controller: _licenseController,
                 decoration: const InputDecoration(
@@ -382,7 +441,6 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
               ),
               const SizedBox(height: 10),
 
-              // Postal Code Field
               TextFormField(
                 controller: _addressController,
                 decoration: const InputDecoration(
@@ -398,7 +456,6 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
               ),
               const SizedBox(height: 20),
 
-              // Update Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -415,7 +472,6 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
 
   @override
   void dispose() {
-    // Clean up controllers when widget is disposed
     _firstNameController.dispose();
     _lastNameController.dispose();
     _addressController.dispose();
