@@ -48,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
     String password = loginPasswordController.text;
 
     if (input.isEmpty || password.isEmpty) {
-      showError(context, "Email/Username and Password are required.");
+      showError(context, "Email/Username and Password are required Fields.");
       return;
     }
 
@@ -70,7 +70,8 @@ class _LoginPageState extends State<LoginPage> {
         showError(context, response['error']);
       }
     } catch (e) {
-      showError(context, "An error occurred. Please try again.");
+      showError(context,
+          "Your Username/Email or Password Were Incorrect, Try again.");
     } finally {
       setState(() {
         isLoading = false;
