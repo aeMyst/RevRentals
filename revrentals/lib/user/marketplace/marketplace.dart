@@ -100,26 +100,6 @@ class _MarketplacePageState extends State<MarketplacePage> {
             ),
             IconButton(
               icon: const Icon(Icons.person),
-<<<<<<< HEAD
-              onPressed: () async {
-                // Await the result from the DisplayProfileDetailsPage
-                final updatedUserData = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DisplayProfileDetailsPage(
-                      userData: widget.userData,
-                    ),
-                  ),
-                );
-                // Check if we got updated data back and update the state
-                if (updatedUserData != null && mounted) {
-                  setState(() {
-                    // Assuming widget.userData is a Map
-                    widget.userData?.addAll(updatedUserData);
-                  });
-                }
-              },
-=======
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -128,7 +108,6 @@ class _MarketplacePageState extends State<MarketplacePage> {
                   ),
                 ),
               ),
->>>>>>> cb90910b3969293231055f3cb54e9a97cbcbfd2c
             ),
           ],
         ),

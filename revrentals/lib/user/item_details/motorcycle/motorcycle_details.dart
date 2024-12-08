@@ -118,18 +118,6 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
             icon: const Icon(Icons.logout),
           ),
           IconButton(
-<<<<<<< HEAD
-            onPressed: () async {
-              // Await the result from DisplayProfileDetailsPage
-              final updatedUserData = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const DisplayProfileDetailsPage(),
-                ),
-              );
-            },
-=======
->>>>>>> cb90910b3969293231055f3cb54e9a97cbcbfd2c
             icon: const Icon(Icons.person),
             onPressed: () async {
               try {
