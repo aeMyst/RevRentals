@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:revrentals/services/listing_service.dart';
 import 'package:revrentals/user/garage/maint_records.dart';
+import 'package:revrentals/regex/listing_regex.dart';
 
 class AddListingPage extends StatefulWidget {
   final int profileId;
@@ -47,6 +48,44 @@ class _AddListingPageState extends State<AddListingPage> {
   List<String> specificAttributeOptions = [];
 
   Future<void> _addListing() async {
+    String? mileageError;
+    String? rentalPriceError;
+
+    if (isMotorcycleSelected) {
+      if (mileageController.text.isEmpty ||
+          int.tryParse(mileageController.text) == null ||
+          int.parse(mileageController.text) <= 0) {
+        mileageError = "Mileage must be a positive integer.";
+      }
+
+      if (rentalPriceController.text.isEmpty ||
+          double.tryParse(rentalPriceController.text) == null ||
+          double.parse(rentalPriceController.text) <= 0) {
+        rentalPriceError = "Rental price must be a positive number.";
+      }
+    } else {
+      if (rentalPriceController.text.isEmpty ||
+          double.tryParse(rentalPriceController.text) == null ||
+          double.parse(rentalPriceController.text) <= 0) {
+        rentalPriceError = "Rental price must be a positive number.";
+      }
+    }
+    // If there's an error, show it and return early
+    if (mileageError != null || rentalPriceError != null) {
+      _showErrorDialog(mileageError ?? rentalPriceError!);
+      return;
+    }
+
+    // Validate inputs
+    String? vinError = Validators.validateVIN(vinController.text);
+    String? registrationError =
+        Validators.validateRegistration(registrationController.text);
+
+    if (vinError != null || registrationError != null) {
+      _showErrorDialog(vinError ?? registrationError!);
+      return; // Exit if there are validation errors
+    }
+
     try {
       // Fetch the garage ID based on the profile ID
       int garageId = await _listingService.fetchGarageId(widget.profileId);
@@ -57,7 +96,7 @@ class _AddListingPageState extends State<AddListingPage> {
         barrierDismissible:
             false, // Prevent the user from dismissing the dialog
         builder: (context) {
-          return Center(
+          return const Center(
             child: CircularProgressIndicator(),
           );
         },
@@ -99,7 +138,6 @@ class _AddListingPageState extends State<AddListingPage> {
             builder: (context) => MaintenanceRecordsPage(
               vin: vinController.text,
               profileId: widget.profileId,
-              // garageId: garageId,
             ),
           ),
         );
@@ -124,7 +162,7 @@ class _AddListingPageState extends State<AddListingPage> {
           _showErrorDialog(response['error']); // Show error message
           return;
         }
-      Navigator.pop(context); // Pop the current page
+        Navigator.pop(context); // Pop the current page
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Listing added successfully!')),
         );
@@ -200,16 +238,33 @@ class _AddListingPageState extends State<AddListingPage> {
                         : value == 'Moped'
                             ? 'Cargo Rack'
                             : 'Terrain Type';*/
-                            
+
                     if (value == 'Motorcycle') {
                       vehicleAttributeLabel = 'Engine Type';
-                      specificAttributeOptions = ['V-Twin', 'Inline-4', 'Single Cylinder'];
+                      specificAttributeOptions = [
+                        'Parallel-Twin',
+                        'Single',
+                        'Inline-Three',
+                        'Inline-Four',
+                        'V-Twin',
+                        'L-Twin',
+                        'V4',
+                        'Flat-Twins'
+                      ];
                     } else if (value == 'Moped') {
                       vehicleAttributeLabel = '# of Cargo Racks';
-                      specificAttributeOptions = ['1', '2'];
+                      specificAttributeOptions = ['0', '1'];
                     } else if (value == 'Dirtbike') {
                       vehicleAttributeLabel = 'Dirtbike Type';
-                      specificAttributeOptions = ['Off-Road', 'Trail', 'Motocross'];
+                      specificAttributeOptions = [
+                        'Off-Road',
+                        'Trail',
+                        'Motocross',
+                        'Enduro',
+                        'Dual-Sport',
+                        'Adventure',
+                        'Hill-Climb'
+                      ];
                     } else {
                       specificAttributeOptions = [];
                       vehicleAttributeLabel = null;
@@ -224,7 +279,7 @@ class _AddListingPageState extends State<AddListingPage> {
                 },
               ),
 
-             /* TextField(
+              /* TextField(
                 controller: specificAttributeController,
                 decoration: InputDecoration(labelText: vehicleAttributeLabel),
               ),*/
@@ -233,8 +288,7 @@ class _AddListingPageState extends State<AddListingPage> {
               DropdownButtonFormField<String>(
                 value: selectedSpecificAttribute,
                 decoration: InputDecoration(
-                  labelText: 'Select ${vehicleAttributeLabel}'
-                ),
+                    labelText: 'Select ${vehicleAttributeLabel}'),
                 items: specificAttributeOptions
                     .map((attribute) => DropdownMenuItem(
                           value: attribute,
@@ -261,7 +315,7 @@ class _AddListingPageState extends State<AddListingPage> {
               const SizedBox(height: 16),
               TextField(
                 controller: modelController,
-                decoration: const InputDecoration(labelText: 'Model'),
+                decoration: const InputDecoration(labelText: 'Vehicle Name'),
               ),
 
               const SizedBox(height: 16),
