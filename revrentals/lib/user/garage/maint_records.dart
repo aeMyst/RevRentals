@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:revrentals/services/auth_service.dart';
 import 'package:revrentals/services/listing_service.dart';
-import 'package:revrentals/user/garage/garage.dart';
-import 'package:revrentals/user/user_home.dart'; // For formatting dates
 
 final ListingService _listingService = ListingService();
 final AuthService _authService = AuthService();
