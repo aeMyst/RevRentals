@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:revrentals/main_pages/auth_page.dart';
 import 'package:revrentals/user/garage/add_listing.dart';
 import 'package:revrentals/user/garage/maint_records.dart';
 import 'package:revrentals/user/notifications/notifications.dart';
 import 'package:revrentals/user/profile_detail.dart';
 import 'package:revrentals/services/listing_service.dart';
 import 'package:revrentals/user/garage/rental_details.dart';
+import 'package:revrentals/main_pages/login_page.dart';
 
 final ListingService _listingService = ListingService();
 
@@ -45,11 +45,6 @@ class _GaragePageState extends State<GaragePage> {
     return _listingService.viewGarageItems(garageId);
   }
 
-  void signUserOut(BuildContext context) {
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => const AuthPage()));
-  }
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<int>(
@@ -78,7 +73,15 @@ class _GaragePageState extends State<GaragePage> {
                 ),
                 actions: [
                   IconButton(
-                    onPressed: () => signUserOut(context),
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              LoginPage(), // Redirect to login page
+                        ),
+                      );
+                    },
                     icon: const Icon(Icons.logout, color: Colors.white),
                   ),
                   IconButton(
@@ -86,9 +89,10 @@ class _GaragePageState extends State<GaragePage> {
                     onPressed: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => DisplayProfileDetailsPage(
-                                userData: widget.userData,
-                              )),
+                        builder: (context) => DisplayProfileDetailsPage(
+                          profileId: widget.profileId,
+                        ),
+                      ),
                     ),
                   ),
                 ],

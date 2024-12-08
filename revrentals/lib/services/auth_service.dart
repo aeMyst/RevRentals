@@ -67,6 +67,30 @@ class AuthService {
     }
   }
 
+  Future<Map<String, dynamic>> fetchProfileDetails(int profileId) async {
+    final url = Uri.parse("$_baseUrl/profile-details/$profileId/");
+    
+    try {
+        final response = await http.get(
+            url,
+            headers: {"Content-Type": "application/json"},
+        );
+
+        print("Response status: ${response.statusCode}"); // Debug print
+        print("Response body: ${response.body}"); // Debug print
+
+        if (response.statusCode == 200) {
+            return jsonDecode(response.body);
+        } else {
+            throw Exception(jsonDecode(response.body)['error'] ?? "Failed to fetch profile details");
+        }
+    } catch (e) {
+        print("Profile details fetch error: $e"); // Debug print
+        throw Exception("Failed to fetch profile details: $e");
+    }
+  }
+
+
   // Profile Details method
   Future<Map<String, dynamic>> saveProfileDetails(
       int profileId, Map<String, dynamic> profileData) async {

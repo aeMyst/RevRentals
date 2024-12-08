@@ -214,33 +214,24 @@ class _LoginPageState extends State<LoginPage> {
                     controller: usernameController,
                     hintText: 'Username',
                     obscureText: false,
+                    additonalText:  'Username must be 6-16 characters long and only contain letters and numbers.',
                   ),
                   const SizedBox(height: 5),
-                  const Text(
-                    'Username must be 6-16 characters long and only contain letters and numbers.',
-                    style: TextStyle(color: Colors.grey, fontSize: 12),
-                    textAlign: TextAlign.left,
-                  ),
-                  const SizedBox(height: 10),
                 ],
                 MyTextField(
                   controller: emailOrUsernameController,
                   hintText: isSignUpMode ? 'Email' : 'Email or Username',
                   obscureText: false,
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 5),
                 if (isSignUpMode) ...[
                   MyTextField(
                     controller: signUpPasswordController,
                     hintText: 'Password',
                     obscureText: true,
+                    additonalText:   'Password must be at least 5 characters, with one letter and one number.',
                   ),
                   const SizedBox(height: 5),
-                  const Text(
-                    'Password must be at least 5 characters, with one letter and one number.',
-                    style: TextStyle(color: Colors.grey, fontSize: 12),
-                  ),
-                  const SizedBox(height: 10),
                   MyTextField(
                     controller: confirmPasswordController,
                     hintText: 'Confirm Password',

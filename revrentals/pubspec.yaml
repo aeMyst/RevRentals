@@ -73,7 +73,7 @@ flutter:
     - lib/images/motorcycle/default_motorcycle.png
     - lib/images/motorcycle/ninja_zx4r.png
     - lib/images/motorcycle/scooter.png
-    - lib/images/motorcycle/dirtbike.png  
+    - lib/images/motorcycle/dirtbike.png
     - lib/images/gear/agv_pista.webp
     - lib/images/gear/gloves.png
     - lib/images/gear/jacket.jpg
