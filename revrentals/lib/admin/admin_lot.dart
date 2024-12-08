@@ -80,6 +80,7 @@ class _AdminLotPageState extends State<AdminLotPage> {
 
             const SizedBox(width: 16),
 
+            // Lot list
             Expanded(
               child: FutureBuilder<List<dynamic>>(
                 future: _storageLotsFuture,
@@ -96,10 +97,6 @@ class _AdminLotPageState extends State<AdminLotPage> {
                       return lotNo.contains(_searchQuery) ||
                           address.contains(_searchQuery);
                     }).toList();
-
-                    if (storageLots.isEmpty) {
-                      return const Center(child: Text("No matching storage lots found."));
-                    }
 
                     return ListView.builder(
                       itemCount: storageLots.length,
