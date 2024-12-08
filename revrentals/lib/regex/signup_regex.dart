@@ -65,4 +65,53 @@ class Validators {
   }
 
   // ###################################### SPLIT ######################################
+
+  static String? validateFirstName(String firstName) {
+    if (firstName.isEmpty) {
+      return "First Name is required.";
+    }
+    final regex = RegExp(r"^[a-zA-Z]+$");
+    if (!regex.hasMatch(firstName)) {
+      return "First Name can only contain letters.";
+    }
+    return null;
+  }
+
+  static String? validateLastName(String lastName) {
+    if (lastName.isEmpty) {
+      return "Last Name is required.";
+    }
+    final regex = RegExp(r"^[a-zA-Z]+$");
+    if (!regex.hasMatch(lastName)) {
+      return "Last Name can only contain letters.";
+    }
+    return null;
+  }
+
+  static String? validateLicenseNumber(String licenseNumber) {
+    if (licenseNumber.isEmpty) {
+      return "License Number is required.";
+    }
+    // https://docs.trellix.com/bundle/data-loss-prevention-11.10.x-classification-definitions-reference-guide/page/GUID-4C5FF6CB-CCD0-4B62-888D-836F75CCEFE9.html
+    // Matches a 9-digit number of the format NNNNNN-NNN delimited by hyphen.
+    final regex = RegExp(r"^\d{6}-\d{3}$");
+    if (!regex.hasMatch(licenseNumber)) {
+      return "Invalid Alberta License Number. Use the following Format: xxxxxx-xxx";
+    }
+    return null;
+  }
+
+  static String? validatePostalCode(String postalCode) {
+    if (postalCode.isEmpty) {
+      return "Postal Code is required.";
+    }
+    // https://stackoverflow.com/questions/15774555/efficient-regex-for-canadian-postal-code-function
+    // allows: h2t-1b8, h2z 1b8, H2Z1B8
+    final regex = RegExp(
+        r"^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z][ -]?\d[ABCEGHJ-NPRSTV-Z]\d$");
+    if (!regex.hasMatch(postalCode)) {
+      return "Invalid Canadian Postal Code. Please Try Again.";
+    }
+    return null;
+  }
 }
