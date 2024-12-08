@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:revrentals/main_pages/auth_page.dart';
-import 'package:revrentals/services/admin_service.dart';
-import 'package:revrentals/services/auth_service.dart';
 import 'package:revrentals/services/listing_service.dart';
 import 'package:revrentals/user/garage/maint_records.dart';
 import 'package:revrentals/user/profile_detail.dart';
+import 'package:revrentals/main_pages/login_page.dart';
 
 class MotorcycleDetailPage extends StatefulWidget {
   final int profileId;
@@ -25,12 +23,6 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
   final ListingService _listingService = ListingService();
   DateTime? selectedStartDate;
   DateTime? selectedEndDate;
-
-  void signUserOut(BuildContext context) {
-    Navigator.pop(context);
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => const AuthPage()));
-  }
 
   Future<void> _selectStartDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -114,15 +106,27 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
       appBar: AppBar(
         actions: [
           IconButton(
-            onPressed: () => signUserOut(context),
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      LoginPage(), // Redirect to the login page
+                ),
+              );
+            },
             icon: const Icon(Icons.logout),
           ),
           IconButton(
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => const DisplayProfileDetailsPage()),
-            ),
+            onPressed: () async {
+              // Await the result from DisplayProfileDetailsPage
+              final updatedUserData = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const DisplayProfileDetailsPage(),
+                ),
+              );
+            },
             icon: const Icon(Icons.person),
           ),
         ],

@@ -65,12 +65,12 @@ class _MyTextFieldState extends State<MyTextField> {
         ),
         const SizedBox(height: 5),
         if (_isFocused && widget.additonalText != null)
-            Text(
-              widget.additonalText!,
-              style: TextStyle(color: Colors.grey, fontSize: 12),
-              textAlign: TextAlign.left,
-            ),
-        ],
+          Text(
+            widget.additonalText!,
+            style: TextStyle(color: Colors.grey, fontSize: 12),
+            textAlign: TextAlign.left,
+          ),
+      ],
     );
   }
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:revrentals/main_pages/auth_page.dart';
 import 'package:revrentals/services/listing_service.dart';
 
 class GearDetailPage extends StatefulWidget {
@@ -22,13 +21,6 @@ class _GearDetailPageState extends State<GearDetailPage> {
   DateTime? selectedEndDate;
 
   ListingService _listingService = ListingService();
-
-  // Sign out function
-  void signUserOut(BuildContext context) {
-    Navigator.pop(context);
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => const AuthPage()));
-  }
 
   // Function to select start rental date
   Future<void> _selectStartDate(BuildContext context) async {

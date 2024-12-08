@@ -31,13 +31,10 @@ dependencies:
   flutter:
     sdk: flutter
   onscreen_num_keyboard: ^1.0.4
-  firebase_core: ^3.6.0
-  firebase_auth: any
   http: ^1.2.2
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  cloud_firestore: ^5.4.4
   intl: ^0.19.0
 
 dev_dependencies:
@@ -76,7 +73,7 @@ flutter:
     - lib/images/motorcycle/default_motorcycle.png
     - lib/images/motorcycle/ninja_zx4r.png
     - lib/images/motorcycle/scooter.png
-    - lib/images/motorcycle/dirtbike.png  
+    - lib/images/motorcycle/dirtbike.png
     - lib/images/gear/agv_pista.webp
     - lib/images/gear/gloves.png
     - lib/images/gear/jacket.jpg

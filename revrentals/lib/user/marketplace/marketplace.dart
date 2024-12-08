@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:revrentals/main_pages/auth_page.dart';
 import 'package:revrentals/user/item_details/gear/gear.dart';
 import 'package:revrentals/user/notifications/notifications.dart';
 import 'package:revrentals/user/profile_detail.dart';
 import 'package:revrentals/user/item_details/motorcycle/motorcycle.dart';
 import 'package:revrentals/user/item_details/lot/lot.dart';
 import 'package:revrentals/services/listing_service.dart';
+import 'package:revrentals/main_pages/login_page.dart';
 
 class MarketplacePage extends StatefulWidget {
   final int profileId;
@@ -57,12 +57,6 @@ class _MarketplacePageState extends State<MarketplacePage> {
     _checkNotifications(); // Refresh notifications after page visit
   }
 
-  void signUserOut(BuildContext context) {
-    Navigator.of(context).pop();
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => const AuthPage()));
-  }
-
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -93,12 +87,21 @@ class _MarketplacePageState extends State<MarketplacePage> {
           ),
           actions: [
             IconButton(
-              onPressed: () => signUserOut(context),
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        LoginPage(), // Redirect to the login page
+                  ),
+                );
+              },
               icon: const Icon(Icons.logout),
             ),
             IconButton(
               icon: const Icon(Icons.person),
-              onPressed: () async {  // Make the onPressed async
+              onPressed: () async {
+                // Await the result from the DisplayProfileDetailsPage
                 final updatedUserData = await Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -107,10 +110,10 @@ class _MarketplacePageState extends State<MarketplacePage> {
                     ),
                   ),
                 );
-                
                 // Check if we got updated data back and update the state
                 if (updatedUserData != null && mounted) {
                   setState(() {
+                    // Assuming widget.userData is a Map
                     widget.userData?.addAll(updatedUserData);
                   });
                 }

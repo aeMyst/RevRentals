@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:revrentals/main_pages/auth_page.dart';
-import 'firebase_options.dart';
+import 'package:revrentals/main_pages/login_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
   runApp(const MyApp());
 }
 
@@ -72,8 +67,7 @@ class MyApp extends StatelessWidget {
                   width: 2, color: Color.fromARGB(255, 135, 158, 170))),
         ),
       ),
-
-      home: const AuthPage(),
+      home: const LoginPage(),
     );
   }
 }

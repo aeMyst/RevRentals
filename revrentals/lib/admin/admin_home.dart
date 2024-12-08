@@ -1,9 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:revrentals/admin/admin_login.dart';
 import 'package:revrentals/admin/admin_agreement.dart';
 import 'package:revrentals/admin/admin_lot.dart';
-import 'package:revrentals/main_pages/auth_page.dart';
 import 'package:revrentals/services/admin_service.dart';
 import 'package:revrentals/services/listing_service.dart';
 
@@ -23,7 +21,6 @@ class _AdminHomePageState extends State<AdminHomePage> {
   late Future<List<dynamic>> _storageLotsFuture;
   late Future<List<dynamic>> _reservationsFuture;
 
-
   @override
   void initState() {
     super.initState();
@@ -33,18 +30,11 @@ class _AdminHomePageState extends State<AdminHomePage> {
         _adminService.fetchReservations(); // Fetch reservations
   }
 
-  // Sign user out method
-  void signUserOut(BuildContext context) {
-    Navigator.of(context).pop();
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const AuthPage()),
-    );
-  }
   // Callback to refresh the lot list after editing
   void _refreshStorageLots() {
     setState(() {
-      _storageLotsFuture = _listingService.fetchStorageLots(); // Re-fetch storage lots
+      _storageLotsFuture =
+          _listingService.fetchStorageLots(); // Re-fetch storage lots
     });
   }
 
@@ -59,7 +49,15 @@ class _AdminHomePageState extends State<AdminHomePage> {
         ),
         actions: [
           IconButton(
-            onPressed: () => signUserOut(context),
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      const AdminLoginPage(), // Redirect to Admin Login Page
+                ),
+              );
+            },
             icon: const Icon(Icons.logout),
           ),
         ],
@@ -77,7 +75,10 @@ class _AdminHomePageState extends State<AdminHomePage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => AdminLotPage(
-                                storageLotsFuture: _storageLotsFuture, adminId: widget.adminId, onLotUpdated: _refreshStorageLots,)));
+                                  storageLotsFuture: _storageLotsFuture,
+                                  adminId: widget.adminId,
+                                  onLotUpdated: _refreshStorageLots,
+                                )));
                     // Navigate to Lots screen
                   }),
                   const SizedBox(width: 24),
