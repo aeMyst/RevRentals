@@ -21,6 +21,8 @@ class AdminLotPage extends StatefulWidget {
 
 class _AdminLotPageState extends State<AdminLotPage> {
   late Future<List<dynamic>> _storageLotsFuture;
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
 
   @override
   void initState() {
@@ -47,41 +49,84 @@ class _AdminLotPageState extends State<AdminLotPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: FutureBuilder<List<dynamic>>(
-          future: _storageLotsFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(child: Text("Error: ${snapshot.error}"));
-            } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-              final storageLots = snapshot.data!;
-              return ListView.builder(
-                itemCount: storageLots.length,
-                itemBuilder: (context, index) {
-                  final lot = storageLots[index];
-                  return ListTile(
-                    title: Text("Lot No: ${lot['Lot_No']}"),
-                    subtitle: Text("Address: ${lot['LAddress']}"),
-                    trailing: const Icon(Icons.warehouse),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => EditLotPage(
-                            lotData: lot,
-                            onLotUpdated: _refreshLots,
-                          ),
-                        ),
-                      );
-                    },
-                  );
+        child: Column (
+          children: [
+            // Search Bar
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: TextField(
+                onChanged: (query) {
+                  setState(() {
+                    _searchQuery = query.toLowerCase(); // Update search query
+                  });
                 },
-              );
-            } else {
-              return const Center(child: Text("No storage lots found."));
-            }
-          },
+                decoration: InputDecoration(
+                  hintText: 'Search storage lots by lot number...',
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                    borderSide: const BorderSide(color: Colors.grey),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                    borderSide: const BorderSide(color: Colors.blue),
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(width: 16),
+
+            // Lot list
+            Expanded(
+              child: FutureBuilder<List<dynamic>>(
+                future: _storageLotsFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text("Error: ${snapshot.error}"));
+                  } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                    // Filter the data based on the search query
+                    final storageLots = snapshot.data!.where((lot) {
+                      final lotNo = lot['Lot_No'].toString().toLowerCase();
+                      final address = lot['LAddress'].toString().toLowerCase();
+                      return lotNo.contains(_searchQuery) ||
+                          address.contains(_searchQuery);
+                    }).toList();
+
+                    return ListView.builder(
+                      itemCount: storageLots.length,
+                      itemBuilder: (context, index) {
+                        final lot = storageLots[index];
+                        return ListTile(
+                          title: Text("Lot No: ${lot['Lot_No']}"),
+                          subtitle: Text("Address: ${lot['LAddress']}"),
+                          trailing: const Icon(Icons.warehouse),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EditLotPage(
+                                  lotData: lot,
+                                  onLotUpdated: _refreshLots,
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    );
+                  } else {
+                    return const Center(child: Text("No storage lots found."));
+                  }
+                },
+              ),
+            ),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -104,6 +149,7 @@ class _AdminLotPageState extends State<AdminLotPage> {
     );
   }
 }
+ 
 
 class AddLotPage extends StatefulWidget {
   final int adminId;
