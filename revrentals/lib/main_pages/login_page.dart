@@ -5,7 +5,7 @@ import 'package:revrentals/components/my_button.dart';
 import 'package:revrentals/components/my_textfield.dart';
 import 'package:revrentals/user/profile_detail.dart';
 import 'package:revrentals/user/user_home.dart';
-
+import 'package:revrentals/regex/signup_regex.dart';
 import '../services/auth_service.dart'; // Import AuthService
 
 class LoginPage extends StatefulWidget {
@@ -17,17 +17,21 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final emailOrUsernameController = TextEditingController();
-  final passwordController = TextEditingController();
-  final usernameController = TextEditingController();
-  final confirmPasswordController = TextEditingController();
-  final AuthService _authService = AuthService(); // Initialize the AuthService
+  final loginPasswordController = TextEditingController(); // For Login
+  final signUpPasswordController = TextEditingController(); // For Sign-Up
+  final confirmPasswordController = TextEditingController(); // For Sign-Up
+  final usernameController = TextEditingController(); // For Sign-Up
+  final AuthService _authService = AuthService();
 
   bool isSignUpMode = false;
-  bool isLoading = false; // To manage loading state
+  bool isLoading = false;
 
   void toggleAuthMode(bool isSignUp) {
     setState(() {
       isSignUpMode = isSignUp;
+      loginPasswordController.clear(); // Clear login-specific password field
+      signUpPasswordController.clear(); // Clear sign-up-specific password field
+      confirmPasswordController.clear(); // Clear confirm password field
     });
   }
 
@@ -41,15 +45,15 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> signInUser(BuildContext context) async {
     String input = emailOrUsernameController.text.trim();
-    String password = passwordController.text;
+    String password = loginPasswordController.text;
 
     if (input.isEmpty || password.isEmpty) {
-      showError(context, "Email/Username and Password are required.");
+      showError(context, "Email/Username and Password are required Fields.");
       return;
     }
 
     setState(() {
-      isLoading = true; // Show loading indicator
+      isLoading = true;
     });
 
     try {
@@ -66,30 +70,36 @@ class _LoginPageState extends State<LoginPage> {
         showError(context, response['error']);
       }
     } catch (e) {
-      showError(context, "An error occurred. Please try again.");
+      showError(context,
+          "Your Username/Email or Password Were Incorrect, Try again.");
     } finally {
       setState(() {
-        isLoading = false; // Hide loading indicator
+        isLoading = false;
       });
     }
   }
 
   Future<void> signUpUser(BuildContext context) async {
-    String username = usernameController.text;
-    String emailOrUsername = emailOrUsernameController.text;
-    String password = passwordController.text;
+    String username = usernameController.text.trim();
+    String emailOrUsername = emailOrUsernameController.text.trim();
+    String password = signUpPasswordController.text;
     String confirmPassword = confirmPasswordController.text;
 
-    if (username.isEmpty ||
-        emailOrUsername.isEmpty ||
-        password.isEmpty ||
-        confirmPassword.isEmpty) {
-      showError(context, "All fields are required.");
-      return;
-    }
+    // Validate input with regex before making backend call
+    String? usernameError = Validators.validateUsername(username);
+    String? emailError = Validators.validateEmail(emailOrUsername);
+    String? passwordError = Validators.validatePassword(password);
+    String? confirmPasswordError =
+        Validators.validateConfirmPassword(confirmPassword, password);
 
-    if (password != confirmPassword) {
-      showError(context, "Passwords do not match.");
+    if ([usernameError, emailError, passwordError, confirmPasswordError]
+        .any((error) => error != null)) {
+      showError(
+          context,
+          usernameError ??
+              emailError ??
+              passwordError ??
+              confirmPasswordError!);
       return;
     }
 
@@ -106,18 +116,13 @@ class _LoginPageState extends State<LoginPage> {
 
       if (response['success']) {
         final profileId = response['data']['profile_id'];
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => ProfileDetailsPage(profileId: profileId)),
+          MaterialPageRoute(
+              builder: (context) => ProfileDetailsPage(profileId: profileId)),
         );
       } else {
-        if (response['error']?.toLowerCase().contains('email already exists')) {
-          showError(context, "This email is already registered. Please use a different email.");
-        } else if (response['error']?.toLowerCase().contains('username already exists')) {
-          showError(context, "This username is already taken. Please choose a different username.");
-        } else {
-          showError(context, response['error'] ?? "Registration failed");
-        }
+        showError(context, response['error'] ?? "Registration failed");
       }
     } catch (e) {
       showError(context, "An error occurred. Please try again.");
@@ -141,7 +146,7 @@ class _LoginPageState extends State<LoginPage> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
               },
               child: const Text('OK'),
             ),
@@ -165,6 +170,8 @@ class _LoginPageState extends State<LoginPage> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 20.0), // Add padding
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -208,6 +215,12 @@ class _LoginPageState extends State<LoginPage> {
                     hintText: 'Username',
                     obscureText: false,
                   ),
+                  const SizedBox(height: 5),
+                  const Text(
+                    'Username must be 6-16 characters long and only contain letters and numbers.',
+                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                    textAlign: TextAlign.left,
+                  ),
                   const SizedBox(height: 10),
                 ],
                 MyTextField(
@@ -216,23 +229,33 @@ class _LoginPageState extends State<LoginPage> {
                   obscureText: false,
                 ),
                 const SizedBox(height: 10),
-                MyTextField(
-                  controller: passwordController,
-                  hintText: 'Password',
-                  obscureText: true,
-                ),
                 if (isSignUpMode) ...[
+                  MyTextField(
+                    controller: signUpPasswordController,
+                    hintText: 'Password',
+                    obscureText: true,
+                  ),
+                  const SizedBox(height: 5),
+                  const Text(
+                    'Password must be at least 5 characters, with one letter and one number.',
+                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
                   const SizedBox(height: 10),
                   MyTextField(
                     controller: confirmPasswordController,
                     hintText: 'Confirm Password',
                     obscureText: true,
                   ),
+                ] else ...[
+                  MyTextField(
+                    controller: loginPasswordController,
+                    hintText: 'Password',
+                    obscureText: true,
+                  ),
                 ],
                 const SizedBox(height: 15),
                 MyButton(
-                  onTap: () =>
-                      authenticateUser(context), // Call authenticate function
+                  onTap: () => authenticateUser(context),
                   label: isLoading
                       ? 'Loading...'
                       : (isSignUpMode ? 'Sign Up' : 'Log In'),

@@ -11,6 +11,9 @@ class AdminReservationsPage extends StatefulWidget {
 }
 
 class _AdminReservationsPageState extends State<AdminReservationsPage> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,41 +22,89 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
         title: const Text('Reservations'),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: FutureBuilder<List<dynamic>>(
-          future: widget.reservationLotsFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(child: Text("Error: ${snapshot.error}"));
-            } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-              final reservations = snapshot.data!;
-              return ListView.builder(
-                itemCount: reservations.length,
-                itemBuilder: (context, index) {
-                  final resos = reservations[index];
-                  return ListTile(
-                    title: Text("Reservation No: ${resos['Reservation_No']}"),
-                    subtitle: Text("Profile_ID: ${resos['Profile_ID']}"),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ReservationDetailsPage(
-                              reservation_no: resos['Reservation_No']),
-                        ),
+         padding: const EdgeInsets.all(16.0),
+        child: Column (
+          children: [
+            // Search Bar
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: TextField(
+                onChanged: (query) {
+                  setState(() {
+                    _searchQuery = query.toLowerCase(); // Update search query
+                  });
+                },
+                decoration: InputDecoration(
+                  hintText: 'Search by reservation number...',
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                    borderSide: const BorderSide(color: Colors.grey),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                    borderSide: const BorderSide(color: Colors.blue),
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(width: 16),
+
+            // Reservation list
+            Expanded(
+              child: FutureBuilder<List<dynamic>>(
+              future: widget.reservationLotsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text("Error: ${snapshot.error}"));
+                } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+
+                  // Filter reservations based on search
+                  final reservations = snapshot.data!;
+                  final filteredReservations = reservations.where((resos) {
+                    final reservationNo = resos['Reservation_No'].toString().toLowerCase();
+                    return reservationNo.contains(_searchQuery);
+                  }).toList();
+
+                  if (filteredReservations.isEmpty) {
+                    return const Center(child: Text("No matching reservations found."));
+                  }
+
+                  return ListView.builder(
+                    //itemCount: reservations.length,
+                    itemCount: filteredReservations.length,
+                    itemBuilder: (context, index) {
+                      final resos = filteredReservations[index];
+                      return ListTile(
+                        title: Text("Reservation No: ${resos['Reservation_No']}"),
+                        subtitle: Text("Profile_ID: ${resos['Profile_ID']}"),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ReservationDetailsPage(
+                                  reservation_no: resos['Reservation_No']),
+                            ),
+                          );
+                        },
                       );
                     },
                   );
-                },
-              );
-            } else {
-              return const Center(child: Text("No reservations found."));
-            }
-          },
-        ),
+                } else {
+                  return const Center(child: Text("No reservations found."));
+                }
+              },
+            ),
+          ),
+        ],  
       ),
+    ), 
     );
   }
 }
