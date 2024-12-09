@@ -313,6 +313,7 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
     _emailController.text = data['email'] ?? '';
     _licenseController.text = data['license'] ?? '';
     _usernameController.text = data['username'] ?? '';
+    print('');
   }
 
   Future<void> _updateProfile() async {
@@ -420,7 +421,7 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
                 ),
                 enabled: false,
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 15),
               TextFormField(
                 controller: _usernameController,
                 decoration: const InputDecoration(
@@ -481,6 +482,7 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
     _addressController.dispose();
     _emailController.dispose();
     _licenseController.dispose();
+    _emailController.dispose();
     super.dispose();
   }
 }
