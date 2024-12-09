@@ -122,9 +122,40 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Vehicle Details"),
-        foregroundColor: Colors.white,
-        backgroundColor: Colors.blueGrey,
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const LoginPage(),
+                ),
+                (route) => false
+              );
+            },
+            icon: const Icon(Icons.logout),
+          ),
+          IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () async {
+              try {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DisplayProfileDetailsPage(
+                      profileId: widget.profileId,
+                    ),
+                  ),
+                );
+                setState(() {});
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Error loading profile: $e')),
+                );
+              }
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -200,22 +231,28 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 20),
-                GestureDetector(
-                  onTap: () => _selectEndDate(context),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.blueGrey),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      selectedEndDate == null
-                          ? 'Select End Date'
-                          : 'End: ${DateFormat('yyyy-MM-dd').format(selectedEndDate!)}',
-                      style: const TextStyle(color: Colors.black, fontSize: 14),
-                    ),
-                  ),
+                const SizedBox(height: 20),
+                Text(
+                  model,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                ),                ),
+                Text(
+                  'Per Day: \$${rentalPrice.toStringAsFixed(2)}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ViewMaintenanceRecordsPage(vin: vin),
+                      ),
+                    );
+                  },
+                  child: const Text('View Maintenance Records'),
                 ),
               ],
             ),

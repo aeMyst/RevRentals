@@ -74,13 +74,12 @@ class _GaragePageState extends State<GaragePage> {
                 actions: [
                   IconButton(
                     onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              LoginPage(), // Redirect to login page
-                        ),
-                      );
+                      Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const LoginPage(),
+                          ),
+                          (route) => false);
                     },
                     icon: const Icon(Icons.logout, color: Colors.white),
                   ),
@@ -257,9 +256,8 @@ class _ListedTabState extends State<ListedTab> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      AddListingPage(profileId: widget.profileId,
-                      userData: widget.userData),
+                  builder: (context) => AddListingPage(
+                      profileId: widget.profileId, userData: widget.userData),
                 ),
               ).then((_) => _refreshGarageItems());
             },
@@ -276,12 +274,12 @@ class GarageVehiclePage extends StatefulWidget {
   final Map<String, dynamic>? vehicleData;
   final int profileId;
   final VoidCallback onPriceUpdated; // Callback function to refresh the list
-  final Map<String,dynamic>? userData;
+  final Map<String, dynamic>? userData;
   const GarageVehiclePage(
       {super.key,
       required this.vehicleData,
       required this.profileId,
-      required this.onPriceUpdated, 
+      required this.onPriceUpdated,
       required this.userData});
 
   @override

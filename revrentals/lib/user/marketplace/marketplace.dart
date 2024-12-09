@@ -88,13 +88,12 @@ class _MarketplacePageState extends State<MarketplacePage> {
           actions: [
             IconButton(
               onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) =>
-                        const LoginPage(), // Redirect to the login page
-                  ),
-                );
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const LoginPage(),
+                    ),
+                    (route) => false);
               },
               icon: const Icon(Icons.logout),
             ),

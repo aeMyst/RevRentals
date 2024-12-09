@@ -88,7 +88,7 @@ class _UserHomePageState extends State<UserHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: null,
+        automaticallyImplyLeading: false,
         title: Text(
           currentUserData != null
               ? 'Welcome, ${currentUserData!['first_name']} ${currentUserData!['last_name']}'

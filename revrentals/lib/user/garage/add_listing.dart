@@ -371,22 +371,11 @@ class _AddListingPageState extends State<AddListingPage> {
               const SizedBox(height: 16),
               TextField(
                 controller: rentalPriceController,
-                decoration: const InputDecoration(labelText: 'Rental Price'),
+                decoration: const InputDecoration(labelText: 'Rental Price Per Day'),
+                
                 keyboardType: TextInputType.number,
               ),
-              // const SizedBox(height: 20),
-              // ElevatedButton(
-              //   onPressed: () {
-              //     Navigator.push(
-              //       context,
-              //       MaterialPageRoute(
-              //         builder: (context) =>
-              //             MaintenanceRecordsPage(vin: vinController.text),
-              //       ),
-              //     );
-              //   },
-              //   child: const Text('Add Maintenance Records'),
-              // )
+
             ] else ...[
               DropdownButtonFormField<String>(
                 value: selectedGearType,
@@ -477,7 +466,7 @@ class _AddListingPageState extends State<AddListingPage> {
               const SizedBox(height: 16),
               TextField(
                 controller: rentalPriceController,
-                decoration: const InputDecoration(labelText: 'Rental Price'),
+                decoration: const InputDecoration(labelText: 'Rental Price Per Day'),
                 keyboardType: TextInputType.number,
               ),
             ],

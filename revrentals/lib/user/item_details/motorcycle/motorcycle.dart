@@ -18,7 +18,7 @@ class MotorcycleTab extends StatefulWidget {
 class _MotorcycleTabState extends State<MotorcycleTab> {
   late Future<List<dynamic>> motorcyclesFuture;
   late List<dynamic> _filteredMotorcycles =
-      [];// local storage of filtered vehicles
+      []; // local storage of filtered vehicles
   late List<dynamic> _originalMotorcycles = [];
   late final int profileId;
   bool filterApplied = false;
@@ -517,20 +517,20 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
   }) async {
     try {
       // Keeping track of filters used.
-      setState(() {
-        _currentFilters = {
-          'vehicle': selectedVehicle,
-          'color': selectedColor,
-          'priceRange': selectedPriceRange,
-          'mileage': selectedMileage,
-          'insurance': selectedInsurance,
-          'cargoRacks': selectedCargoRacks,
-          'engine': selectedEngineType,
-          'dirtbikeType': selectedDirtbikeType,
-        };
-
-        print(_currentFilters);
-      });
+      setState(
+        () {
+          _currentFilters = {
+            'vehicle': selectedVehicle,
+            'color': selectedColor,
+            'priceRange': selectedPriceRange,
+            'mileage': selectedMileage,
+            'insurance': selectedInsurance,
+            'cargoRacks': selectedCargoRacks,
+            'engine': selectedEngineType,
+            'dirtbikeType': selectedDirtbikeType,
+          };
+        },
+      );
 
       final Map<String, String?> filters = {
         "vehicle": selectedVehicle,

@@ -13,6 +13,23 @@ class AdminReservationsPage extends StatefulWidget {
 class _AdminReservationsPageState extends State<AdminReservationsPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  late Future<List<dynamic>> _reservationLotsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _reservationLotsFuture = widget.reservationLotsFuture; // Initialize Future
+  }
+
+  /// Method to refresh the screen completely
+  void _refreshScreen() {
+    setState(() {
+      _searchController.clear(); // Clear the search field
+      _searchQuery = ''; // Reset the search query
+      _reservationLotsFuture =
+          AdminService().fetchReservations(); // Re-fetch data
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,15 +37,23 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Reservations'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _refreshScreen, // Trigger full screen refresh
+            tooltip: 'Refresh',
+          ),
+        ],
       ),
       body: Padding(
-         padding: const EdgeInsets.all(16.0),
-        child: Column (
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
           children: [
             // Search Bar
             Padding(
               padding: const EdgeInsets.only(bottom: 16.0),
               child: TextField(
+                controller: _searchController,
                 onChanged: (query) {
                   setState(() {
                     _searchQuery = query.toLowerCase(); // Update search query
@@ -57,54 +82,55 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
             // Reservation list
             Expanded(
               child: FutureBuilder<List<dynamic>>(
-              future: widget.reservationLotsFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text("Error: ${snapshot.error}"));
-                } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                future: _reservationLotsFuture, // Use the local Future variable
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text("Error: ${snapshot.error}"));
+                  } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                    // Filter reservations based on search
+                    final reservations = snapshot.data!;
+                    final filteredReservations = reservations.where((resos) {
+                      final reservationNo =
+                          resos['Reservation_No'].toString().toLowerCase();
+                      return reservationNo.contains(_searchQuery);
+                    }).toList();
 
-                  // Filter reservations based on search
-                  final reservations = snapshot.data!;
-                  final filteredReservations = reservations.where((resos) {
-                    final reservationNo = resos['Reservation_No'].toString().toLowerCase();
-                    return reservationNo.contains(_searchQuery);
-                  }).toList();
+                    if (filteredReservations.isEmpty) {
+                      return const Center(
+                          child: Text("No matching reservations found."));
+                    }
 
-                  if (filteredReservations.isEmpty) {
-                    return const Center(child: Text("No matching reservations found."));
+                    return ListView.builder(
+                      itemCount: filteredReservations.length,
+                      itemBuilder: (context, index) {
+                        final resos = filteredReservations[index];
+                        return ListTile(
+                          title: Text(
+                              "Reservation No: ${resos['Reservation_No']}"),
+                          subtitle: Text("Profile_ID: ${resos['Profile_ID']}"),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ReservationDetailsPage(
+                                    reservation_no: resos['Reservation_No']),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    );
+                  } else {
+                    return const Center(child: Text("No reservations found."));
                   }
-
-                  return ListView.builder(
-                    //itemCount: reservations.length,
-                    itemCount: filteredReservations.length,
-                    itemBuilder: (context, index) {
-                      final resos = filteredReservations[index];
-                      return ListTile(
-                        title: Text("Reservation No: ${resos['Reservation_No']}"),
-                        subtitle: Text("Profile_ID: ${resos['Profile_ID']}"),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ReservationDetailsPage(
-                                  reservation_no: resos['Reservation_No']),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  );
-                } else {
-                  return const Center(child: Text("No reservations found."));
-                }
-              },
+                },
+              ),
             ),
-          ),
-        ],  
+          ],
+        ),
       ),
-    ), 
     );
   }
 }
@@ -368,63 +394,3 @@ class _TransactionAgreementsPageState extends State<TransactionAgreementsPage> {
     );
   }
 }
-// class TransactionAgreementsPage extends StatefulWidget {
-//   final int reservation_no; // Now it's a List<dynamic>
-
-//   TransactionAgreementsPage({super.key, required this.reservation_no});
-
-//   @override
-//   State<TransactionAgreementsPage> createState() =>
-//       _TransactionAgreementsPageState();
-// }
-
-// class _TransactionAgreementsPageState extends State<TransactionAgreementsPage> {
-//   final AdminService _adminService = AdminService();
-//   late Future<Map<String, dynamic>> transactionData;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     // Pass the reservation number from the first item in the list
-//     transactionData = _adminService.fetchTransactions(widget.reservation_no);
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text("Transaction & Agreement Details"),
-//       ),
-//       body: FutureBuilder<Map<String, dynamic>>(
-//         future: transactionData,
-//         builder: (context, snapshot) {
-//           if (snapshot.connectionState == ConnectionState.waiting) {
-//             return const Center(child: CircularProgressIndicator());
-//           } else if (snapshot.hasError) {
-//             return Center(child: Text("Error: ${snapshot.error}"));
-//           } else if (!snapshot.hasData) {
-//             return const Center(
-//                 child: Text("No transaction details available."));
-//           } else {
-//             final data = snapshot.data!['transaction'];
-
-//             return Padding(
-//               padding: const EdgeInsets.all(16),
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   Text("Transaction ID: ${data['Transaction_ID']}"),
-//                   Text("Agreement ID: ${data['Agreement_ID']}"),
-//                   Text("Garage ID: ${data['Garage_ID']}"),
-//                   Text("Payment Date: ${data['Pay_Date']}"),
-//                   Text("Payment Method: ${data['Payment_Method']}"),
-//                   Text("Amount Paid: \$${data['Amount_Paid']}"),
-//                 ],
-//               ),
-//             );
-//           }
-//         },
-//       ),
-//     );
-//   }
-// }
