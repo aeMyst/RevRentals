@@ -7,7 +7,7 @@ import 'package:revrentals/main_pages/login_page.dart';
 
 class MotorcycleDetailPage extends StatefulWidget {
   final int profileId;
-  final Map<String, dynamic> motorcycleData; // Accept motorcycleData as a Map
+  final Map<String, dynamic> motorcycleData;
 
   const MotorcycleDetailPage({
     super.key,
@@ -34,15 +34,23 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
     if (picked != null) {
       setState(() {
         selectedStartDate = picked;
+        selectedEndDate = null; // Reset end date when start date changes
       });
     }
   }
 
   Future<void> _selectEndDate(BuildContext context) async {
+    if (selectedStartDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a start date first.')),
+      );
+      return;
+    }
+
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
+      initialDate: selectedStartDate!.add(const Duration(days: 1)),
+      firstDate: selectedStartDate!.add(const Duration(days: 1)),
       lastDate: DateTime(2100),
     );
     if (picked != null) {
@@ -54,6 +62,15 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
 
   Future<void> _rentMotorcycle() async {
     if (selectedStartDate != null && selectedEndDate != null) {
+      if (selectedEndDate!.isBefore(selectedStartDate!)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('End date cannot be earlier than the start date.'),
+          ),
+        );
+        return;
+      }
+
       try {
         String formattedStartDate =
             DateFormat('yyyy-MM-dd').format(selectedStartDate!);
@@ -74,13 +91,12 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-                'Motorcycle Request sent to Seller for Approval During This Period: $rentalPeriod'),
+                'Motorcycle request sent to seller for approval during this period: $rentalPeriod'),
             duration: const Duration(seconds: 5),
           ),
         );
         Navigator.pop(context);
       } catch (e) {
-        print('Error occurred trying to rent motorcycle: $e');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('An error occurred. Please try again.')),
         );
@@ -100,7 +116,8 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
         (widget.motorcycleData['Rental_Price'] as num?)?.toDouble() ?? 0.0;
     final String imagePath = widget.motorcycleData['Image_Path'] ??
         'lib/images/motorcycle/default_motorcycle.png';
-    final String vin = (widget.motorcycleData['VIN']);
+    final String vin = widget.motorcycleData['VIN'];
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -110,8 +127,7 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      LoginPage(), // Redirect to the login page
+                  builder: (context) => LoginPage(),
                 ),
               );
             },
@@ -121,7 +137,7 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
             icon: const Icon(Icons.person),
             onPressed: () async {
               try {
-                final response = await Navigator.push(
+                await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => DisplayProfileDetailsPage(
@@ -129,13 +145,7 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
                     ),
                   ),
                 );
-
-                if (response != null) {
-                  // Handle any updates if needed
-                  setState(() {
-                    // Refresh any profile-dependent data here if necessary
-                  });
-                }
+                setState(() {});
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Error loading profile: $e')),
@@ -148,56 +158,41 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment:
-              MainAxisAlignment.spaceBetween, // Space out content
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Top section: Image and details
             Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 20),
-                // Motorcycle Image
                 Center(
                   child: Image.asset(
                     imagePath,
                     fit: BoxFit.cover,
-                    // height: 200,
-                    // width: 300,
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Motorcycle Model
                 Text(
                   model,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: const TextStyle(fontSize: 24),
                 ),
-                const SizedBox(height: 10),
-                // Rental Price
                 Text(
-                  'Per Day: \$${rentalPrice.toStringAsFixed(2)} CAD',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  'Per Day: \$${rentalPrice.toStringAsFixed(2)}',
+                  style: const TextStyle(fontSize: 16),
                 ),
-                const SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                ViewMaintenanceRecordsPage(vin: vin)));
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ViewMaintenanceRecordsPage(vin: vin),
+                      ),
+                    );
                   },
                   child: const Text('View Maintenance Records'),
                 ),
               ],
             ),
-
-            // Middle Section: Date Pickers and Rent Button
             Column(
               children: [
                 Row(

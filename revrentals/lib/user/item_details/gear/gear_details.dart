@@ -4,7 +4,7 @@ import 'package:revrentals/services/listing_service.dart';
 
 class GearDetailPage extends StatefulWidget {
   final int profileId;
-  final Map<String, dynamic> gearData; // Accept the full gear data as a Map
+  final Map<String, dynamic> gearData;
 
   const GearDetailPage({
     super.key,
@@ -33,21 +33,36 @@ class _GearDetailPageState extends State<GearDetailPage> {
     if (picked != null) {
       setState(() {
         selectedStartDate = picked;
+        selectedEndDate = null; // Reset the end date when start date changes
       });
     }
   }
 
   // Function to select end rental date
   Future<void> _selectEndDate(BuildContext context) async {
+    if (selectedStartDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a start date first.')),
+      );
+      return;
+    }
+
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
+      initialDate: selectedStartDate!.add(const Duration(days: 1)),
+      firstDate: selectedStartDate!.add(const Duration(days: 1)),
       lastDate: DateTime(2100),
     );
     if (picked != null) {
       setState(() {
-        selectedEndDate = picked;
+        if (picked.isBefore(selectedStartDate!)) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content: Text('End date cannot be before the start date.')),
+          );
+        } else {
+          selectedEndDate = picked;
+        }
       });
     }
   }
@@ -56,7 +71,6 @@ class _GearDetailPageState extends State<GearDetailPage> {
   Future<void> _rentGear() async {
     if (selectedStartDate != null && selectedEndDate != null) {
       try {
-        // Convert DateTime objects to strings in the format yyyy-MM-dd
         String formattedStartDate =
             DateFormat('yyyy-MM-dd').format(selectedStartDate!);
         String formattedEndDate =
@@ -79,7 +93,6 @@ class _GearDetailPageState extends State<GearDetailPage> {
         );
         Navigator.pop(context);
       } catch (e) {
-        print('Error occurred trying to rent gear: $e');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('An error occurred. Please try again.')),
         );
@@ -107,7 +120,6 @@ class _GearDetailPageState extends State<GearDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Gear image (placeholder as there's no image in the data)
             Center(
               child: Image.asset(
                 'lib/images/gear/agv_pista.webp',
@@ -117,8 +129,6 @@ class _GearDetailPageState extends State<GearDetailPage> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Gear name
             Center(
               child: Text(
                 gear['Gear_Name'] ?? 'No Name Available',
@@ -129,8 +139,6 @@ class _GearDetailPageState extends State<GearDetailPage> {
               ),
             ),
             const SizedBox(height: 10),
-
-            // Gear details
             Center(
               child: Text(
                 "Brand: ${gear['Brand'] ?? 'N/A'}\n"
@@ -142,8 +150,6 @@ class _GearDetailPageState extends State<GearDetailPage> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Gear price
             Center(
               child: Text(
                 'Per day: \$${gear['GRentalPrice']?.toStringAsFixed(2) ?? '0.00'} CAD',
@@ -154,12 +160,9 @@ class _GearDetailPageState extends State<GearDetailPage> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Select rental start and end date
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Select start date
                 GestureDetector(
                   onTap: () => _selectStartDate(context),
                   child: Container(
@@ -178,8 +181,6 @@ class _GearDetailPageState extends State<GearDetailPage> {
                   ),
                 ),
                 const SizedBox(width: 20),
-
-                // Select end date
                 GestureDetector(
                   onTap: () => _selectEndDate(context),
                   child: Container(
@@ -200,8 +201,6 @@ class _GearDetailPageState extends State<GearDetailPage> {
               ],
             ),
             const SizedBox(height: 20),
-
-            // Rent button
             Center(
               child: ElevatedButton(
                 onPressed: _rentGear,

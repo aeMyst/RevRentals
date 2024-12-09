@@ -5,7 +5,7 @@ import 'package:revrentals/user/notifications/agreement_transaction.dart';
 
 class LotDetailsPage extends StatefulWidget {
   final int profileId;
-  final Map<String, dynamic> lotData; // Accept the full lot data as a Map
+  final Map<String, dynamic> lotData;
 
   const LotDetailsPage({
     super.key,
@@ -34,16 +34,24 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
     if (picked != null) {
       setState(() {
         selectedStartDate = picked;
+        selectedEndDate = null; // Reset end date when start date changes
       });
     }
   }
 
   // Function to select end rental date
   Future<void> _selectEndDate(BuildContext context) async {
+    if (selectedStartDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a start date first.')),
+      );
+      return;
+    }
+
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
+      initialDate: selectedStartDate!.add(const Duration(days: 1)),
+      firstDate: selectedStartDate!.add(const Duration(days: 1)),
       lastDate: DateTime(2100),
     );
     if (picked != null) {
@@ -64,11 +72,10 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
     }
 
     setState(() {
-      _isLoading = true; // Start loading
+      _isLoading = true;
     });
 
     try {
-      // Step 1: Check for active lot rental
       final activeRental =
           await _listingService.checkActiveLotRental(widget.profileId);
 
@@ -84,20 +91,15 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
         return;
       }
 
-      // Step 2: Format dates for reservation
       String formattedStartDate =
           DateFormat('yyyy-MM-dd').format(selectedStartDate!);
       String formattedEndDate =
           DateFormat('yyyy-MM-dd').format(selectedEndDate!);
-      print('Full lot data: ${widget.lotData}');
-      // Debug prices
-      print('Rental price from lot data: ${widget.lotData['LRentalPrice']}');
+
       final duration =
           selectedEndDate!.difference(selectedStartDate!).inDays + 1;
       final totalPrice = (widget.lotData['LRentalPrice'] ?? 0.0) * duration;
-      print('Calculated total price: $totalPrice');
 
-      // Step 3: Add reservation
       Map<String, dynamic> listingData = {
         "profile_id": widget.profileId,
         "lot_no": widget.lotData['Lot_No'],
@@ -114,12 +116,10 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
 
       final reservationNo = response['reservation_no'] as int;
 
-      // Step 4: Fetch reservation details
       final reservationDetails =
           await _listingService.fetchReservationDetails(reservationNo);
 
-      // Step 5: Navigate to transaction page
-      if (!mounted) return; // Check if widget is still mounted
+      if (!mounted) return;
 
       Navigator.push(
         context,
@@ -139,7 +139,6 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
         ),
       );
     } catch (e) {
-      print('Error occurred trying to rent storage lot: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );
@@ -165,7 +164,6 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Lot image (placeholder as there's no image in the data)
             Center(
               child: Image.asset(
                 'lib/images/lots/storage_units.png',
@@ -175,7 +173,6 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
               ),
             ),
             const SizedBox(height: 20),
-            // Lot address
             Center(
               child: Text(
                 "Address: ${lot['LAddress']}",
@@ -197,7 +194,6 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
               ),
             ),
             const SizedBox(height: 10),
-            // Lot description
             Center(
               child: Text(
                 "Admin ID: ${lot['Admin_ID']}",
@@ -205,11 +201,9 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
               ),
             ),
             const SizedBox(height: 20),
-            // Select rental start and end date
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Select start date
                 GestureDetector(
                   onTap: () => _selectStartDate(context),
                   child: Container(
@@ -228,7 +222,6 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
                   ),
                 ),
                 const SizedBox(width: 20),
-                // Select end date
                 GestureDetector(
                   onTap: () => _selectEndDate(context),
                   child: Container(
@@ -249,12 +242,9 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
               ],
             ),
             const SizedBox(height: 20),
-            // Rent button
             Center(
               child: ElevatedButton(
-                onPressed: _isLoading
-                    ? null
-                    : _rentLot, // Disable button while loading
+                onPressed: _isLoading ? null : _rentLot,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blueGrey,
                   foregroundColor: Colors.white,
