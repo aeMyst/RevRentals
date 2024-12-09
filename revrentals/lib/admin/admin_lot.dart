@@ -30,10 +30,13 @@ class _AdminLotPageState extends State<AdminLotPage> {
     _storageLotsFuture = widget.storageLotsFuture;
   }
 
-  /// Method to fetch the latest lot data
-  Future<void> _refreshLots() async {
+  /// Method to reload the screen and fetch fresh data
+  void _reloadScreen() {
     setState(() {
-      _storageLotsFuture = ListingService().fetchStorageLots();
+      _searchController.clear(); // Clear the search field
+      _searchQuery = ''; // Reset the search query
+      _storageLotsFuture =
+          ListingService().fetchStorageLots(); // Correctly assign the Future
     });
   }
 
@@ -42,18 +45,24 @@ class _AdminLotPageState extends State<AdminLotPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
-          "Lots",
-        ),
+        title: const Text("Lots"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _reloadScreen, // Trigger full screen reload
+            tooltip: 'Reload',
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column (
+        child: Column(
           children: [
             // Search Bar
             Padding(
               padding: const EdgeInsets.only(bottom: 16.0),
               child: TextField(
+                controller: _searchController,
                 onChanged: (query) {
                   setState(() {
                     _searchQuery = query.toLowerCase(); // Update search query
@@ -111,7 +120,7 @@ class _AdminLotPageState extends State<AdminLotPage> {
                               MaterialPageRoute(
                                 builder: (context) => EditLotPage(
                                   lotData: lot,
-                                  onLotUpdated: _refreshLots,
+                                  onLotUpdated: _reloadScreen,
                                 ),
                               ),
                             );
@@ -136,11 +145,10 @@ class _AdminLotPageState extends State<AdminLotPage> {
             MaterialPageRoute(
               builder: (context) => AddLotPage(
                 adminId: widget.adminId,
-                onLotAdded: _refreshLots,
+                onLotAdded: _reloadScreen,
               ),
             ),
           );
-          await _refreshLots();
         },
         backgroundColor: Colors.blueGrey,
         child: const Icon(Icons.add, color: Colors.white),
@@ -148,13 +156,13 @@ class _AdminLotPageState extends State<AdminLotPage> {
     );
   }
 }
- 
 
 class AddLotPage extends StatefulWidget {
   final int adminId;
   final VoidCallback onLotAdded; // Callback to notify the parent of changes
 
-  const AddLotPage({super.key, required this.adminId, required this.onLotAdded});
+  const AddLotPage(
+      {super.key, required this.adminId, required this.onLotAdded});
 
   @override
   State<AddLotPage> createState() => _AddLotPageState();
@@ -229,30 +237,41 @@ class _AddLotPageState extends State<AddLotPage> {
   /// Method to validate the lot address and show an error dialog if empty
   Future<void> _validateAndAddLot(BuildContext context) async {
     final lotAddress = addressController.text.trim();
-    final rentalPrice = double.parse(rentalPriceController.text.trim());
-    if (lotAddress.isEmpty) {
-      _showErrorDialog(context, "Lot address cannot be empty!");
-    } else if (rentalPrice <= 0) {
-      _showErrorDialog(context, "Rental price cannot be less than 0.");
-    } else {
-      Map<String, dynamic> lotListingData = {
-        "admin_id": widget.adminId,
-        "laddress": lotAddress,
-        "lrentalprice": rentalPrice,
-      };
-      try {
-        await _adminService.addLotListing(lotListingData);
-        widget.onLotAdded();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Listing added successfully!')),
-        );
-        // Navigate back to the previous screen
-        Navigator.pop(context);
-      } catch (e) {
-        _showErrorDialog(context, "Unable to insert lot data.");
-      }
+    final rentalPriceText = rentalPriceController.text.trim();
 
-      // addressController.clear(); // Clear the input field after submission
+    // Check for empty or "null" (case-insensitive) values
+    if (lotAddress.isEmpty || lotAddress.toLowerCase() == "null") {
+      _showErrorDialog(context, "Lot address cannot be empty or 'null'!");
+      return;
+    }
+    if (rentalPriceText.isEmpty || rentalPriceText.toLowerCase() == "null") {
+      _showErrorDialog(context, "Rental price cannot be empty or 'null'!");
+      return;
+    }
+
+    // Parse and validate rental price
+    final rentalPrice = double.tryParse(rentalPriceText);
+    if (rentalPrice == null || rentalPrice <= 0) {
+      _showErrorDialog(
+          context, "Rental price must be a valid positive number.");
+      return;
+    }
+
+    Map<String, dynamic> lotListingData = {
+      "admin_id": widget.adminId,
+      "laddress": lotAddress,
+      "lrentalprice": rentalPrice,
+    };
+
+    try {
+      await _adminService.addLotListing(lotListingData);
+      widget.onLotAdded();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Listing added successfully!')),
+      );
+      Navigator.pop(context); // Navigate back to the previous screen
+    } catch (e) {
+      _showErrorDialog(context, "Unable to insert lot data.");
     }
   }
 
@@ -315,26 +334,36 @@ class _EditLotPageState extends State<EditLotPage> {
 
   Future<void> _updateLot() async {
     final updatedAddress = addressController.text.trim();
-    final updatedPrice = double.parse(rentalPriceController.text.trim());
+    final updatedPriceText = rentalPriceController.text.trim();
 
-    if (updatedAddress.isEmpty) {
-      _showErrorDialog("Address cannot be empty!");
+    // Check for empty or "null" (case-insensitive) values
+    if (updatedAddress.isEmpty || updatedAddress.toLowerCase() == "null") {
+      _showErrorDialog("Address cannot be empty or 'null'!");
       return;
-    } else if (updatedPrice <= 0) {
-      _showErrorDialog("Rental priced cannot be less than 0");
-    } else {
-      final updatedData = {
-        "Lot_No": widget.lotData['Lot_No'], // Include the Lot ID here
-        "LAddress": updatedAddress,
-        "LRentalPrice": updatedPrice,
-      };
+    }
+    if (updatedPriceText.isEmpty || updatedPriceText.toLowerCase() == "null") {
+      _showErrorDialog("Price cannot be empty or 'null'!");
+      return;
+    }
 
-      // Call the service to update the lot
+    // Parse and validate updated price
+    final updatedPrice = double.tryParse(updatedPriceText);
+    if (updatedPrice == null || updatedPrice <= 0) {
+      _showErrorDialog("Price must be a valid positive number.");
+      return;
+    }
+
+    final updatedData = {
+      "Lot_No": widget.lotData['Lot_No'], // Include the Lot ID here
+      "LAddress": updatedAddress,
+      "LRentalPrice": updatedPrice,
+    };
+
+    try {
       final response = await _adminService.updateLotListing(
           updatedAddress, widget.lotData['Lot_No'], updatedPrice);
 
       if (response['success'] == true) {
-        // Show a success message and return to the previous screen
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(response['message'])),
         );
@@ -344,6 +373,8 @@ class _EditLotPageState extends State<EditLotPage> {
         _showErrorDialog(
             response['error'] ?? "An error occurred while updating.");
       }
+    } catch (e) {
+      _showErrorDialog("Unable to update lot data.");
     }
   }
 
