@@ -174,8 +174,10 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
                 const SizedBox(height: 20),
                 Text(
                   model,
-                  style: const TextStyle(fontSize: 24),
-                ),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                ),                ),
                 Text(
                   'Per Day: \$${rentalPrice.toStringAsFixed(2)}',
                   style: const TextStyle(fontSize: 16),
