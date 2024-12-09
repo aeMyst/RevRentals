@@ -126,11 +126,8 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
         MaterialPageRoute(
           builder: (context) => AgreementTransactionPage(
             itemName: widget.lotData['LAddress'],
-            renterName:
-                "${reservationDetails['renter_first_name']} ${reservationDetails['renter_last_name']}",
+            sellerName: "RevRental Admin",
             rentalPeriod: '$formattedStartDate to $formattedEndDate',
-            rentalPrice: widget.lotData['LRentalPrice'] ?? 0.0,
-            totalPrice: totalPrice,
             onActionCompleted: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(

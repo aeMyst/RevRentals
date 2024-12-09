@@ -5,24 +5,6 @@ class ListingService {
   final String _baseUrl =
       "http://10.0.2.2:8000/api"; // Update with your backend URL
 
-  /// Adds a motorized vehicle listing to the garage.
-  // Future<Map<String, dynamic>> addListing(
-  //     Map<String, dynamic> listingData) async {
-  //   final url = Uri.parse("$_baseUrl/add-listing/");
-  //   final response = await http.post(
-  //     url,
-  //     headers: {"Content-Type": "application/json"},
-  //     body: jsonEncode(listingData),
-  //   );
-
-  //   if (response.statusCode == 201) {
-  //     return {"success": true, "message": "Listing added successfully"};
-  //   } else {
-  //     final error = jsonDecode(response.body);
-  //     throw Exception(error["error"] ?? "Failed to add listing");
-  //   }
-  // }
-
   Future<Map<String, dynamic>> addListing(
       Map<String, dynamic> listingData) async {
     final response = await http.post(
@@ -38,23 +20,6 @@ class ListingService {
     }
   }
 
-  /// Adds a motorized vehicle listing to the garage.
-  // Future<Map<String, dynamic>> addGearListing(
-  //     Map<String, dynamic> listingData) async {
-  //   final url = Uri.parse("$_baseUrl/add-gear-listing/");
-  //   final response = await http.post(
-  //     url,
-  //     headers: {"Content-Type": "application/json"},
-  //     body: jsonEncode(listingData),
-  //   );
-
-  //   if (response.statusCode == 201) {
-  //     return {"success": true, "message": "Gear listing added successfully"};
-  //   } else {
-  //     final error = jsonDecode(response.body);
-  //     throw Exception(error["error"] ?? "Failed to add gear listing");
-  //   }
-  // }
   Future<Map<String, dynamic>> addGearListing(
       Map<String, dynamic> listingData) async {
     final response = await http.post(
@@ -435,10 +400,10 @@ class ListingService {
 
   Future<Map<String, dynamic>> checkActiveLotRental(int profileId) async {
     final url = Uri.parse("$_baseUrl/lot-rental/check/$profileId/");
-    
+
     try {
       final response = await http.get(url);
-      
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         return data;
@@ -450,4 +415,3 @@ class ListingService {
     }
   }
 }
-

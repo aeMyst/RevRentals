@@ -3,33 +3,60 @@ import 'package:revrentals/services/listing_service.dart';
 
 class AgreementTransactionPage extends StatefulWidget {
   final String itemName;
-  final String renterName;
+  final String sellerName;
   final String rentalPeriod;
-  final double rentalPrice;
-  final double totalPrice;
   final VoidCallback onActionCompleted;
   final int agreementId;
 
   const AgreementTransactionPage({
     super.key,
     required this.itemName,
-    required this.renterName,
+    required this.sellerName,
     required this.rentalPeriod,
-    required this.rentalPrice,
-    required this.totalPrice,
     required this.onActionCompleted,
-    required this.agreementId
+    required this.agreementId,
   });
 
   @override
-  _AgreementTransactionPageState createState() => _AgreementTransactionPageState();
+  _AgreementTransactionPageState createState() =>
+      _AgreementTransactionPageState();
 }
 
 class _AgreementTransactionPageState extends State<AgreementTransactionPage> {
   final ListingService _listingService = ListingService();
-  final List<String> paymentMethods = ['Credit Card', 'Debit Card', 'PayPal', 'E-Transfer'];
+  final List<String> paymentMethods = [
+    'Credit Card',
+    'Debit Card',
+    'PayPal',
+    'E-Transfer'
+  ];
   String? selectedPaymentMethod;
   bool isProcessing = false;
+  bool isLoading = true; // For loading state
+  String? errorMessage; // To display error if any
+  Map<String, dynamic>? reservationDetails; // Store fetched reservation details
+
+  @override
+  void initState() {
+    super.initState();
+    _loadReservationDetails();
+  }
+
+  Future<void> _loadReservationDetails() async {
+    try {
+      final details =
+          await _listingService.fetchReservationDetails(widget.agreementId);
+      setState(() {
+        reservationDetails = details;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Failed to load reservation details: $e';
+        isLoading = false;
+      });
+    }
+  }
 
   Future<void> _processPayment() async {
     if (selectedPaymentMethod == null) {
@@ -45,16 +72,16 @@ class _AgreementTransactionPageState extends State<AgreementTransactionPage> {
 
     try {
       await _listingService.addTransaction({
-        "agreement_id": widget.agreementId,     // agreementID is the same as reservationID
+        "agreement_id": widget.agreementId,
         "payment_method": selectedPaymentMethod,
       });
-      print(widget.agreementId);    // testing purposes
       widget.onActionCompleted();
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Payment successful via $selectedPaymentMethod")),
+        SnackBar(
+            content: Text("Payment successful via $selectedPaymentMethod")),
       );
-      
+
       Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -67,8 +94,45 @@ class _AgreementTransactionPageState extends State<AgreementTransactionPage> {
     }
   }
 
+  Future<void> _cleanupReservation() async {
+    try {
+      await _listingService.deleteReservation(widget.agreementId);
+      print(
+          "Unpaid reservation cleaned up for agreement ID ${widget.agreementId}");
+    } catch (e) {
+      print("Error during cleanup: $e");
+    }
+  }
+
+  @override
+  void dispose() {
+    if (!isProcessing && selectedPaymentMethod == null) {
+      _cleanupReservation();
+    }
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (errorMessage != null) {
+      return Scaffold(
+        body: Center(
+          child: Text(errorMessage!),
+        ),
+      );
+    }
+
+    final rentalPrice = reservationDetails?['rental_price'] ?? 0.0;
+    final totalPrice = reservationDetails?['total_price'] ?? 0.0;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -89,7 +153,7 @@ class _AgreementTransactionPageState extends State<AgreementTransactionPage> {
               style: const TextStyle(fontSize: 16),
             ),
             Text(
-              "Rented By: ${widget.renterName}",
+              "Sold By: ${widget.sellerName}",
               style: const TextStyle(fontSize: 16),
             ),
             Text(
@@ -97,11 +161,11 @@ class _AgreementTransactionPageState extends State<AgreementTransactionPage> {
               style: const TextStyle(fontSize: 16),
             ),
             Text(
-              "Rental Price: \$${widget.rentalPrice.toStringAsFixed(2)} per day",
+              "Rental Price: \$${rentalPrice.toStringAsFixed(2)} per day",
               style: const TextStyle(fontSize: 16),
             ),
             Text(
-              "Total Price: \$${widget.totalPrice.toStringAsFixed(2)}",
+              "Total Price: \$${totalPrice.toStringAsFixed(2)}",
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 30),
@@ -110,7 +174,6 @@ class _AgreementTransactionPageState extends State<AgreementTransactionPage> {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-            
             DropdownButtonFormField<String>(
               dropdownColor: Colors.white,
               decoration: const InputDecoration(
@@ -122,7 +185,8 @@ class _AgreementTransactionPageState extends State<AgreementTransactionPage> {
                   selectedPaymentMethod = newValue;
                 });
               },
-              items: paymentMethods.map<DropdownMenuItem<String>>((String value) {
+              items:
+                  paymentMethods.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),

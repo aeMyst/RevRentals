@@ -24,21 +24,27 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
   Future<List<dynamic>> _fetchNotifications() async {
     try {
-      final sellerNotifications = await _listingService.fetchSellerNotifications(widget.profileId);
-      final buyerNotifications = await _listingService.fetchBuyerNotifications(widget.profileId);
-      
+      final sellerNotifications =
+          await _listingService.fetchSellerNotifications(widget.profileId);
+      final buyerNotifications =
+          await _listingService.fetchBuyerNotifications(widget.profileId);
+
       // Mark seller notifications
-      final markedSellerNotifications = sellerNotifications.map((notification) => {
-        ...notification,
-        'is_seller': true,
-      }).toList();
-      
+      final markedSellerNotifications = sellerNotifications
+          .map((notification) => {
+                ...notification,
+                'is_seller': true,
+              })
+          .toList();
+
       // Mark buyer notifications
-      final markedBuyerNotifications = buyerNotifications.map((notification) => {
-        ...notification,
-        'is_seller': false,
-      }).toList();
-      
+      final markedBuyerNotifications = buyerNotifications
+          .map((notification) => {
+                ...notification,
+                'is_seller': false,
+              })
+          .toList();
+
       return [...markedSellerNotifications, ...markedBuyerNotifications];
     } catch (e) {
       print("Error fetching notifications: $e");
@@ -70,17 +76,17 @@ class _NotificationsPageState extends State<NotificationsPage> {
               itemBuilder: (context, index) {
                 final notification = notifications[index];
                 final int reservationNo = notification['reservation_no'];
-                final String itemName = notification['item_name'] ?? "Unknown Item";
+                final String itemName =
+                    notification['item_name'] ?? "Unknown Item";
                 final String status = notification['status'] ?? "Unknown";
                 final bool isSeller = notification['is_seller'] ?? false;
-                final String renterName = notification.containsKey('renter_first_name') &&
-                        notification.containsKey('renter_last_name')
-                    ? "${notification['renter_first_name']} ${notification['renter_last_name']}"
-                    : "N/A";
+                final String sellerName = notification['seller_name'] ?? "N/A";
+                final double rentalPrice =
+                    (notification['rental_price'] ?? 0.0).toDouble();
+                final double totalPrice =
+                    (notification['total_price'] ?? 0.0).toDouble();
                 final String rentalPeriod =
                     "${notification['start_date']} to ${notification['end_date']}";
-                final double rentalPrice = (notification['rental_price'] ?? 0.0).toDouble();
-                final double totalPrice = (notification['total_price'] ?? 0.0).toDouble();
 
                 return ListTile(
                   leading: Icon(
@@ -96,13 +102,18 @@ class _NotificationsPageState extends State<NotificationsPage> {
                             : Colors.red,
                   ),
                   title: Text(
-                    status == "Rejected"
-                        ? "Request for $itemName was rejected"
-                        : "Rental request for $itemName",
+                    isSeller
+                        ? "Rental request for $itemName"
+                        : status == "Rejected"
+                            ? "Your request for $itemName was rejected"
+                            : "Rental of $itemName",
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   subtitle: Text(
-                      "Renter: $renterName\nPeriod: $rentalPeriod\nStatus: $status"),
+                    isSeller
+                        ? "Period: $rentalPeriod\nStatus: $status"
+                        : "Seller: $sellerName\nPeriod: $rentalPeriod\nStatus: $status",
+                  ),
                   trailing: const Icon(Icons.arrow_forward_ios),
                   onTap: () {
                     if (status == "Pending Approval" && isSeller) {
@@ -123,10 +134,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
                         MaterialPageRoute(
                           builder: (context) => AgreementTransactionPage(
                             itemName: itemName,
-                            renterName: renterName,
+                            sellerName: sellerName,
                             rentalPeriod: rentalPeriod,
-                            rentalPrice: rentalPrice,
-                            totalPrice: totalPrice,
                             onActionCompleted: _refreshNotifications,
                             agreementId: reservationNo,
                           ),
@@ -136,7 +145,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                              "The request for $itemName was rejected. Tap to dismiss."),
+                              "The request for $itemName was rejected. Tap to dismiss Reservation."),
                           action: SnackBarAction(
                             label: "Dismiss",
                             onPressed: () {

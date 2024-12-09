@@ -44,15 +44,15 @@ class _RentalApprovalPageState extends State<RentalApprovalPage> {
     }
   }
 
-    Future<void> _approveRental() async {
+  Future<void> _approveRental() async {
     setState(() => isLoading = true);
 
     try {
       final response = await _listingService.addAgreement({
         "reservation_no": widget.reservationNo,
-    });
+      });
 
-    if (response['success']) {
+      if (response['success']) {
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Rental request approved')),
@@ -60,7 +60,7 @@ class _RentalApprovalPageState extends State<RentalApprovalPage> {
 
         widget.onActionCompleted(); // Refresh notifications
         Navigator.pop(context); // Return to notifications page
-    }
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error approving rental: $e')),
