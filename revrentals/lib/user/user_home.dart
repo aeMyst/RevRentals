@@ -6,15 +6,16 @@ import 'package:revrentals/services/auth_service.dart';
 
 class UserHomePage extends StatefulWidget {
   final Map<String, dynamic>? userData;
-
-  const UserHomePage({Key? key, this.userData}) : super(key: key);
+  final int selectedTab;
+  const UserHomePage({Key? key, this.userData, this.selectedTab = 0})
+      : super(key: key);
 
   @override
   State<UserHomePage> createState() => _UserHomePageState();
 }
 
 class _UserHomePageState extends State<UserHomePage> {
-  int _currentIndex = 0;
+  late int _currentIndex;
   final AuthService _authService = AuthService();
   int? profileId;
   bool isLoading = true;
@@ -24,6 +25,8 @@ class _UserHomePageState extends State<UserHomePage> {
   void initState() {
     super.initState();
     currentUserData = widget.userData;
+    _currentIndex =
+        widget.selectedTab; // Initialize current index with the selectedTab
     _fetchProfileIdAndData();
   }
 
@@ -102,7 +105,11 @@ class _UserHomePageState extends State<UserHomePage> {
                 await _refreshUserData();
                 return true;
               },
-              child: _pages[_currentIndex],
+              // child: _pages[_currentIndex],
+              child: IndexedStack(
+                index: _currentIndex,
+                children: _pages,
+              ),
             ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,

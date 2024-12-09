@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:revrentals/services/auth_service.dart';
 import 'package:revrentals/services/listing_service.dart';
 import 'package:revrentals/user/garage/garage.dart';
+import 'package:revrentals/user/user_home.dart';
 
 final ListingService _listingService = ListingService();
 final AuthService _authService = AuthService();
@@ -10,11 +11,14 @@ final AuthService _authService = AuthService();
 class MaintenanceRecordsPage extends StatefulWidget {
   final String vin;
   final int profileId;
+  final Map<String, dynamic>? userData;
+
   // final garageId;
   MaintenanceRecordsPage({
     super.key,
     required this.vin,
     required this.profileId,
+    required this.userData,
     // required this.garageId
   });
 
@@ -64,7 +68,7 @@ class _MaintenanceRecordsPageState extends State<MaintenanceRecordsPage> {
         onPressed: () {
           _saveRecords(context);
         },
-        child: const Icon(Icons.save),
+        child: const Icon(Icons.check),
       ),
     );
   }
@@ -120,9 +124,9 @@ class _MaintenanceRecordsPageState extends State<MaintenanceRecordsPage> {
 
   // Validate records before saving
   bool _validateRecords() {
-    if (maintenanceRecords.isEmpty) {
-      return false;
-    }
+    // if (maintenanceRecords.isEmpty) {
+    //   return false;
+    // }
     for (var record in maintenanceRecords) {
       if (record['date'] == null) {
         return false; // Invalid if date is null or empty
@@ -139,25 +143,37 @@ class _MaintenanceRecordsPageState extends State<MaintenanceRecordsPage> {
   }
 
   Future<void> _saveRecords(BuildContext context) async {
-    if (!_validateRecords()) {
+    if (maintenanceRecords.isEmpty) {
+      errorMessage(context, "No maintenance records inputted.");
+    } else if (!_validateRecords()) {
       errorMessage(context, "All fields must be filled.");
     } else {
       try {
         // Handle saving records (e.g., sending to backend or storing locally)
-        print("Saving records: $maintenanceRecords");
+        // print("Saving records: $maintenanceRecords");
         await _listingService.addMaintRecords(maintenanceRecords);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Maintenance records saved.")),
         );
-        // Navigator.pop(context);
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => GaragePage(profileId: widget.profileId)));
+
+
+        _navigateToHomePageWithGarageTab(context);
       } catch (e) {
         errorMessage(context, e.toString());
       }
     }
+  }
+
+  // Method to navigate to UserHomePage with Garage Tab selected
+  void _navigateToHomePageWithGarageTab(BuildContext context) {
+
+    // Navigate back to the user home page (under garage tab)
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => UserHomePage(userData: widget.userData, selectedTab: 1,)),
+      (route) =>
+          false, // This will remove all previous routes, ensuring we go to the home page
+    );
   }
 }
 
@@ -206,7 +222,8 @@ class _MaintenanceRecordRowState extends State<MaintenanceRecordRow> {
       context: context,
       initialDate: selectedDate ?? DateTime.now(),
       firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+      // lastDate: DateTime(2100),
+      lastDate: DateTime.now(),
     );
     if (pickedDate != null) {
       setState(() {
@@ -287,8 +304,9 @@ class _MaintenanceRecordRowState extends State<MaintenanceRecordRow> {
 class DisplayMaintenanceRecordsPage extends StatefulWidget {
   final String vin;
   final int profileId;
+  final Map<String, dynamic>? userData;
   const DisplayMaintenanceRecordsPage(
-      {super.key, required this.profileId, required this.vin});
+      {super.key, required this.profileId, required this.vin, required this.userData});
 
   @override
   State<DisplayMaintenanceRecordsPage> createState() =>
@@ -370,6 +388,7 @@ class _DisplayMaintenanceRecordsPageState
                     context,
                     MaterialPageRoute(
                       builder: (context) => MaintenanceRecordsPage(
+                        userData: widget.userData,
                         vin: widget.vin,
                         profileId: widget.profileId,
                       ),

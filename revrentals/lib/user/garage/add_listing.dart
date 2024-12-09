@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:revrentals/services/listing_service.dart';
 import 'package:revrentals/user/garage/maint_records.dart';
 import 'package:revrentals/regex/listing_regex.dart';
+import 'package:revrentals/user/user_home.dart';
 
 class AddListingPage extends StatefulWidget {
   final int profileId;
+  final Map<String, dynamic>? userData;
 
-  const AddListingPage({super.key, required this.profileId});
+  const AddListingPage(
+      {super.key, required this.profileId, required this.userData});
 
   @override
   _AddListingPageState createState() => _AddListingPageState();
@@ -74,28 +77,24 @@ class _AddListingPageState extends State<AddListingPage> {
       _showErrorDialog(mileageError ?? rentalPriceError!);
       return;
     }
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent dismissing the dialog
+      builder: (context) {
+        return Center(child: CircularProgressIndicator());
+      },
+    );
 
     try {
       // Fetch the garage ID based on the profile ID
       int garageId = await _listingService.fetchGarageId(widget.profileId);
 
-      // Show loading dialog
-      showDialog(
-        context: context,
-        barrierDismissible:
-            false, // Prevent the user from dismissing the dialog
-        builder: (context) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        },
-      );
-
       if (isMotorcycleSelected) {
         // Validate inputs
-        String? vinError = Validators.validateVIN(vinController.text);
+        String? vinError = Validators.validateVIN(vinController.text.trim());
         String? registrationError =
-            Validators.validateRegistration(registrationController.text);
+            Validators.validateRegistration(registrationController.text.trim());
 
         if (vinError != null || registrationError != null) {
           _showErrorDialog(vinError ?? registrationError!);
@@ -123,22 +122,23 @@ class _AddListingPageState extends State<AddListingPage> {
           Navigator.pop(context); // Close loading dialog
           _showErrorDialog(response['error']); // Show error message
           return;
-        }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Listing added successfully!')),
+          );
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Listing added successfully!')),
-        );
-
-        // Now that the VIN is valid, pass it to the MaintenanceRecordsPage
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MaintenanceRecordsPage(
-              vin: vinController.text,
-              profileId: widget.profileId,
+          // Now that the VIN is valid, pass it to the MaintenanceRecordsPage
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MaintenanceRecordsPage(
+                vin: vinController.text,
+                profileId: widget.profileId,
+                userData: widget.userData,
+              ),
             ),
-          ),
-        );
+          );
+        }
       } else {
         // Prepare gear data
         Map<String, dynamic> listingData = {
@@ -160,15 +160,11 @@ class _AddListingPageState extends State<AddListingPage> {
           _showErrorDialog(response['error']); // Show error message
           return;
         }
+        Navigator.of(context).pop();
 
-        Navigator.pop(context);
-        Navigator.pop(context);
-        
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Listing added successfully!')),
         );
-
-        // Navigator.popUntil(context, (route) => route.isFirst);
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

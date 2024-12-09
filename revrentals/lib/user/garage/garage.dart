@@ -120,6 +120,7 @@ class _GaragePageState extends State<GaragePage> {
                           garageItemsFuture: _garageItemsFuture,
                           profileId: widget.profileId,
                           garageId: garageId,
+                          userData: widget.userData,
                         ),
                         RentedTab(
                           profileId:
@@ -144,12 +145,13 @@ class ListedTab extends StatefulWidget {
   final Future<Map<String, dynamic>> garageItemsFuture;
   final int profileId; // Accept profileId
   final int garageId;
-
+  final Map<String, dynamic>? userData;
   const ListedTab(
       {super.key,
       required this.garageItemsFuture,
       required this.profileId,
-      required this.garageId});
+      required this.garageId,
+      required this.userData});
 
   @override
   _ListedTabState createState() => _ListedTabState();
@@ -207,6 +209,7 @@ class _ListedTabState extends State<ListedTab> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => GarageVehiclePage(
+                              userData: widget.userData,
                               vehicleData: vehicle,
                               profileId: widget.profileId,
                               onPriceUpdated: _refreshGarageItems,
@@ -255,9 +258,10 @@ class _ListedTabState extends State<ListedTab> {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      AddListingPage(profileId: widget.profileId),
+                      AddListingPage(profileId: widget.profileId,
+                      userData: widget.userData),
                 ),
-              );
+              ).then((_) => _refreshGarageItems());
             },
             backgroundColor: Colors.blueGrey,
             child: const Icon(Icons.add, color: Colors.white),
@@ -272,12 +276,13 @@ class GarageVehiclePage extends StatefulWidget {
   final Map<String, dynamic>? vehicleData;
   final int profileId;
   final VoidCallback onPriceUpdated; // Callback function to refresh the list
-
+  final Map<String,dynamic>? userData;
   const GarageVehiclePage(
       {super.key,
       required this.vehicleData,
       required this.profileId,
-      required this.onPriceUpdated});
+      required this.onPriceUpdated, 
+      required this.userData});
 
   @override
   State<GarageVehiclePage> createState() => _GarageVehiclePageState();
@@ -381,6 +386,7 @@ class _GarageVehiclePageState extends State<GarageVehiclePage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => DisplayMaintenanceRecordsPage(
+                          userData: widget.userData,
                           vin: widget.vehicleData?['VIN'],
                           profileId: widget.profileId),
                     ),
