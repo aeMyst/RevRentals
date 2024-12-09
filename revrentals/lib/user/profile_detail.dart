@@ -37,17 +37,9 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
     String? postalCodeError = Validators.validatePostalCode(address);
 
     // Show appropriate error messages if validation fails
-    if (firstName.toLowerCase() == 'null') {
-        showError('First name cannot be null');
-        return;
-    }
     if (firstNameError != null) {
       showError(firstNameError);
       return;
-    }
-    if (lastName.toLowerCase() == 'null') {
-        showError('Last name cannot be null');
-        return;
     }
     if (lastNameError != null) {
       showError(lastNameError);
@@ -264,6 +256,7 @@ class DisplayProfileDetailsPage extends StatefulWidget {
 
 class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
@@ -313,6 +306,7 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
   }
 
   void _populateFields(Map<String, dynamic> data) {
+    _usernameController.text = data['username'] ?? '';
     _firstNameController.text = data['first_name'] ?? '';
     _lastNameController.text = data['last_name'] ?? '';
     _addressController.text = data['address'] ?? '';
@@ -386,6 +380,15 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              TextFormField(
+                controller: _usernameController,
+                decoration: const InputDecoration(
+                  labelText: 'Username',
+                  border: OutlineInputBorder(),
+                ),
+                enabled: false,
+              ),
+              const SizedBox(height: 10), 
               TextFormField(
                 controller: _firstNameController,
                 decoration: const InputDecoration(

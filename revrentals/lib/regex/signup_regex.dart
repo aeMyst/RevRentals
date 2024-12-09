@@ -73,7 +73,10 @@ class Validators {
     final regex = RegExp(r"^[a-zA-Z]+$");
     if (!regex.hasMatch(firstName)) {
       return "First Name can only contain letters.";
+    } else if (firstName.toLowerCase() == 'null') {
+      return "First Name cannot be null.";
     }
+
     return null;
   }
 
@@ -84,7 +87,10 @@ class Validators {
     final regex = RegExp(r"^[a-zA-Z]+$");
     if (!regex.hasMatch(lastName)) {
       return "Last Name can only contain letters.";
+    } else if (lastName.toLowerCase() == 'null') {
+      return "Last Name cannot be null.";
     }
+
     return null;
   }
 
