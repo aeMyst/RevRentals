@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:revrentals/services/auth_service.dart';
 import 'package:revrentals/services/listing_service.dart';
+import 'package:revrentals/user/garage/garage.dart';
 
 final ListingService _listingService = ListingService();
 final AuthService _authService = AuthService();
@@ -148,11 +149,11 @@ class _MaintenanceRecordsPageState extends State<MaintenanceRecordsPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Maintenance records saved.")),
         );
-        Navigator.pop(context);
-        // Navigator.push(
-        //     context,
-        //     MaterialPageRoute(
-        //         builder: (context) => GaragePage(profileId: widget.profileId)));
+        // Navigator.pop(context);
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => GaragePage(profileId: widget.profileId)));
       } catch (e) {
         errorMessage(context, e.toString());
       }
