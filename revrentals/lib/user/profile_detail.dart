@@ -312,6 +312,7 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
     _addressController.text = data['address'] ?? '';
     _emailController.text = data['email'] ?? '';
     _licenseController.text = data['license'] ?? '';
+    _usernameController.text = data['username'] ?? '';
   }
 
   Future<void> _updateProfile() async {
@@ -380,14 +381,6 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextFormField(
-                controller: _usernameController,
-                decoration: const InputDecoration(
-                  labelText: 'Username',
-                  border: OutlineInputBorder(),
-                ),
-                enabled: false,
-              ),
               const SizedBox(height: 10),
               TextFormField(
                 controller: _firstNameController,
@@ -423,6 +416,15 @@ class _DisplayProfileDetailsPageState extends State<DisplayProfileDetailsPage> {
                 controller: _emailController,
                 decoration: const InputDecoration(
                   labelText: 'Email',
+                  border: OutlineInputBorder(),
+                ),
+                enabled: false,
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: _usernameController,
+                decoration: const InputDecoration(
+                  labelText: 'Username',
                   border: OutlineInputBorder(),
                 ),
                 enabled: false,
