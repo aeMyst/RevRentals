@@ -16,7 +16,7 @@ class _AddListingPageState extends State<AddListingPage> {
   final ListingService _listingService = ListingService();
   bool isMotorcycleSelected = true;
 
-  // Controllers for text fields
+  // Controllers for motorized vehicle
   final TextEditingController modelController = TextEditingController();
   final TextEditingController colorController = TextEditingController();
   final TextEditingController mileageController = TextEditingController();
@@ -27,6 +27,7 @@ class _AddListingPageState extends State<AddListingPage> {
   final TextEditingController specificAttributeController =
       TextEditingController();
 
+// Gear controllers
   final TextEditingController gearSizeController = TextEditingController();
   final TextEditingController brandController = TextEditingController();
   final TextEditingController materialController = TextEditingController();
@@ -74,16 +75,6 @@ class _AddListingPageState extends State<AddListingPage> {
       return;
     }
 
-    // Validate inputs
-    String? vinError = Validators.validateVIN(vinController.text);
-    String? registrationError =
-        Validators.validateRegistration(registrationController.text);
-
-    if (vinError != null || registrationError != null) {
-      _showErrorDialog(vinError ?? registrationError!);
-      return; // Exit if there are validation errors
-    }
-
     try {
       // Fetch the garage ID based on the profile ID
       int garageId = await _listingService.fetchGarageId(widget.profileId);
@@ -101,6 +92,15 @@ class _AddListingPageState extends State<AddListingPage> {
       );
 
       if (isMotorcycleSelected) {
+        // Validate inputs
+        String? vinError = Validators.validateVIN(vinController.text);
+        String? registrationError =
+            Validators.validateRegistration(registrationController.text);
+
+        if (vinError != null || registrationError != null) {
+          _showErrorDialog(vinError ?? registrationError!);
+          return; // Exit if there are validation errors
+        }
         // Prepare motorized vehicle data
         Map<String, dynamic> listingData = {
           "garage_id": garageId,
@@ -160,10 +160,15 @@ class _AddListingPageState extends State<AddListingPage> {
           _showErrorDialog(response['error']); // Show error message
           return;
         }
-        Navigator.pop(context); // Pop the current page
+
+        Navigator.pop(context);
+        Navigator.pop(context);
+        
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Listing added successfully!')),
         );
+
+        // Navigator.popUntil(context, (route) => route.isFirst);
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -322,7 +327,7 @@ class _AddListingPageState extends State<AddListingPage> {
                 decoration: const InputDecoration(labelText: 'Color'),
                 items: const [
                   DropdownMenuItem(value: 'Other', child: Text('Other')),
-                  DropdownMenuItem(value: 'Red', child: Text('Basic')),
+                  DropdownMenuItem(value: 'Red', child: Text('Red')),
                   DropdownMenuItem(value: 'Orange', child: Text('Orange')),
                   DropdownMenuItem(value: 'Yellow', child: Text('Yellow')),
                   DropdownMenuItem(value: 'Green', child: Text('Green')),
@@ -331,6 +336,8 @@ class _AddListingPageState extends State<AddListingPage> {
                   DropdownMenuItem(value: 'Pink', child: Text('Pink')),
                   DropdownMenuItem(value: 'Black', child: Text('Black')),
                   DropdownMenuItem(value: 'White', child: Text('White')),
+                  DropdownMenuItem(
+                      value: 'Multicolor', child: Text('Multicolor')),
                 ],
                 onChanged: (value) {
                   setState(() {
