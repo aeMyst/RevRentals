@@ -27,7 +27,7 @@ class LotTab extends StatelessWidget {
               final lot = storageLots[index];
               return ListTile(
                 title: Text("Lot No: ${lot['Lot_No']}"),
-                subtitle: Text("Address: ${lot['LAddress']}"),
+                subtitle: Text("Address: ${lot['LAddress']}" + "\nRental Price: ${lot['LRentalPrice']}"),
                 trailing: const Icon(Icons.warehouse),
                 onTap: () {
                   print('Lot data before navigation: $lot'); // FOR SOME REASON RENTAL PRICE IS NOT BEING PASSED

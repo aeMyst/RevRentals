@@ -194,13 +194,6 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
               ),
             ),
             const SizedBox(height: 10),
-            Center(
-              child: Text(
-                "Admin ID: ${lot['Admin_ID']}",
-                style: TextStyle(color: Colors.grey[700], fontSize: 16),
-              ),
-            ),
-            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

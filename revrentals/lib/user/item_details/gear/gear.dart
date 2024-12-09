@@ -7,12 +7,10 @@ class GearTab extends StatefulWidget {
   final int profileId;
   final Future<List<dynamic>> gearFuture;
 
-  const GearTab(
-      {super.key, required this.profileId, required this.gearFuture});
+  const GearTab({super.key, required this.profileId, required this.gearFuture});
 
   @override
   _GearTabState createState() => _GearTabState();
-
 }
 
 class _GearTabState extends State<GearTab> {
@@ -35,7 +33,6 @@ class _GearTabState extends State<GearTab> {
     'material': "Any",
   };
 
-
   @override
   void initState() {
     super.initState();
@@ -52,8 +49,8 @@ class _GearTabState extends State<GearTab> {
       final response = await fetchGear('http://10.0.2.2:8000/get-all-gear');
       if (response != null && response.isNotEmpty) {
         setState(() {
-          _originalGear = response; 
-          _filteredGear = List.from(response); 
+          _originalGear = response;
+          _filteredGear = List.from(response);
         });
       }
     } catch (error) {
@@ -69,10 +66,10 @@ class _GearTabState extends State<GearTab> {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         if (responseData.containsKey('gear') && responseData['gear'] is List) {
-            return responseData['gear'];
-          } else {
-            return [];
-          }
+          return responseData['gear'];
+        } else {
+          return [];
+        }
       } else {
         print("Server responded with status code: ${response.statusCode}");
         return null;
@@ -83,63 +80,63 @@ class _GearTabState extends State<GearTab> {
     }
   }
 
-
   // Show sort options when Sort button pressed
   void _showSortDialog(BuildContext context, {required String currentSort}) {
-  String selectedSortOption = _currentSort;
-  final List<String> sortOptions = [
-    'None',
-    'Price: Low to High',
-    'Price: High to Low',
-  ];
+    String selectedSortOption = _currentSort;
+    final List<String> sortOptions = [
+      'None',
+      'Price: Low to High',
+      'Price: High to Low',
+    ];
 
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return StatefulBuilder(
-        builder: (BuildContext context, StateSetter setState) {
-          return AlertDialog(
-            title: const Text('Sort Options'),
-            content: DropdownButtonFormField<String>(
-              dropdownColor: Colors.white,
-              value: selectedSortOption,
-              decoration: const InputDecoration(
-                labelText: 'Sort By',
-                border: OutlineInputBorder(),
-              ),
-              items: sortOptions.map((String option) {
-                return DropdownMenuItem<String>(
-                  value: option,
-                  child: Text(option),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedSortOption = newValue!;
-                  _currentSort = newValue;
-                });
-              },
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  print('Applying Sort Option: $selectedSortOption');
-                  _applySort(selectedSortOption);
-                  _currentSort = selectedSortOption;
-                  Navigator.pop(context);
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: const Text('Sort Options'),
+              content: DropdownButtonFormField<String>(
+                dropdownColor: Colors.white,
+                value: selectedSortOption,
+                decoration: const InputDecoration(
+                  labelText: 'Sort By',
+                  border: OutlineInputBorder(),
+                ),
+                items: sortOptions.map((String option) {
+                  return DropdownMenuItem<String>(
+                    value: option,
+                    child: Text(option),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedSortOption = newValue!;
+                    _currentSort = newValue;
+                  });
                 },
-                child: const Text('Apply'),
               ),
-            ],
-          );
-        },
-      );
-    },
-  );}
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    print('Applying Sort Option: $selectedSortOption');
+                    _applySort(selectedSortOption);
+                    _currentSort = selectedSortOption;
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Apply'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
 
   // Function to apply sorting
   void _applySort(String selectedSortOption) {
@@ -152,15 +149,18 @@ class _GearTabState extends State<GearTab> {
         // Sorting original gear
         switch (selectedSortOption) {
           case 'None':
-            _filteredGear = List.from(_originalGear); // Reset to original unsorted data
+            _filteredGear =
+                List.from(_originalGear); // Reset to original unsorted data
             break;
           case 'Price: Low to High':
             _filteredGear = List.from(_originalGear)
-             ..sort((a, b) => (a['GRentalPrice'] as double).compareTo(b['GRentalPrice'] as double));
+              ..sort((a, b) => (a['GRentalPrice'] as double)
+                  .compareTo(b['GRentalPrice'] as double));
             break;
           case 'Price: High to Low':
             _filteredGear = List.from(_originalGear)
-             ..sort((a, b) => (b['GRentalPrice'] as double).compareTo(a['GRentalPrice'] as double));
+              ..sort((a, b) => (b['GRentalPrice'] as double)
+                  .compareTo(a['GRentalPrice'] as double));
             break;
           default:
             _filteredGear = List.from(_originalGear); // Default behavior
@@ -169,13 +169,16 @@ class _GearTabState extends State<GearTab> {
         // Sorting filtered motorcycles
         switch (selectedSortOption) {
           case 'None':
-            _filteredGear = List.from(_filteredGear); // Reset to filtered unsorted data
+            _filteredGear =
+                List.from(_filteredGear); // Reset to filtered unsorted data
             break;
           case 'Price: Low to High':
-            _filteredGear.sort((a, b) => double.parse(a['GRentalPrice']).compareTo(double.parse(b['GRentalPrice'])));
+            _filteredGear.sort((a, b) => double.parse(a['GRentalPrice'])
+                .compareTo(double.parse(b['GRentalPrice'])));
             break;
           case 'Price: High to Low':
-            _filteredGear.sort((a, b) => double.parse(b['GRentalPrice']).compareTo(double.parse(a['GRentalPrice'])));
+            _filteredGear.sort((a, b) => double.parse(b['GRentalPrice'])
+                .compareTo(double.parse(a['GRentalPrice'])));
             break;
           default:
             _filteredGear = List.from(_filteredGear); // Default behavior
@@ -185,7 +188,8 @@ class _GearTabState extends State<GearTab> {
   }
 
   // Show filter options when 'Filter' pressed
-  void _showFilterDialog(BuildContext context, {required Map<String, String?> currentFilters}) {
+  void _showFilterDialog(BuildContext context,
+      {required Map<String, String?> currentFilters}) {
     String selectedGear = currentFilters['type'] ?? 'All';
     String selectedPriceRange = currentFilters['priceRange'] ?? 'Any';
     String selectedBrand = currentFilters['brand'] ?? 'Any';
@@ -364,9 +368,9 @@ class _GearTabState extends State<GearTab> {
                   child: const Text('Cancel'),
                 ), */
                 const SizedBox(width: 8),
-                Row (
+                Row(
                   mainAxisSize: MainAxisSize.min,
-                  children: [   
+                  children: [
                     ElevatedButton(
                       onPressed: () {
                         resetFilters();
@@ -376,15 +380,15 @@ class _GearTabState extends State<GearTab> {
                     ),
                     const SizedBox(width: 8),
                     ElevatedButton(
-                    onPressed: () {
-                      _applyGearPageFilter(
-                        context: context,
-                        selectedGear: selectedGear,
-                        selectedBrand: selectedBrand,
-                        selectedSize: selectedSize,
-                        selectedPriceRange: selectedPriceRange,
-                        selectedMaterial: selectedMaterial);
-                      Navigator.pop(context);
+                      onPressed: () {
+                        _applyGearPageFilter(
+                            context: context,
+                            selectedGear: selectedGear,
+                            selectedBrand: selectedBrand,
+                            selectedSize: selectedSize,
+                            selectedPriceRange: selectedPriceRange,
+                            selectedMaterial: selectedMaterial);
+                        Navigator.pop(context);
                       },
                       child: const Text('Apply Filters'),
                     ),
@@ -399,71 +403,71 @@ class _GearTabState extends State<GearTab> {
   }
 
   // Function to apply filtering
-  void _applyGearPageFilter(
-    {required BuildContext context,
+  void _applyGearPageFilter({
+    required BuildContext context,
     String? selectedGear,
     String? selectedPriceRange,
     String? selectedBrand,
     String? selectedMaterial,
     String? selectedSize,
-
-    }) async {
-      try {
-         setState(() {
-          // Keeping track of filters used
-          _currentFilters = {
-            'type': selectedGear,
-            'brand': selectedBrand,
-            'priceRange': selectedPriceRange,
-            'size': selectedSize,
-            'material': selectedMaterial,
-          };
-
-          print(_currentFilters);
-        });
-
-        final Map<String, String?> filters = {
-          "type": selectedGear,
-          "brand": selectedBrand,
-          "size": selectedSize,
-          "material": selectedMaterial,
-          "grental_price": selectedPriceRange != "Any"
-            ? parsePrice(selectedPriceRange)?.toString()
-            : "Any",
+  }) async {
+    try {
+      setState(() {
+        // Keeping track of filters used
+        _currentFilters = {
+          'type': selectedGear,
+          'brand': selectedBrand,
+          'priceRange': selectedPriceRange,
+          'size': selectedSize,
+          'material': selectedMaterial,
         };
 
-        final query = filters.entries
+        print(_currentFilters);
+      });
+
+      final Map<String, String?> filters = {
+        "type": selectedGear,
+        "brand": selectedBrand,
+        "size": selectedSize,
+        "material": selectedMaterial,
+        "grental_price": selectedPriceRange != "Any"
+            ? parsePrice(selectedPriceRange)?.toString()
+            : "Any",
+      };
+
+      final query = filters.entries
           .where((entry) => entry.value != "Any" && entry.value != "All")
           .map((entry) => '${entry.key}=${Uri.encodeComponent(entry.value!)}')
           .join('&');
-        print("QUERY: $query");
+      print("QUERY: $query");
 
-        final requestUrl = 'http://10.0.2.2:8000/filter-gear-by-multiple-conditions/?$query';
-        print("Request URL: $requestUrl");
+      final requestUrl =
+          'http://10.0.2.2:8000/filter-gear-by-multiple-conditions/?$query';
+      print("Request URL: $requestUrl");
 
-        final response = await fetchGear(requestUrl);
+      final response = await fetchGear(requestUrl);
 
-        if (response != null && response.isNotEmpty) {
-          setState(() {
-            _filteredGear = response;
-            _originalGear = response; // save original list
-            filterApplied = true;
-          });
-        } else {
-          setState(() {
-            _filteredGear = [];
-            _originalGear = [];
-            filterApplied = true;
-          });
-        }
-      } catch (error) {
-        print("Error applying filters: $error");
-        setState((){
+      if (response != null && response.isNotEmpty) {
+        setState(() {
+          _filteredGear = response;
+          _originalGear = response; // save original list
+          filterApplied = true;
+        });
+      } else {
+        setState(() {
           _filteredGear = [];
           _originalGear = [];
-          filterApplied = false;
+          filterApplied = true;
         });
       }
+    } catch (error) {
+      print("Error applying filters: $error");
+      setState(() {
+        _filteredGear = [];
+        _originalGear = [];
+        filterApplied = false;
+      });
+    }
   }
 
   // Helper function to parsePrice
@@ -496,14 +500,14 @@ class _GearTabState extends State<GearTab> {
       }
 
       setState(() {
-              _currentFilters = {
-                'type': "All",
-                'priceRange': "Any",
-                'brand': "Any",
-                'size': "Any",
-                'material': "Any",
-              };
-            });
+        _currentFilters = {
+          'type': "All",
+          'priceRange': "Any",
+          'brand': "Any",
+          'size': "Any",
+          'material': "Any",
+        };
+      });
     } catch (error) {
       print("Error resetting filters and fetching all vehicles: $error");
     }
@@ -516,39 +520,39 @@ class _GearTabState extends State<GearTab> {
     return Column(
       children: [
         const SizedBox(height: 16),
-
-        // Filter and Sort Buttons Row
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton.icon(
-              icon: const Icon(Icons.filter_list),
-              label: const Text(
-                'Filter',
+        Container(
+          padding: const EdgeInsets.only(left: 16, right: 16),
+          child: // Filter and Sort Buttons Row
+              Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              ElevatedButton.icon(
+                icon: const Icon(Icons.filter_list),
+                label: const Text(
+                  'Filter',
+                ),
+                onPressed: () {
+                  _showFilterDialog(context, currentFilters: _currentFilters);
+                },
               ),
-              onPressed: () {
-                _showFilterDialog(context, currentFilters: _currentFilters);
-              },
-            ),
-            const SizedBox(width: 16),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.sort),
-              label: const Text(
-                'Sort',
-              ),
-              onPressed: () {
+              const SizedBox(width: 16),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.sort),
+                label: const Text(
+                  'Sort',
+                ),
+                onPressed: () {
                   _showSortDialog(context, currentSort: _currentSort);
-              },
-            ),
-          ],
+                },
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 16),
-
         Expanded(
           child: Builder(
             builder: (context) {
               if (_filteredGear.isNotEmpty) {
-
                 // SHOW FILTERED GEAR
                 print("Displaying filtered GEAR");
                 return ListView.builder(
@@ -556,22 +560,22 @@ class _GearTabState extends State<GearTab> {
                   itemBuilder: (context, index) {
                     final gearItems = _filteredGear[index];
 
-                    return ListTile (
-                      title: Text(gearItems['Gear_Name'] ?? 'Unknown Gear'),
-                      subtitle: Text("Rental Price: \$${gearItems['GRentalPrice']}"),
-                      trailing: const Icon(Icons.settings),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => GearDetailPage(
-                              profileId: widget.profileId, 
-                              gearData: gearItems, 
+                    return ListTile(
+                        title: Text(gearItems['Gear_Name'] ?? 'Unknown Gear'),
+                        subtitle: Text(
+                            "Rental Price: \$${gearItems['GRentalPrice']}"),
+                        trailing: const Icon(Icons.settings),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => GearDetailPage(
+                                profileId: widget.profileId,
+                                gearData: gearItems,
                               ),
                             ),
-                        );
-                      }
-                    );
+                          );
+                        });
                   },
                 );
               } else if (filterApplied) {
@@ -607,21 +611,22 @@ class _GearTabState extends State<GearTab> {
                           final gearItems = gear[index];
 
                           return ListTile(
-                            title: Text(gearItems['Gear_Name'] ?? 'Unknown Gear'),
-                            subtitle: Text("Rental Price: \$${gearItems['GRentalPrice']}"),
-                            trailing: const Icon(Icons.settings),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => GearDetailPage(
-                                    profileId: profileId, 
-                                    gearData: gearItems,
+                              title: Text(
+                                  gearItems['Gear_Name'] ?? 'Unknown Gear'),
+                              subtitle: Text(
+                                  "Rental Price: \$${gearItems['GRentalPrice']}"),
+                              trailing: const Icon(Icons.settings),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => GearDetailPage(
+                                      profileId: profileId,
+                                      gearData: gearItems,
                                     ),
                                   ),
-                              );
-                            }
-                          );
+                                );
+                              });
                         },
                       );
                     } else {
@@ -636,4 +641,4 @@ class _GearTabState extends State<GearTab> {
       ],
     );
   }
-} 
+}
