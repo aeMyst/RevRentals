@@ -124,11 +124,12 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.pushReplacement(
+              Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => LoginPage(),
+                  builder: (context) => const LoginPage(),
                 ),
+                (route) => false
               );
             },
             icon: const Icon(Icons.logout),

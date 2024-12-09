@@ -91,8 +91,8 @@ class _MarketplacePageState extends State<MarketplacePage> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        LoginPage(), // Redirect to the login page
+                    builder: (_) =>
+                        const LoginPage(), // Redirect to the login page
                   ),
                 );
               },
