@@ -37,17 +37,9 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
     String? postalCodeError = Validators.validatePostalCode(address);
 
     // Show appropriate error messages if validation fails
-    if (firstName.toLowerCase() == 'null') {
-        showError('First name cannot be null');
-        return;
-    }
     if (firstNameError != null) {
       showError(firstNameError);
       return;
-    }
-    if (lastName.toLowerCase() == 'null') {
-        showError('Last name cannot be null');
-        return;
     }
     if (lastNameError != null) {
       showError(lastNameError);
