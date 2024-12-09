@@ -112,134 +112,155 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
   @override
   Widget build(BuildContext context) {
     final String model = widget.motorcycleData['Model'] ?? 'Unknown Model';
-    final double rentalPrice =
-        (widget.motorcycleData['Rental_Price'] as num?)?.toDouble() ?? 0.0;
-    final String imagePath = widget.motorcycleData['Image_Path'] ??
-        'lib/images/motorcycle/default_motorcycle.png';
-    final String vin = widget.motorcycleData['VIN'];
+    final double rentalPrice = (widget.motorcycleData['Rental_Price'] as num?)?.toDouble() ?? 0.0;
+    final String vehicleType = widget.motorcycleData['Vehicle_Type'] ?? 'Unknown Type';
+    final String color = widget.motorcycleData['Color'] ?? 'Unknown Color';
+    final int mileage = widget.motorcycleData['Mileage'] ?? 0;
+    final String insurance = widget.motorcycleData['Insurance'] ?? 'Unknown';
+    final String vin = widget.motorcycleData['VIN'] ?? 'Unknown VIN';
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const LoginPage(),
-                ),
-                (route) => false
-              );
-            },
-            icon: const Icon(Icons.logout),
-          ),
-          IconButton(
-            icon: const Icon(Icons.person),
-            onPressed: () async {
-              try {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DisplayProfileDetailsPage(
-                      profileId: widget.profileId,
-                    ),
-                  ),
-                );
-                setState(() {});
-              } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Error loading profile: $e')),
-                );
-              }
-            },
-          ),
-        ],
+        title: const Text("Vehicle Details"),
+        foregroundColor: Colors.white,
+        backgroundColor: Colors.blueGrey,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+            // Motorcycle Image
+            Center(
+              child: Image.asset(
+                'lib/images/motorcycle/default_motorcycle.png',
+                fit: BoxFit.contain,
+                height: 300,
+                width: 300,
+              ),
+            ),
+            const SizedBox(height: 20),
+            
+            // Model Name
+            Center(
+              child: Text(
+                model,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            
+            // Vehicle details in centered format
+            Center(
+              child: Text(
+                "Vehicle Type: $vehicleType\n"
+                "Color: $color\n"
+                "Mileage: $mileage km\n"
+                "Insurance: $insurance\n",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey[700], fontSize: 16),
+              ),
+            ),
+            const SizedBox(height: 20),
+            
+            // Rental Price
+            Center(
+              child: Text(
+                'Per day: \$${rentalPrice.toStringAsFixed(2)} CAD',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueGrey,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Date Selection Row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 20),
-                Center(
-                  child: Image.asset(
-                    imagePath,
-                    fit: BoxFit.cover,
+                GestureDetector(
+                  onTap: () => _selectStartDate(context),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.blueGrey),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      selectedStartDate == null
+                          ? 'Select Start Date'
+                          : 'Start: ${DateFormat('yyyy-MM-dd').format(selectedStartDate!)}',
+                      style: const TextStyle(color: Colors.black, fontSize: 14),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 20),
-                Text(
-                  model,
-                  style: const TextStyle(fontSize: 24),
-                ),
-                Text(
-                  'Per Day: \$${rentalPrice.toStringAsFixed(2)}',
-                  style: const TextStyle(fontSize: 16),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            ViewMaintenanceRecordsPage(vin: vin),
-                      ),
-                    );
-                  },
-                  child: const Text('View Maintenance Records'),
+                const SizedBox(width: 20),
+                GestureDetector(
+                  onTap: () => _selectEndDate(context),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.blueGrey),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      selectedEndDate == null
+                          ? 'Select End Date'
+                          : 'End: ${DateFormat('yyyy-MM-dd').format(selectedEndDate!)}',
+                      style: const TextStyle(color: Colors.black, fontSize: 14),
+                    ),
+                  ),
                 ),
               ],
             ),
-            Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    GestureDetector(
-                      onTap: () => _selectStartDate(context),
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.blueGrey),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          selectedStartDate == null
-                              ? 'Start Date'
-                              : DateFormat('yyyy-MM-dd')
-                                  .format(selectedStartDate!),
-                        ),
-                      ),
+            const SizedBox(height: 20),
+
+            // View Maintenance Records Button
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ViewMaintenanceRecordsPage(vin: vin),
                     ),
-                    const SizedBox(width: 20),
-                    GestureDetector(
-                      onTap: () => _selectEndDate(context),
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.blueGrey),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          selectedEndDate == null
-                              ? 'End Date'
-                              : DateFormat('yyyy-MM-dd')
-                                  .format(selectedEndDate!),
-                        ),
-                      ),
-                    ),
-                  ],
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueGrey,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 30),
+                  textStyle: const TextStyle(fontSize: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
-                const SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: _rentMotorcycle,
-                  child: const Text('Rent Motorcycle'),
+                child: const Text('View Maintenance Records'),
+              ),
+            ),
+            const SizedBox(height: 10),
+
+            // Rent Button
+            Center(
+              child: ElevatedButton(
+                onPressed: _rentMotorcycle,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueGrey,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 30),
+                  textStyle: const TextStyle(fontSize: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
-              ],
+                child: const Text('Rent Vehicle'),
+              ),
             ),
           ],
         ),

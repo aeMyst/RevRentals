@@ -343,6 +343,7 @@ class _GarageVehiclePageState extends State<GarageVehiclePage> {
             Text(
               "Mileage: ${widget.vehicleData?['Mileage']?.toString() ?? 'N/A'}",
             ),
+            Text("Vehicle Type: " + widget.vehicleData?['Vehicle_Type']),
             Text(
               "Color: " + widget.vehicleData?['Color'],
             ),
