@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:revrentals/services/auth_service.dart';
 import 'package:revrentals/services/listing_service.dart';
-import 'package:revrentals/user/garage/garage.dart';
 import 'package:revrentals/user/user_home.dart';
 
 final ListingService _listingService = ListingService();
@@ -156,7 +155,6 @@ class _MaintenanceRecordsPageState extends State<MaintenanceRecordsPage> {
           const SnackBar(content: Text("Maintenance records saved.")),
         );
 
-
         _navigateToHomePageWithGarageTab(context);
       } catch (e) {
         errorMessage(context, e.toString());
@@ -166,11 +164,14 @@ class _MaintenanceRecordsPageState extends State<MaintenanceRecordsPage> {
 
   // Method to navigate to UserHomePage with Garage Tab selected
   void _navigateToHomePageWithGarageTab(BuildContext context) {
-
     // Navigate back to the user home page (under garage tab)
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => UserHomePage(userData: widget.userData, selectedTab: 1,)),
+      MaterialPageRoute(
+          builder: (context) => UserHomePage(
+                userData: widget.userData,
+                selectedTab: 1,
+              )),
       (route) =>
           false, // This will remove all previous routes, ensuring we go to the home page
     );
@@ -306,7 +307,10 @@ class DisplayMaintenanceRecordsPage extends StatefulWidget {
   final int profileId;
   final Map<String, dynamic>? userData;
   const DisplayMaintenanceRecordsPage(
-      {super.key, required this.profileId, required this.vin, required this.userData});
+      {super.key,
+      required this.profileId,
+      required this.vin,
+      required this.userData});
 
   @override
   State<DisplayMaintenanceRecordsPage> createState() =>

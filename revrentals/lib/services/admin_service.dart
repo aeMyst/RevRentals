@@ -96,21 +96,6 @@ class AdminService {
     }
   }
 
-  // Future<Map<String, dynamic>> fetchAgreement(int reservationNo) async {
-  //   final url = Uri.parse("$_baseUrl/view-agreement/$reservationNo/");
-  //   try {
-  //     final response = await http.get(url);
-  //     if (response.statusCode == 200) {
-  //       final data = jsonDecode(response.body);
-  //       return data['agreement'];
-  //     } else {
-  //       throw Exception("Failed to fetch agreement: ${response.body}");
-  //     }
-  //   } catch (e) {
-  //     throw Exception("An error occurred trying to fetch agreement: $e");
-  //   }
-  // }
-
   Future<Map<String, dynamic>> addLotListing(
       Map<String, dynamic> lotData) async {
     final url = Uri.parse("$_baseUrl/add-lot-listing/");

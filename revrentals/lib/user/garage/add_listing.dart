@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:revrentals/services/listing_service.dart';
 import 'package:revrentals/user/garage/maint_records.dart';
 import 'package:revrentals/regex/listing_regex.dart';
-import 'package:revrentals/user/user_home.dart';
 
 class AddListingPage extends StatefulWidget {
   final int profileId;
@@ -277,12 +276,6 @@ class _AddListingPageState extends State<AddListingPage> {
                   });
                 },
               ),
-
-              /* TextField(
-                controller: specificAttributeController,
-                decoration: InputDecoration(labelText: vehicleAttributeLabel),
-              ),*/
-
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 value: selectedSpecificAttribute,
@@ -300,7 +293,6 @@ class _AddListingPageState extends State<AddListingPage> {
                   });
                 },
               ),
-
               const SizedBox(height: 16),
               TextField(
                 controller: vinController,
@@ -316,7 +308,6 @@ class _AddListingPageState extends State<AddListingPage> {
                 controller: modelController,
                 decoration: const InputDecoration(labelText: 'Vehicle Name'),
               ),
-
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 value: selectedColor,
@@ -348,7 +339,6 @@ class _AddListingPageState extends State<AddListingPage> {
                 decoration: const InputDecoration(labelText: 'Mileage'),
                 keyboardType: TextInputType.number,
               ),
-
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 value: selectedInsuranceType,
@@ -367,15 +357,13 @@ class _AddListingPageState extends State<AddListingPage> {
                   });
                 },
               ),
-
               const SizedBox(height: 16),
               TextField(
                 controller: rentalPriceController,
-                decoration: const InputDecoration(labelText: 'Rental Price Per Day'),
-                
+                decoration:
+                    const InputDecoration(labelText: 'Rental Price Per Day'),
                 keyboardType: TextInputType.number,
               ),
-
             ] else ...[
               DropdownButtonFormField<String>(
                 value: selectedGearType,
@@ -466,7 +454,8 @@ class _AddListingPageState extends State<AddListingPage> {
               const SizedBox(height: 16),
               TextField(
                 controller: rentalPriceController,
-                decoration: const InputDecoration(labelText: 'Rental Price Per Day'),
+                decoration:
+                    const InputDecoration(labelText: 'Rental Price Per Day'),
                 keyboardType: TextInputType.number,
               ),
             ],

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:revrentals/services/listing_service.dart';
 import 'package:revrentals/user/garage/garage.dart';
 import 'package:revrentals/user/marketplace/marketplace.dart';
 import 'package:revrentals/services/auth_service.dart';

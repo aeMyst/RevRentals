@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:revrentals/services/listing_service.dart';
 import 'package:revrentals/user/garage/maint_records.dart';
-import 'package:revrentals/user/profile_detail.dart';
-import 'package:revrentals/main_pages/login_page.dart';
 
 class MotorcycleDetailPage extends StatefulWidget {
   final int profileId;
@@ -112,8 +110,10 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
   @override
   Widget build(BuildContext context) {
     final String model = widget.motorcycleData['Model'] ?? 'Unknown Model';
-    final double rentalPrice = (widget.motorcycleData['Rental_Price'] as num?)?.toDouble() ?? 0.0;
-    final String vehicleType = widget.motorcycleData['Vehicle_Type'] ?? 'Unknown Type';
+    final double rentalPrice =
+        (widget.motorcycleData['Rental_Price'] as num?)?.toDouble() ?? 0.0;
+    final String vehicleType =
+        widget.motorcycleData['Vehicle_Type'] ?? 'Unknown Type';
     final String color = widget.motorcycleData['Color'] ?? 'Unknown Color';
     final int mileage = widget.motorcycleData['Mileage'] ?? 0;
     final String insurance = widget.motorcycleData['Insurance'] ?? 'Unknown';
@@ -141,7 +141,7 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
               ),
             ),
             const SizedBox(height: 20),
-            
+
             // Model Name
             Center(
               child: Text(
@@ -153,7 +153,7 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
               ),
             ),
             const SizedBox(height: 10),
-            
+
             // Vehicle details in centered format
             Center(
               child: Text(
@@ -166,7 +166,7 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
               ),
             ),
             const SizedBox(height: 20),
-            
+
             // Rental Price
             Center(
               child: Text(
@@ -187,7 +187,8 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
                 GestureDetector(
                   onTap: () => _selectStartDate(context),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 10),
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.blueGrey),
                       borderRadius: BorderRadius.circular(8),
@@ -204,7 +205,8 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
                 GestureDetector(
                   onTap: () => _selectEndDate(context),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 10),
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.blueGrey),
                       borderRadius: BorderRadius.circular(8),
@@ -228,14 +230,16 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ViewMaintenanceRecordsPage(vin: vin),
+                      builder: (context) =>
+                          ViewMaintenanceRecordsPage(vin: vin),
                     ),
                   );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blueGrey,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 30),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 30),
                   textStyle: const TextStyle(fontSize: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -253,7 +257,8 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blueGrey,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 30),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 30),
                   textStyle: const TextStyle(fontSize: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
