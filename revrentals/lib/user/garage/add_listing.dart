@@ -48,11 +48,18 @@ class _AddListingPageState extends State<AddListingPage> {
   String? vehicleAttributeLabel = 'Vehicle Type First';
   List<String> specificAttributeOptions = [];
 
-  Future<void> _addListing() async {
+Future<void> _addListing() async {
     String? mileageError;
     String? rentalPriceError;
 
     if (isMotorcycleSelected) {
+      // Add model name validation here
+      String? modelError = Validators.validateName(modelController.text.trim());
+      if (modelError != null) {
+        _showErrorDialog(modelError);
+        return;
+      }
+
       if (mileageController.text.isEmpty ||
           int.tryParse(mileageController.text) == null ||
           int.parse(mileageController.text) <= 0) {
@@ -65,6 +72,13 @@ class _AddListingPageState extends State<AddListingPage> {
         rentalPriceError = "Rental price must be a positive number.";
       }
     } else {
+      // Add gear name validation here
+      String? gearNameError = Validators.validateName(gearNameController.text.trim());
+      if (gearNameError != null) {
+        _showErrorDialog(gearNameError);
+        return;
+      }
+
       if (rentalPriceController.text.isEmpty ||
           double.tryParse(rentalPriceController.text) == null ||
           double.parse(rentalPriceController.text) <= 0) {

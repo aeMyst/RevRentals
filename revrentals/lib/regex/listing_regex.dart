@@ -18,6 +18,17 @@ class Validators {
       return 'Registration is required.';
     } else if (!registrationRegex.hasMatch(value)) {
       return 'Invalid registration. Format must be AbC000.';
+    } else if (value.toLowerCase() == 'null') {
+      return "Registration cannot be 'null'.";
+    }
+    return null; // Valid input
+  }
+
+  static String? validateName(String value) {
+    if (value.isEmpty) {
+      return 'Model is required.';
+    } else if (value.toLowerCase() == 'null') {
+      return "Model cannot be 'null'.";
     }
     return null; // Valid input
   }
