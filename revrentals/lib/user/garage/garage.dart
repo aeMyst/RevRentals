@@ -10,10 +10,9 @@ import 'package:revrentals/main_pages/login_page.dart';
 final ListingService _listingService = ListingService();
 
 class GaragePage extends StatefulWidget {
-  final int profileId; // Accept profileId as a parameter
+  final int profileId;
   final Map<String, dynamic>? userData;
-// Add a callback to refresh the data
-  // final VoidCallback onPriceUpdated;
+
   const GaragePage({super.key, required this.profileId, this.userData});
 
   @override
@@ -21,9 +20,8 @@ class GaragePage extends StatefulWidget {
 }
 
 class _GaragePageState extends State<GaragePage> {
-  late Future<int> _garageIdFuture; // Future to fetch garage ID
-  late Future<Map<String, dynamic>>
-      _garageItemsFuture; // Future for fetching garage items
+  late Future<int> _garageIdFuture;
+  late Future<Map<String, dynamic>> _garageItemsFuture;
 
   @override
   void initState() {
@@ -45,6 +43,13 @@ class _GaragePageState extends State<GaragePage> {
     return _listingService.viewGarageItems(garageId);
   }
 
+  /// Refresh the entire page
+  void _refreshPage() {
+    setState(() {
+      _garageIdFuture = _fetchGarageId(); // Re-fetch garage ID and items
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<int>(
@@ -57,29 +62,23 @@ class _GaragePageState extends State<GaragePage> {
         } else if (snapshot.hasData) {
           final garageId = snapshot.data!;
           return DefaultTabController(
-            length: 2, // Number of tabs (Listed & Rented)
+            length: 2,
             child: Scaffold(
               backgroundColor: Colors.white,
               appBar: AppBar(
-                leading: IconButton(
-                  icon: const Icon(Icons.notifications),
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => NotificationsPage(
-                              profileId: widget.profileId,
-                            )),
-                  ),
-                ),
                 actions: [
+                  IconButton(
+                    icon: const Icon(Icons.refresh),
+                    onPressed: _refreshPage, // Trigger page refresh
+                    tooltip: 'Refresh Page',
+                  ),
                   IconButton(
                     onPressed: () {
                       Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const LoginPage(),
-                          ),
-                          (route) => false);
+                        context,
+                        MaterialPageRoute(builder: (_) => const LoginPage()),
+                        (route) => false,
+                      );
                     },
                     icon: const Icon(Icons.logout, color: Colors.white),
                   ),
@@ -122,8 +121,7 @@ class _GaragePageState extends State<GaragePage> {
                           userData: widget.userData,
                         ),
                         RentedTab(
-                          profileId:
-                              widget.profileId, // Pass profileId to RentedTab
+                          profileId: widget.profileId,
                         ),
                       ],
                     ),
