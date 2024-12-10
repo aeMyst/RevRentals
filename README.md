@@ -1,7 +1,8 @@
 # **RevRentals**
 
 **Course**: CPSC 471 - Database Management Systems
-[RevRentals Backend Repository]([url](https://github.com/fion-lei/RevRentals-backend))
+
+[RevRentals Backend Repository](https://github.com/fion-lei/RevRentals-backend)
 
 RevRentals is a database-driven platform showcasing the integration of a relational database with a front-end application for managing motorized vehicles, gear, and storage lot rentals. The platform supports both renters and sellers, providing seamless notifications, reservations, and transaction workflows, while also providing an admin dashboard to oversee transactions and manage lot listings.
 
