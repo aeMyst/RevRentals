@@ -7,6 +7,8 @@ class Validators {
       return 'VIN is required.';
     } else if (!vinRegex.hasMatch(value)) {
       return 'Invalid VIN. It must be a 17-character alphanumeric string. If letters are included, must be UPPERCASE.';
+    } else if (value.toLowerCase() == 'null') {
+      return "VIN cannot be 'null'.";
     }
     return null; // Valid input
   }
@@ -26,9 +28,9 @@ class Validators {
 
   static String? validateName(String value) {
     if (value.isEmpty) {
-      return 'Model is required.';
+      return 'Name is required.';
     } else if (value.toLowerCase() == 'null') {
-      return "Model cannot be 'null'.";
+      return "Name cannot be 'null'.";
     }
     return null; // Valid input
   }

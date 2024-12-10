@@ -3,6 +3,10 @@ class Validators {
   static String? validateRequiredField(String fieldName, String value) {
     if (value.isEmpty) {
       return "$fieldName is required.";
+    } else if (fieldName.toLowerCase() == 'null') {
+      return "Cannot be 'null'.";
+    } else if (value.toLowerCase() == 'null') {
+      return "Cannot be 'null'.";
     }
     return null;
   }
@@ -21,6 +25,8 @@ class Validators {
     //  Stop at the end of the string or lin
     if (!RegExp(r"^[^@]+@[^@]+\.[^@]+$").hasMatch(value)) {
       return "Invalid email format.";
+    } else if (value.toLowerCase() == 'null') {
+      return "Email cannot be 'null'.";
     }
     return null;
   }
@@ -34,6 +40,8 @@ class Validators {
     // can only contain letters and numbers, and must be between 6-16 characeters
     if (!RegExp(r"^[0-9A-Za-z]{6,16}$").hasMatch(value)) {
       return "Username must be 6-16 characters long and only contain letters and numbers.";
+    } else if (value.toLowerCase() == 'null') {
+      return "Username cannot be 'null'.";
     }
     return null;
   }
@@ -48,6 +56,8 @@ class Validators {
     // at least one letter and one number
     if (!RegExp(r"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$").hasMatch(value)) {
       return "Password must be at least 5 characters long and contain atleast 1 letter and 1 number";
+    } else if (value.toLowerCase() == 'null') {
+      return "Password cannot be 'null'.";
     }
     return null;
   }
@@ -103,6 +113,8 @@ class Validators {
     final regex = RegExp(r"^\d{6}-\d{3}$");
     if (!regex.hasMatch(licenseNumber)) {
       return "Invalid Alberta License Number. Use the following Format: xxxxxx-xxx";
+    } else if (licenseNumber.toLowerCase() == 'null') {
+      return "License Number cannot be 'null'.";
     }
     return null;
   }
@@ -117,6 +129,8 @@ class Validators {
         r"^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z][ -]?\d[ABCEGHJ-NPRSTV-Z]\d$");
     if (!regex.hasMatch(postalCode)) {
       return "Invalid Canadian Postal Code. Please Try Again.";
+    } else if (postalCode.toLowerCase() == 'null') {
+      return "Postal Code cannot be 'null'.";
     }
     return null;
   }
