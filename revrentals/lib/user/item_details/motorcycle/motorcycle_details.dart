@@ -170,7 +170,7 @@ class _MotorcycleDetailPageState extends State<MotorcycleDetailPage> {
             // Rental Price
             Center(
               child: Text(
-                'Per day: \$${rentalPrice.toStringAsFixed(2)} CAD',
+                'Rental Price Per Day: \$${rentalPrice.toStringAsFixed(2)} CAD',
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

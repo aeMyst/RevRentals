@@ -185,7 +185,7 @@ class _LotDetailsPageState extends State<LotDetailsPage> {
             const SizedBox(height: 10),
             Center(
               child: Text(
-                "Rental Price: \$${lot['LRentalPrice'].toStringAsFixed(2)}/day",
+                "Rental Price Per Day: \$${lot['LRentalPrice'].toStringAsFixed(2)}/day",
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
