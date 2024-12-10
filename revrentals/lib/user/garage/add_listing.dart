@@ -48,7 +48,7 @@ class _AddListingPageState extends State<AddListingPage> {
   String? vehicleAttributeLabel = 'Vehicle Type First';
   List<String> specificAttributeOptions = [];
 
-Future<void> _addListing() async {
+  Future<void> _addListing() async {
     String? mileageError;
     String? rentalPriceError;
 
@@ -73,7 +73,8 @@ Future<void> _addListing() async {
       }
     } else {
       // Add gear name validation here
-      String? gearNameError = Validators.validateName(gearNameController.text.trim());
+      String? gearNameError =
+          Validators.validateName(gearNameController.text.trim());
       if (gearNameError != null) {
         _showErrorDialog(gearNameError);
         return;
@@ -124,7 +125,7 @@ Future<void> _addListing() async {
           "mileage": int.parse(mileageController.text),
           "insurance": selectedInsuranceType,
           "model": modelController.text,
-          "specific_attribute": specificAttributeController.text,
+          "specific_attribute": selectedSpecificAttribute,
         };
 
         // Add motorized vehicle listing

@@ -299,7 +299,8 @@ class _GarageVehiclePageState extends State<GarageVehiclePage> {
         double.tryParse(_rentalPriceController.text) == null ||
         double.parse(_rentalPriceController.text) <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Rental price must be a positive number.")),
+        const SnackBar(
+            content: Text("Rental price must be a positive number.")),
       );
       return;
     }
@@ -444,12 +445,21 @@ class _GarageGearPageState extends State<GarageGearPage> {
   }
 
   void updateRentalPrice() async {
+    if (_rentalPriceController.text.isEmpty ||
+        double.tryParse(_rentalPriceController.text) == null ||
+        double.parse(_rentalPriceController.text) <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text("Rental price must be a positive number.")),
+      );
+      return;
+    }
+
     bool request = await _listingService.updateRentalPrice(
       itemType: 'gear',
       itemId: widget.gearData?['Product_No'],
       newPrice: double.parse(_rentalPriceController.text),
     );
-    print(request);
     if (!request) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Rental price update was unsuccessful.")),

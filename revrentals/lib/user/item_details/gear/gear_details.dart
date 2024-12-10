@@ -152,8 +152,8 @@ class _GearDetailPageState extends State<GearDetailPage> {
             const SizedBox(height: 20),
             Center(
               child: Text(
-                'Rental Price Per Day: \$${gear['GRentalPrice']?.toStringAsFixed(2) ?? '0.00'} CAD',
-                 style: const TextStyle(
+                'Rental Price Per Day: \$${gear['GRentalPrice'] ?? '0.00'} CAD',
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Colors.blueGrey,
