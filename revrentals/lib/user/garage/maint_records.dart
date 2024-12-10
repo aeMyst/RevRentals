@@ -148,7 +148,7 @@ class _MaintenanceRecordsPageState extends State<MaintenanceRecordsPage> {
     if (maintenanceRecords.isEmpty) {
       errorMessage(context, "No maintenance records inputted.");
     } else if (!_validateRecords()) {
-      errorMessage(context, "All fields must be filled.");
+      errorMessage(context, "Fields cannot be null.");
     } else {
       try {
         // Handle saving records (e.g., sending to backend or storing locally)

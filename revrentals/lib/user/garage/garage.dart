@@ -294,11 +294,22 @@ class _GarageVehiclePageState extends State<GarageVehiclePage> {
   }
 
   void updateRentalPrice() async {
+    // Check for invalid rental price
+    if (_rentalPriceController.text.isEmpty ||
+        double.tryParse(_rentalPriceController.text) == null ||
+        double.parse(_rentalPriceController.text) <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Rental price must be a positive number.")),
+      );
+      return;
+    }
+
     bool request = await _listingService.updateRentalPrice(
       itemType: 'vehicle',
       itemId: widget.vehicleData?['VIN'],
       newPrice: double.parse(_rentalPriceController.text),
     );
+
     if (!request) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Rental price update was unsuccessful.")),
