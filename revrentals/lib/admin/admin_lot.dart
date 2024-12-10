@@ -5,8 +5,9 @@ import 'package:revrentals/services/listing_service.dart';
 class AdminLotPage extends StatefulWidget {
   final Future<List<dynamic>> storageLotsFuture;
   final int adminId;
-  final VoidCallback onLotUpdated; // Add a callback for refreshing
 
+  final VoidCallback onLotUpdated; // Add a callback for refreshing
+  
   const AdminLotPage({
     super.key,
     required this.storageLotsFuture,
