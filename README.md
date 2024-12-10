@@ -60,7 +60,7 @@ To run this project, you must have the following installed:
 4. Launch the app: ```flutter run```
 
 ### Backend Setup
-1. Navigate to the backend directory: ```cd revrentals-backend```
+1. Navigate to the backend directory: ```cd revrentals-backend/revrentals```
 2. Set up a virtual environment and install dependencies:
 ```python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
