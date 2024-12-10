@@ -10,42 +10,39 @@
 .svn/
 migrate_working_dir/
 
-# IntelliJ related
+# IntelliJ/JetBrains related
 *.iml
 *.ipr
 *.iws
 .idea/
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
 
 # Flutter/Dart/Pub related
 **/doc/api/
-**/ios/Flutter/.last_build_id
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
 .pub-cache/
 .packages
 .pub/
-/build/
+build/
+**/ios/Flutter/.last_build_id
 
+# Flutter generated plugin registrants
+**/macos/Flutter/GeneratedPluginRegistrant.swift
+**/windows/flutter/generated_plugin_registrant.cc
+**/windows/flutter/generated_plugins.cmake
 
-# Symbolication related
+# Flutter symbolication/obfuscation
 app.*.symbols
-
-# Obfuscation related
 app.*.map.json
-
-# Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
-
-.env/
-.vscode/
 
 # Android related
 **/android/**/gradle-wrapper.jar
@@ -67,7 +64,6 @@ app.*.map.json
 **/ios/**/.tags*
 **/ios/**/.vagrant/
 **/ios/**/DerivedData/
-**/ios/**/Icon?
 **/ios/**/Pods/
 **/ios/**/.symlinks/
 **/ios/**/profile
@@ -78,61 +74,36 @@ app.*.map.json
 **/ios/Flutter/Flutter.framework
 **/ios/Flutter/Flutter.podspec
 **/ios/Flutter/Generated.xcconfig
-**/ios/Flutter/app.flx
-**/ios/Flutter/app.zip
 **/ios/Flutter/flutter_assets/
 **/ios/Flutter/flutter_export_environment.sh
-**/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
 
-# Exceptions to above rules.
-!**/ios/**/default.mode1v3
-!**/ios/**/default.mode2v3
-!**/ios/**/default.pbxuser
-!**/ios/**/default.perspectivev3
-!/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
-
-### macOS ###
-# General
+# macOS
 .DS_Store
 .AppleDouble
 .LSOverride
 
-### Linux ###
+# Linux
 *~
-
-# temporary files which can be created if a process still has a handle open of a deleted file
 .fuse_hidden*
-
-# KDE directory preferences
 .directory
-
-# Linux trash folder which might appear on any partition or disk
 .Trash-*
-
-# .nfs files are created when an open file is removed but is still being accessed
 .nfs*
 
-### VisualStudioCode ###
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-!.vscode/*.code-snippets
+# Firebase
+firebase-debug.log
+firebase_app_id_file.json
 
-# Local History for Visual Studio Code
-.history/
+# Temporary files
+*.tmp
+*.lock
+*.bak
 
-# Built Visual Studio Code Extensions
-*.vsix
+# Ignore .env files containing sensitive information
+.env
+.env.*
 
-### VisualStudioCode Patch ###
-# Ignore all local history of files
-.history
-.ionide
-
-### Web ###
+# Web
 *.asp
 *.cer
 *.csr
@@ -146,3 +117,9 @@ app.*.map.json
 *.wasm
 *.wat
 *.xhtml
+
+# Exceptions
+!**/ios/**/default.mode1v3
+!**/ios/**/default.mode2v3
+!**/ios/**/default.pbxuser
+!**/ios/**/default.perspectivev3
