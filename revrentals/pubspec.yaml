@@ -71,19 +71,8 @@ flutter:
     # - lib/images/moped.jpg
     - lib/images/rr_logo.png
     - lib/images/motorcycle/default_motorcycle.png
-    - lib/images/motorcycle/ninja_zx4r.png
-    - lib/images/motorcycle/scooter.png
-    - lib/images/motorcycle/dirtbike.png
     - lib/images/gear/agv_pista.webp
-    - lib/images/gear/gloves.png
-    - lib/images/gear/jacket.jpg
-    - lib/images/lots/big_parking.png
-    - lib/images/lots/outdoor_parking.png
-    - lib/images/lots/parking_garage.png
     - lib/images/lots/storage_units.png
-    - lib/images/lots/public_parking.png
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

@@ -23,7 +23,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
   late Future<List<dynamic>> _gearFuture;
   late Future<List<dynamic>> _storageLotsFuture;
 
-  bool hasUnreadNotifications = false; // Track unread notifications
+  bool hasUnreadNotifications = false;
 
   @override
   void initState() {
@@ -32,6 +32,16 @@ class _MarketplacePageState extends State<MarketplacePage> {
     _gearFuture = _listingService.fetchGearItems();
     _storageLotsFuture = _listingService.fetchStorageLots();
     _checkNotifications();
+  }
+
+  /// Method to refresh the page
+  void _refreshPage() {
+    setState(() {
+      _motorcyclesFuture = _listingService.fetchMotorizedVehicles();
+      _gearFuture = _listingService.fetchGearItems();
+      _storageLotsFuture = _listingService.fetchStorageLots();
+      _checkNotifications();
+    });
   }
 
   Future<void> _checkNotifications() async {
@@ -87,13 +97,19 @@ class _MarketplacePageState extends State<MarketplacePage> {
           ),
           actions: [
             IconButton(
+              icon: const Icon(Icons.refresh), // Refresh button
+              onPressed: _refreshPage, // Trigger page refresh
+              tooltip: 'Refresh Page',
+            ),
+            IconButton(
               onPressed: () {
                 Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const LoginPage(),
-                    ),
-                    (route) => false);
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const LoginPage(),
+                  ),
+                  (route) => false,
+                );
               },
               icon: const Icon(Icons.logout),
             ),
