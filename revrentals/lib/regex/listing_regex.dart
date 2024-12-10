@@ -30,7 +30,7 @@ class Validators {
     if (value.isEmpty) {
       return 'Name is required.';
     } else if (value.toLowerCase() == 'null') {
-      return "Name cannot be 'null'.";
+      return "Cannot be 'null'.";
     }
     return null; // Valid input
   }

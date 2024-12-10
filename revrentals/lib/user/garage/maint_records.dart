@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:revrentals/services/auth_service.dart';
 import 'package:revrentals/services/listing_service.dart';
 import 'package:revrentals/user/user_home.dart';
+import 'package:revrentals/regex/listing_regex.dart';
 
 final ListingService _listingService = ListingService();
 final AuthService _authService = AuthService();
@@ -123,19 +124,21 @@ class _MaintenanceRecordsPageState extends State<MaintenanceRecordsPage> {
 
   // Validate records before saving
   bool _validateRecords() {
-    // if (maintenanceRecords.isEmpty) {
-    //   return false;
-    // }
     for (var record in maintenanceRecords) {
       if (record['date'] == null) {
         return false; // Invalid if date is null or empty
       }
-      if (record['serviced_by'] == null || record['serviced_by'].isEmpty) {
-        return false; // Invalid if servicedBy is null or empty
+      
+      // Validate service provider name
+      String? serviceByError = Validators.validateName(record['serviced_by']?.trim() ?? '');
+      if (serviceByError != null) {
+        return false;
       }
-      if (record['service_details'] == null ||
-          record['service_details'].isEmpty) {
-        return false; // Invalid if serviceDetails is null or empty
+      
+      // Validate service details
+      String? serviceDetailsError = Validators.validateName(record['service_details']?.trim() ?? '');
+      if (serviceDetailsError != null) {
+        return false;
       }
     }
     return true; // All records are valid
