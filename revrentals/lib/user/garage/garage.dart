@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:revrentals/user/garage/add_listing.dart';
 import 'package:revrentals/user/garage/maint_records.dart';
-import 'package:revrentals/user/notifications/notifications.dart';
 import 'package:revrentals/user/profile_detail.dart';
 import 'package:revrentals/services/listing_service.dart';
 import 'package:revrentals/user/garage/rental_details.dart';
