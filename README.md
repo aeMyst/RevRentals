@@ -21,68 +21,6 @@ It highlights the practical application of database concepts, including:
 - **Kai Ferrer**
 
 ---
-## ** Project Structure **
-```
-RevRentals/
-├── RevRentals-backend/
-├── RevRentals/                                  # Frontend files
-│   ├── lib/                                     # Flutter code
-│   │   ├── admin/                               # Admin-specific screens and logic
-│   │   │   ├── admin_agreement.dart             # Admin agreement management
-│   │   │   ├── admin_home.dart                  # Admin dashboard
-│   │   │   ├── admin_login.dart                 # Admin login page
-│   │   │   └── admin_lot.dart                   # Admin lot listings
-│   │   ├── components/                          # Reusable widgets (buttons, text fields, etc.)
-│   │   │   ├── my_button.dart                   # Custom button component
-│   │   │   ├── my_textfield.dart                # Custom text field component
-│   │   │   └── signup_button.dart               # Signup-specific button
-│   │   ├── images/                              # App images and assets
-│   │   │   ├── gear/                            # Images of gear
-│   │   │   │   └── agv_pista.webp               # Helmet image
-│   │   │   ├── lots/                            # Storage lot images
-│   │   │   │   └── storage_units.png            # Storage unit image
-│   │   │   ├── motorcycle/                      # Motorcycle images
-│   │   │   │   └── default_motorcycle.png       # Default motorcycle image
-│   │   │   └── rr_logo.png                      # App logo
-│   │   ├── main_pages/                          # Main app screens (login, user home, etc.)
-│   │   │   ├── login_page.dart                  # Login page
-│   │   │   └── user_home.dart                   # User home page
-│   │   ├── regex/                               # Input validation using regex
-│   │   │   ├── listing_regex.dart               # Regex for item listings
-│   │   │   └── signup_regex.dart                # Regex for signup forms
-│   │   ├── services/                            # API integrations
-│   │   │   ├── admin_service.dart               # Admin-related API calls
-│   │   │   ├── auth_service.dart                # Authentication API calls
-│   │   │   └── listing_service.dart             # Listing-related API calls
-│   │   ├── user/                                # User-specific screens and logic
-│   │   │   ├── garage/                          # Garage management
-│   │   │   │   ├── add_listing.dart             # Add a listing to the garage
-│   │   │   │   ├── garage.dart                  # Garage page
-│   │   │   │   ├── maint_records.dart           # Maintenance records
-│   │   │   │   └── rental_details.dart          # Rental details
-│   │   │   ├── item_details/                    # Detailed views for items
-│   │   │   │   ├── gear/                        # Gear details
-│   │   │   │   │   ├── gear.dart                # Gear item details
-│   │   │   │   │   └── gear_details.dart        # Detailed gear view
-│   │   │   │   ├── lot/                         # Storage lot details
-│   │   │   │   │   ├── lot.dart                 # Lot item details
-│   │   │   │   │   └── lot_details.dart         # Detailed lot view
-│   │   │   │   └── motorcycle/                  # Motorcycle details
-│   │   │   │       ├── motorcycle.dart          # Motorcycle item details
-│   │   │   │       └── motorcycle_details.dart  # Detailed motorcycle view
-│   │   │   ├── marketplace/                     # Marketplace functionality
-│   │   │   │   └── marketplace.dart             # Marketplace page
-│   │   │   └── notifications/                   # Notification management
-│   │   │       ├── agreement_transaction.dart   # Agreement transactions
-│   │   │       ├── notifications.dart           # Notification list
-│   │   │       └── rental_approval.dart         # Rental approval page
-│   ├── macos/                                   # macOS Flutter files
-│   ├── windows/                                 # Windows Flutter files
-│   ├── pubspec.yaml                             # Flutter dependencies
-│   └── analysis_options.yaml                    # Linting rules for Flutter
-├── README.md                                    # Project documentation
-└── .gitignore                                   # Git ignore rules
-```
 
 ## **Features**
 ### **Buyer Functionality**
@@ -154,3 +92,68 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 4. Start the Django development server: ```python manage.py runserver```
+
+---
+
+### File Specifications and Locations: 
+```
+RevRentals/
+├── RevRentals-backend/
+├── RevRentals/                                  # Frontend files
+│   ├── lib/                                     # Flutter code
+│   │   ├── admin/                               # Admin-specific screens and logic
+│   │   │   ├── admin_agreement.dart             # Admin agreement management
+│   │   │   ├── admin_home.dart                  # Admin dashboard
+│   │   │   ├── admin_login.dart                 # Admin login page
+│   │   │   └── admin_lot.dart                   # Admin lot listings
+│   │   ├── components/                          # Reusable widgets (buttons, text fields, etc.)
+│   │   │   ├── my_button.dart                   # Custom button component
+│   │   │   ├── my_textfield.dart                # Custom text field component
+│   │   │   └── signup_button.dart               # Signup-specific button
+│   │   ├── images/                              # App images and assets
+│   │   │   ├── gear/                            # Images of gear
+│   │   │   │   └── agv_pista.webp               # Helmet image
+│   │   │   ├── lots/                            # Storage lot images
+│   │   │   │   └── storage_units.png            # Storage unit image
+│   │   │   ├── motorcycle/                      # Motorcycle images
+│   │   │   │   └── default_motorcycle.png       # Default motorcycle image
+│   │   │   └── rr_logo.png                      # App logo
+│   │   ├── main_pages/                          # Main app screens (login, user home, etc.)
+│   │   │   ├── login_page.dart                  # Login page
+│   │   │   └── user_home.dart                   # User home page
+│   │   ├── regex/                               # Input validation using regex
+│   │   │   ├── listing_regex.dart               # Regex for item listings
+│   │   │   └── signup_regex.dart                # Regex for signup forms
+│   │   ├── services/                            # API integrations
+│   │   │   ├── admin_service.dart               # Admin-related API calls
+│   │   │   ├── auth_service.dart                # Authentication API calls
+│   │   │   └── listing_service.dart             # Listing-related API calls
+│   │   ├── user/                                # User-specific screens and logic
+│   │   │   ├── garage/                          # Garage management
+│   │   │   │   ├── add_listing.dart             # Add a listing to the garage
+│   │   │   │   ├── garage.dart                  # Garage page
+│   │   │   │   ├── maint_records.dart           # Maintenance records
+│   │   │   │   └── rental_details.dart          # Rental details
+│   │   │   ├── item_details/                    # Detailed views for items
+│   │   │   │   ├── gear/                        # Gear details
+│   │   │   │   │   ├── gear.dart                # Gear item details
+│   │   │   │   │   └── gear_details.dart        # Detailed gear view
+│   │   │   │   ├── lot/                         # Storage lot details
+│   │   │   │   │   ├── lot.dart                 # Lot item details
+│   │   │   │   │   └── lot_details.dart         # Detailed lot view
+│   │   │   │   └── motorcycle/                  # Motorcycle details
+│   │   │   │       ├── motorcycle.dart          # Motorcycle item details
+│   │   │   │       └── motorcycle_details.dart  # Detailed motorcycle view
+│   │   │   ├── marketplace/                     # Marketplace functionality
+│   │   │   │   └── marketplace.dart             # Marketplace page
+│   │   │   └── notifications/                   # Notification management
+│   │   │       ├── agreement_transaction.dart   # Agreement transactions
+│   │   │       ├── notifications.dart           # Notification list
+│   │   │       └── rental_approval.dart         # Rental approval page
+│   ├── macos/                                   # macOS Flutter files
+│   ├── windows/                                 # Windows Flutter files
+│   ├── pubspec.yaml                             # Flutter dependencies
+│   └── analysis_options.yaml                    # Linting rules for Flutter
+├── README.md                                    # Project documentation
+└── .gitignore                                   # Git ignore rules
+```
