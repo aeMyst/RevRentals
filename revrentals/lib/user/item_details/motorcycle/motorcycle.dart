@@ -55,9 +55,9 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
           await fetchMotorcycles('http://10.0.2.2:8000/get-all-vehicles');
       if (response != null && response.isNotEmpty) {
         setState(() {
-          _originalMotorcycles = response; // Save full unfiltered data here.
+          _originalMotorcycles = response; 
           _filteredMotorcycles =
-              List.from(response); // Make a copy for filtered data.
+              List.from(response); 
         });
       }
     } catch (error) {
@@ -638,7 +638,6 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
 
   @override
   Widget build(BuildContext context) {
-    List<dynamic> displayMotorcycles;
 
     return Column(
       children: [
@@ -676,7 +675,7 @@ class _MotorcycleTabState extends State<MotorcycleTab> {
             builder: (context) {
               if (_filteredMotorcycles.isNotEmpty) {
                 // SHOW FILTERED MOTORCYCLES
-                print("Displaying filtered motorcycles");
+                
                 return ListView.builder(
                   itemCount: _filteredMotorcycles.length,
                   itemBuilder: (context, index) {
